@@ -1,0 +1,10 @@
+{
+  "name": "techtuate",
+  "private": true,
+  "version": "0.0.1",
+  "description": "techtuate — a drawer of free, browser-based little tools.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev:pdf-editor": "npm --prefix pdf-editor run dev"
+  }
+}
