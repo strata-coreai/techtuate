@@ -1,0 +1,7 @@
+# techtuate - free in-browser tools
+# Everything is public. Crawlers welcome.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://techtuate.com/sitemap.xml

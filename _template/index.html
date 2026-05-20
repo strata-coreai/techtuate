@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>__TOOL_NAME__ - free, in your browser, no sign-up - techtuate</title>
+  <meta name="description" content="__TOOL_DESCRIPTION__" />
+  <meta name="keywords" content="__TOOL_KEYWORDS__" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/__TOOL_SLUG__/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M18 22 L32 14 L46 22 L46 42 L32 50 L18 42 Z' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/__TOOL_SLUG__/" />
+  <meta property="og:title" content="__TOOL_NAME__ - free, in your browser, no sign-up" />
+  <meta property="og:description" content="__TOOL_DESCRIPTION__" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate __TOOL_NAME__",
+    "url": "https://techtuate.com/__TOOL_SLUG__/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "__TOOL_DESCRIPTION__",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads, ever.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">__TOOL_TAGLINE__</div>
+      <h1>__TOOL_NAME__</h1>
+      <p class="lede">__TOOL_DESCRIPTION__</p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The whole point is that everything runs in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <!-- ============ TOOL UI GOES HERE ============ -->
+      <div class="callout">
+        <h4>TODO</h4>
+        <p>Replace this with the actual tool UI. Use the styles in <code>/assets/site.css</code> - <code>.btn</code>, <code>.callout</code>, <code>.compare</code>, etc. - so it matches every other page.</p>
+      </div>
+      <!-- ============ /TOOL UI ============ -->
+
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, forever, no sign-up. Runs entirely in your browser - nothing is uploaded.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/pdf-editor/">pdf editor</a> &middot;
+        <a href="/vs/">comparisons</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // ============ TOOL LOGIC ============
+    // (Replace with the actual implementation.)
+    // ============ /TOOL LOGIC ============
+  </script>
+</body>
+</html>

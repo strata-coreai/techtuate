@@ -47,7 +47,8 @@ Web Analytics and Buy Me a Coffee placeholders are in `index.html` — search th
 
 | Tool | Path | Status |
 | --- | --- | --- |
-| PDF editor | `/pdf-editor/` | in progress — see below |
+| PDF editor     | `/pdf-editor/`      | live (beta) — annotations, form fill, page ops, images |
+| JSON Formatter | `/json-formatter/`  | live                                                    |
 
 ## PDF editor — planned build sequence
 

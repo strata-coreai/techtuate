@@ -3,10 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>techtuate — free little tools, always</title>
-  <meta name="description" content="A growing drawer of free, browser-based utilities. No accounts. No credit cards. No ads. Everything runs locally on your device." />
+  <title>techtuate - Free PDF editor and other little tools. No sign-up. No ads.</title>
+  <meta name="description" content="A free in-browser PDF editor and a growing drawer of tiny utilities. No account, no upload, no ads. Always free. Your files never leave your device." />
+  <meta name="keywords" content="free pdf editor, pdf editor no signup, pdf editor in browser, online pdf editor free, free pdf tools, private pdf editor" />
   <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M18 22 L32 14 L46 22 L46 42 L32 50 L18 42 Z' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/assets/site.css" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/" />
+  <meta property="og:title" content="techtuate - Free PDF editor and other little tools" />
+  <meta property="og:description" content="Free PDF editor and a growing drawer of tiny utilities. No account, no upload, no ads. Your files never leave your device." />
+  <meta property="og:site_name" content="techtuate" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="techtuate - Free PDF editor, no sign-up, no ads" />
+  <meta name="twitter:description" content="A free in-browser PDF editor and growing drawer of tiny utilities. Always free, always private." />
+
+  <!-- JSON-LD: site + WebApplication for the PDF editor -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://techtuate.com/#site",
+        "url": "https://techtuate.com/",
+        "name": "techtuate",
+        "description": "Free, browser-based little tools. No sign-up, no ads, no uploads."
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://techtuate.com/#org",
+        "name": "techtuate",
+        "url": "https://techtuate.com/",
+        "logo": "https://techtuate.com/favicon.svg"
+      },
+      {
+        "@type": "WebApplication",
+        "name": "techtuate PDF editor",
+        "url": "https://techtuate.com/pdf-editor/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web Browser",
+        "browserRequirements": "Requires JavaScript. Requires modern browser.",
+        "description": "Free in-browser PDF editor. Annotate, fill forms, reorder and rotate pages, add images as pages. No sign-up, no upload, your files stay on your device.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "View and navigate multi-page PDFs",
+          "Save and round-trip PDFs",
+          "Runs entirely in the browser",
+          "No account required",
+          "No file upload to any server",
+          "No ads"
+        ]
+      }
+    ]
+  }
+  </script>
 
   <!-- =============================================================
        Placeholder: Cloudflare Web Analytics
@@ -14,486 +72,15 @@
        Cloudflare provides here (a single <script defer ...> tag).
        Do NOT paste a token until ready to ship.
        ============================================================= -->
-
-  <style>
-    /* ============================================================
-       palette: white + yellow + black/dark-gray (no other colors)
-       ============================================================ */
-    :root {
-      --bg:        #ffffff;
-      --bg-soft:   #fafaf7;
-      --bg-card:   #ffffff;
-      --ink:       #0a0a0a;
-      --ink-mute:  #3a3a3a;
-      --ink-dim:   #707070;
-      --line:      #ececec;
-      --line-bold: #0a0a0a;
-
-      --yellow:        #ffd60a;
-      --yellow-soft:   #fff3a6;
-      --yellow-deep:   #f5c400;
-
-      --font-display: "Inter Tight","Inter","Helvetica Neue",Helvetica,Arial,sans-serif;
-      --font-body:    "Inter","Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
-      --font-mono:    ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-
-      --r-sm: 6px;
-      --r-md: 12px;
-      --r-lg: 18px;
-    }
-
-    /* ---------- reset / base ---------- */
-    *,*::before,*::after { box-sizing: border-box; }
-    html,body { margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-    }
-    a { color: inherit; }
-    img, svg { display: block; }
-
-    ::selection { background: var(--yellow); color: var(--ink); }
-
-    /* ---------- layout ---------- */
-    .wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 28px 24px 96px;
-    }
-
-    /* ---------- top bar ---------- */
-    header.site {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 0 28px;
-      border-bottom: 2px solid var(--ink);
-      margin-bottom: 48px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: inherit;
-    }
-    .brand-mark {
-      width: 36px; height: 36px;
-      background: var(--yellow);
-      border: 2px solid var(--ink);
-      border-radius: 10px;
-      display: grid; place-items: center;
-      box-shadow: 3px 3px 0 var(--ink);
-      transition: transform .18s ease, box-shadow .18s ease;
-    }
-    .brand:hover .brand-mark {
-      transform: translate(-1px, -1px);
-      box-shadow: 4px 4px 0 var(--ink);
-    }
-    .brand-mark::after {
-      content: "";
-      width: 12px; height: 12px;
-      background: var(--ink);
-      border-radius: 50%;
-    }
-    .brand-name {
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-    }
-    .brand-name span { background: var(--yellow); padding: 0 4px; }
-
-    nav.top {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      display: flex; gap: 4px;
-    }
-    nav.top a {
-      text-decoration: none;
-      padding: 6px 10px;
-      border-radius: var(--r-sm);
-      color: var(--ink);
-      transition: background .15s;
-    }
-    nav.top a:hover { background: var(--yellow); }
-
-    /* ---------- hero ---------- */
-    .hero {
-      margin-bottom: 56px;
-      max-width: 880px;
-    }
-    .hero .eyebrow {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ink);
-      background: var(--yellow);
-      padding: 5px 10px;
-      border-radius: 999px;
-      margin-bottom: 22px;
-    }
-    .hero h1 {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(40px, 7vw, 80px);
-      line-height: 0.98;
-      letter-spacing: -0.025em;
-      margin: 0 0 22px;
-      color: var(--ink);
-    }
-    .hero h1 .mark {
-      background: var(--yellow);
-      padding: 0 0.15em;
-      box-decoration-break: clone;
-      -webkit-box-decoration-break: clone;
-    }
-    .hero p.lede {
-      font-size: clamp(17px, 2vw, 20px);
-      line-height: 1.5;
-      color: var(--ink-mute);
-      margin: 0 0 24px;
-      max-width: 640px;
-    }
-    .hero .pills {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-    }
-    .pill {
-      padding: 6px 10px;
-      border: 1.5px solid var(--ink);
-      border-radius: 999px;
-      background: var(--bg);
-      font-weight: 600;
-      color: var(--ink);
-    }
-    .pill.solid {
-      background: var(--ink);
-      color: var(--bg);
-    }
-    .pill.yellow {
-      background: var(--yellow);
-      border-color: var(--ink);
-    }
-
-    /* ---------- section heading ---------- */
-    .section-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 22px;
-      padding-bottom: 12px;
-      border-bottom: 1.5px solid var(--ink);
-    }
-    .section-head h2 {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(22px, 3vw, 30px);
-      letter-spacing: -0.01em;
-      margin: 0;
-    }
-    .section-head .count {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--ink-mute);
-      background: var(--yellow-soft);
-      padding: 4px 8px;
-      border-radius: 999px;
-    }
-
-    /* ---------- founder's note ---------- */
-    .note {
-      position: relative;
-      margin: 0 0 64px;
-      background: var(--yellow);
-      border: 2px solid var(--ink);
-      border-radius: var(--r-lg);
-      padding: 28px 28px 26px;
-      box-shadow: 6px 6px 0 var(--ink);
-    }
-    .note .tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      background: var(--ink);
-      color: var(--yellow);
-      padding: 4px 10px;
-      border-radius: 999px;
-      margin-bottom: 14px;
-      font-weight: 600;
-    }
-    .note h3 {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: clamp(22px, 3vw, 28px);
-      letter-spacing: -0.01em;
-      margin: 0 0 12px;
-      max-width: 760px;
-    }
-    .note p {
-      font-size: 16px;
-      line-height: 1.6;
-      color: var(--ink);
-      margin: 0 0 12px;
-      max-width: 760px;
-    }
-    .note p:last-child { margin-bottom: 0; }
-    .note .signoff {
-      margin-top: 14px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-    }
-
-    /* ---------- tool grid ---------- */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 16px;
-      margin-bottom: 64px;
-    }
-
-    .card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      padding: 22px 22px 20px;
-      background: var(--bg-card);
-      border: 2px solid var(--ink);
-      border-radius: var(--r-lg);
-      text-decoration: none;
-      color: inherit;
-      min-height: 220px;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-      box-shadow: 4px 4px 0 var(--ink);
-    }
-    .card:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 6px 6px 0 var(--ink);
-      background: var(--yellow-soft);
-    }
-    .card:active { transform: translate(0, 0); box-shadow: 2px 2px 0 var(--ink); }
-    .card-icon {
-      width: 44px; height: 44px;
-      display: grid; place-items: center;
-      background: var(--yellow);
-      border: 2px solid var(--ink);
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-    .card-icon svg { display: block; }
-    .card-title {
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      margin: 0 0 6px;
-    }
-    .card-desc {
-      font-size: 14.5px;
-      line-height: 1.5;
-      color: var(--ink-mute);
-      margin: 0 0 18px;
-    }
-    .card-meta {
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.04em;
-      color: var(--ink);
-    }
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 10px;
-      border: 1.5px solid var(--ink);
-      border-radius: 999px;
-      text-transform: uppercase;
-      font-weight: 700;
-      background: var(--bg);
-    }
-    .status::before {
-      content: "";
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--ink-dim);
-    }
-    .status.live::before { background: var(--ink); }
-    .status.beta::before { background: var(--ink); }
-    .status.beta { background: var(--yellow); }
-    .status.soon::before { background: var(--ink-dim); }
-
-    .card-arrow {
-      font-weight: 700;
-      transition: transform .15s ease;
-    }
-    .card:hover .card-arrow { transform: translateX(3px); }
-
-    /* "coming soon" placeholder card */
-    .card.ghost {
-      background: var(--bg-soft);
-      box-shadow: none;
-      border-style: dashed;
-      color: var(--ink-mute);
-      cursor: default;
-    }
-    .card.ghost:hover {
-      transform: none;
-      box-shadow: none;
-      background: var(--bg-soft);
-    }
-    .card.ghost .card-icon {
-      background: var(--bg);
-      border-style: dashed;
-    }
-    .card.ghost .card-title { color: var(--ink-mute); }
-
-    /* ---------- spread the word ---------- */
-    .spread {
-      margin-bottom: 64px;
-    }
-    .spread-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-    .spread-card {
-      padding: 18px;
-      background: var(--bg);
-      border: 2px solid var(--ink);
-      border-radius: var(--r-md);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .spread-card .num {
-      display: inline-grid; place-items: center;
-      width: 28px; height: 28px;
-      background: var(--yellow);
-      border: 2px solid var(--ink);
-      border-radius: 8px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 13px;
-    }
-    .spread-card h4 {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 16px;
-      margin: 4px 0 2px;
-    }
-    .spread-card p {
-      margin: 0;
-      font-size: 13.5px;
-      color: var(--ink-mute);
-      line-height: 1.5;
-    }
-    .spread-actions {
-      margin-top: 22px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: var(--ink);
-      color: var(--bg);
-      border: 2px solid var(--ink);
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s, color .15s;
-      box-shadow: 3px 3px 0 var(--ink);
-    }
-    .btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); background: var(--yellow); color: var(--ink); }
-    .btn.alt { background: var(--yellow); color: var(--ink); }
-    .btn.alt:hover { background: var(--bg); }
-    .btn.ghost { background: var(--bg); color: var(--ink); }
-    .btn.ghost:hover { background: var(--yellow); }
-
-    /* small copy-feedback */
-    #copy-flash {
-      position: fixed;
-      bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--ink); color: var(--yellow);
-      padding: 10px 16px; border-radius: 999px;
-      font-family: var(--font-mono); font-size: 13px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .2s, transform .2s;
-      z-index: 50;
-    }
-    #copy-flash.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ---------- footer ---------- */
-    footer.site {
-      margin-top: 80px;
-      padding-top: 28px;
-      border-top: 2px solid var(--ink);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--ink-mute);
-    }
-    footer.site a {
-      color: var(--ink);
-      text-decoration: none;
-      border-bottom: 2px solid var(--yellow);
-      font-weight: 600;
-    }
-    footer.site a:hover { background: var(--yellow); }
-
-    /* =============================================================
-       Placeholder: Buy Me a Coffee button
-       Drop the official BMC widget script + button here when ready:
-         <script data-name="BMC-Widget" ...></script>
-       Or use a static image link. Hidden until added.
-       ============================================================= */
-    .support-slot { display: none; }
-
-    /* ---------- responsive ---------- */
-    @media (max-width: 720px) {
-      .wrap { padding: 20px 18px 72px; }
-      header.site { margin-bottom: 32px; padding-bottom: 20px; }
-      .hero { margin-bottom: 40px; }
-      .note { padding: 22px 20px; box-shadow: 4px 4px 0 var(--ink); }
-      .grid { gap: 14px; }
-      .card { padding: 20px 18px 18px; box-shadow: 3px 3px 0 var(--ink); }
-      .card:hover { box-shadow: 4px 4px 0 var(--ink); }
-    }
-    @media (max-width: 480px) {
-      .brand-name { font-size: 19px; }
-      nav.top { font-size: 12px; }
-      .spread-grid { grid-template-columns: 1fr; }
-    }
-  </style>
 </head>
 <body>
+
+  <!-- thin understated banner so the founder note stays out of the way -->
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads, ever.
+    <a href="/why-free/">read why</a>
+  </div>
+
   <div class="wrap">
 
     <header class="site">
@@ -503,22 +90,23 @@
       </a>
       <nav class="top" aria-label="primary">
         <a href="#tools">tools</a>
-        <a href="#why">why</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
         <a href="#spread">spread</a>
       </nav>
     </header>
 
     <!-- ============ Hero ============ -->
     <section class="hero">
-      <div class="eyebrow">free · forever · in your browser</div>
+      <div class="eyebrow">free pdf editor &amp; more, in your browser</div>
       <h1>
-        Little tools that<br>
-        <span class="mark">just work.</span><br>
+        Little tools that
+        <span class="mark">just work.</span>
         No catch.
       </h1>
       <p class="lede">
-        Single-purpose web utilities, free to use, no sign-up.
-        Everything runs locally on your device — your files never leave the page.
+        Starting with a free PDF editor. No sign-up, no uploads, no ads, ever.
+        Everything runs locally on your device, your files never leave the page.
       </p>
       <div class="pills">
         <span class="pill solid">no sign-up</span>
@@ -529,32 +117,11 @@
       </div>
     </section>
 
-    <!-- ============ Founder's note ============ -->
-    <section id="why" class="note" aria-labelledby="why-h">
-      <span class="tag">a note from the founder</span>
-      <h3 id="why-h">Tired of paying $7/month for a JPG converter? Yeah, same.</h3>
-      <p>
-        Somewhere along the way, every tiny utility on the internet grew a paywall.
-        Crop an image — $4.99/mo. Merge two PDFs — sign up first, then 30-day trial, then $9/mo.
-        Convert a file — make an account, verify your email, sit through an ad, and oh, that one’s “Pro only.”
-      </p>
-      <p>
-        Most of these are five-minute scripts dressed up as SaaS. So I started building the boring,
-        one-off things I keep needing, and putting them here. <strong>Always free. No sign-up. No credit card.
-        No ads.</strong> Just the tool, in your browser, doing the thing.
-      </p>
-      <p>
-        All I ask in return: if one of these saves you a minute or a few dollars,
-        <strong>tell someone</strong>. Send the link to a friend. Post it. Bookmark it. That’s it — that’s the deal.
-      </p>
-      <p class="signoff">— GJ, founder</p>
-    </section>
-
-    <!-- ============ Tools ============ -->
+    <!-- ============ Tools (above the fold) ============ -->
     <section id="tools" aria-labelledby="tools-h">
       <div class="section-head">
         <h2 id="tools-h">The tools</h2>
-        <span class="count">01 / ∞ &nbsp;·&nbsp; more coming</span>
+        <span class="count">02 / &infin; &nbsp;&middot;&nbsp; more coming</span>
       </div>
 
       <div class="grid">
@@ -570,23 +137,40 @@
           </div>
           <h3 class="card-title">PDF editor</h3>
           <p class="card-desc">
-            Annotate, fill forms, reorder &amp; rotate pages, turn images into PDFs — all in the browser.
+            View, save, annotate, fill forms, reorder &amp; rotate pages, turn images into PDFs. All in the browser.
           </p>
           <div class="card-meta">
-            <span class="status beta">in&nbsp;progress</span>
-            <span class="card-arrow">open →</span>
+            <span class="status live">live &middot; beta</span>
+            <span class="card-arrow">open &rarr;</span>
+          </div>
+        </a>
+
+        <!-- ============ JSON Formatter ============ -->
+        <a class="card" href="/json-formatter/">
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H7a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1"/>
+              <path d="M16 3h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-1"/>
+            </svg>
+          </div>
+          <h3 class="card-title">JSON Formatter</h3>
+          <p class="card-desc">
+            Paste JSON to instantly format, validate, and minify it. No server, no account, stays in your tab.
+          </p>
+          <div class="card-meta">
+            <span class="status live">live</span>
+            <span class="card-arrow">open &rarr;</span>
           </div>
         </a>
 
         <!--
           Adding a new tool? Copy a card above, point href to "/<tool>/",
           swap the SVG icon, set title + description, choose a status:
-            .live  → shipped & ready
-            .beta  → usable, still iterating
-            .soon  → not yet built (use .ghost card)
+            .live  -> shipped & ready
+            .beta  -> usable, still iterating
+            .soon  -> not yet built (use .ghost card)
         -->
 
-        <!-- placeholder slot -->
         <div class="card ghost" aria-hidden="true">
           <div class="card-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -595,15 +179,30 @@
           </div>
           <h3 class="card-title">More on the way</h3>
           <p class="card-desc">
-            Another little utility will land here soon. Got an idea? Send it over.
+            Image resize, file convert, QR codes, more. Got an idea? Send it over.
           </p>
           <div class="card-meta">
             <span class="status soon">planned</span>
-            <span class="card-arrow"> </span>
+            <span class="card-arrow"></span>
           </div>
         </div>
 
       </div>
+    </section>
+
+    <!-- ============ Founder's note (compact) ============ -->
+    <section id="why" class="note" aria-labelledby="why-h">
+      <span class="tag">a quick note</span>
+      <h3 id="why-h">Most "tiny tool" SaaS is a 5-minute script with a paywall.</h3>
+      <p>
+        I got tired of paying $9 a month to merge two PDFs, or $15 to crop a JPG, or making yet another account to convert one file once.
+        So I'm building the little utilities I keep needing, and putting them here. Always free, no sign-up, no ads.
+      </p>
+      <p>
+        All I ask: if one of these saves you a minute, <a href="#spread">tell someone</a>.
+        Or read <a href="/why-free/">why I'm doing this</a>, or see <a href="/vs/">how techtuate stacks up vs. the paid PDF tools</a>.
+      </p>
+      <p class="signoff">- GJ, founder</p>
     </section>
 
     <!-- ============ Spread the word ============ -->
@@ -614,35 +213,34 @@
       </div>
 
       <p style="max-width:720px; color:var(--ink-mute); margin: 0 0 6px;">
-        These tools stay free for everyone if more people know they exist.
-        Here are five things you can do in under 30 seconds:
+        These tools stay free for everyone if more people know they exist. Five things you can do in under 30 seconds:
       </p>
 
       <div class="spread-grid">
         <div class="spread-card">
           <span class="num">1</span>
           <h4>Send the link to one friend</h4>
-          <p>The one who pays $9/mo for a "PDF Pro" app. They’ll thank you.</p>
+          <p>The one who pays $9/mo for a "PDF Pro" app. They'll thank you.</p>
         </div>
         <div class="spread-card">
           <span class="num">2</span>
           <h4>Post it once</h4>
-          <p>X, BlueSky, LinkedIn, Mastodon, a Discord — wherever you hang out online.</p>
+          <p>X, BlueSky, LinkedIn, Mastodon, a Discord, wherever you hang out online.</p>
         </div>
         <div class="spread-card">
           <span class="num">3</span>
           <h4>Drop it in a team chat</h4>
-          <p>"Hey, here's a free thing that does X" — Slack, Teams, group chat, all good.</p>
+          <p>"Hey, here's a free thing that does X." Slack, Teams, group chat, all good.</p>
         </div>
         <div class="spread-card">
           <span class="num">4</span>
           <h4>Bookmark + come back</h4>
-          <p>Repeat visitors are the best marketing. New tools land here every few weeks.</p>
+          <p>Repeat visitors are the best marketing. New tools land every few weeks.</p>
         </div>
         <div class="spread-card">
           <span class="num">5</span>
           <h4>Submit it</h4>
-          <p>Hacker News, Reddit (r/InternetIsBeautiful, r/webdev), Product Hunt — whatever fits.</p>
+          <p>Hacker News, Reddit (r/InternetIsBeautiful, r/webdev), Product Hunt, whatever fits.</p>
         </div>
       </div>
 
@@ -654,30 +252,29 @@
           Post on BlueSky
         </a>
         <button class="btn ghost" id="copy-link" type="button">Copy link</button>
-        <a class="btn ghost" href="mailto:?subject=A%20drawer%20of%20free%20little%20tools&amp;body=Found%20these%20—%20free%2C%20no%20sign-up%2C%20no%20ads.%20%0A%0Ahttps%3A%2F%2Ftechtuate.com">Email a friend</a>
+        <a class="btn ghost" href="mailto:?subject=A%20drawer%20of%20free%20little%20tools&amp;body=Found%20these.%20Free%2C%20no%20sign-up%2C%20no%20ads.%20%0A%0Ahttps%3A%2F%2Ftechtuate.com">Email a friend</a>
       </div>
     </section>
 
     <footer class="site">
-      <div>© <span id="yr"></span> techtuate · made by hand, given for free</div>
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
       <div>
-        <a href="#tools">tools</a> ·
-        <a href="#why">why</a> ·
-        <a href="mailto:hi@example.com">say hi</a>
+        <a href="/pdf-editor/">pdf editor</a> &middot;
+        <a href="/vs/">comparisons</a> &middot;
+        <a href="/why-free/">why free</a> &middot;
+        <a href="/free-pdf-editor/">free pdf editor</a>
       </div>
       <div class="support-slot" id="support-slot">
-        <!-- BMC button will be injected here once enabled -->
+        <!-- Placeholder: Buy Me a Coffee button -->
       </div>
     </footer>
 
   </div>
 
-  <div id="copy-flash" role="status" aria-live="polite">link copied — now go paste it somewhere ✱</div>
+  <div id="copy-flash" role="status" aria-live="polite">link copied. now go paste it somewhere &#10033;</div>
 
   <script>
     document.getElementById('yr').textContent = new Date().getFullYear();
-
-    // Copy-link button
     document.getElementById('copy-link').addEventListener('click', async () => {
       const url = window.location.origin || 'https://techtuate.com';
       try {
