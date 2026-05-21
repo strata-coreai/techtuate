@@ -124,15 +124,16 @@ Monthly review (you + me, ~1 hr):
 - Plan committed to repo. **You** push to git.
 - **You:** verify Cloudflare Web Analytics is set up, paste snippet, commit.
 
-### Week 1
+### Week 1 (this week)
 - **Claude Code:** ship QR code generator. Add card + vs page.
 - **You (~3 hrs total):** Submit sitemap to Google Search Console + Bing Webmaster. Set up Buy Me a Coffee account. Make GitHub repo public. Sign up for Sejda Partner + Adobe Affiliate programs.
 - **You (~30 min):** Post to r/InternetIsBeautiful. (I'll draft.)
+- **HN launch pre-flight overlaps this week:** Sat 2026-05-23 walkthrough, Sun 2026-05-24 OG image, Mon 2026-05-25 BMaC link + HN karma check. Issues filed via `seed-hn-launch.sh`.
 
-### Week 2
+### Week 2 (anchored: 2026-05-25 -> 2026-05-31)
 - **Claude Code:** ship password generator. Write tools index page.
-- **You (~2 hrs):** **HN Show HN post** Tuesday 8am ET. Respond to comments for ~6 hrs across the day. (Single biggest leverage point of the entire 90 days.)
-- **You (~30 min):** Cross-post to X/BlueSky/LinkedIn.
+- **You (~2 hrs):** **HN Show HN post Tuesday 2026-05-26, 08:00 ET (12:00 UTC).** Respond to comments for ~6 hrs across the day. (Single biggest leverage point of the entire 90 days.) Full timeline + pre-flight: [`docs/launch/timeline.md`](launch/timeline.md). Run [`scripts/seed-hn-launch.sh`](../scripts/seed-hn-launch.sh) to file the 8 timeline issues into GitHub.
+- **You (~30 min):** Cross-post to X/BlueSky/LinkedIn (T+2h, gated on front-page HN).
 
 ### Week 3
 - **Claude Code:** ship word counter.

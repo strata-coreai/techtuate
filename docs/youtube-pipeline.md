@@ -2,17 +2,23 @@
 
 A repeatable system for turning every new tool into a 2-3 min how-to video + a 60-sec short, with AI narration, that you can record in ~10 min and we publish weekly.
 
+## Why Google Vids over raw Veo
+
+Google Vids (part of Workspace / Google AI Pro) is purpose-built for this exact workflow: drop in a screen recording, paste a script as scenes, Vids generates narration via Gemini and overlays a talking-head avatar. Veo alone is text-to-video; Vids is "video editor with AI." Use Vids; you already pay for it.
+
 ## The loop (per video)
 
 1. **I write the script** (1 page, timestamped, with screen actions called out).
 2. **I write the recording instructions** (exact clicks, the order, what to highlight).
-3. **You record screen** for ~5-8 min (no voice). OBS, QuickTime, or built-in Windows Game Bar all work.
-4. **You drop the raw screen recording** in `youtube/raw/` in the repo (or a Dropbox/Drive folder).
-5. **I generate narration** via ElevenLabs API, time-aligned to the script. Output a single audio file.
-6. **You (or I via a small script) muxes audio + video** in CapCut, DaVinci Resolve, or one-click via FFmpeg if you want fully automated. ~3 min on your end if it's manual.
+3. **I write the Vids script** (one paragraph per scene, with timing markers tied to the screen recording, plus the avatar style + voice tone to set once for the channel).
+4. **You record screen** for ~5-8 min (no voice). OBS, QuickTime, or built-in Windows Game Bar all work.
+5. **You upload the raw recording into Google Vids + paste my script as the scene narration.** Vids generates narration with the consistent voice + drops in the talking-head avatar overlay.
+6. **You download the finished video.** No mux step.
 7. **I generate the thumbnail** (SVG/PNG, palette-matched).
 8. **You upload to YouTube** (title, description, tags I prep).
 9. **I clip the same video into a 60-sec short** for YouTube Shorts.
+
+Fallback if Vids doesn't handle a specific edit: drop the exported Vids video into CapCut, add the missing element, re-export (~2 min). Rarely needed.
 
 **Your time per video: ~10 min total.** Recording + upload. Everything else is me.
 
@@ -68,11 +74,11 @@ You follow the numbered list, no voice, no editing. Stop recording. Drop file. I
 |---|---|---|
 | Screen recording | Windows Game Bar (Win + G) or OBS Studio | Loom Pro ($15/mo, adds polish) |
 | Video editor (if muxing manually) | CapCut (free, great), DaVinci Resolve (free, pro-grade) | Adobe Premiere ($23/mo) |
-| AI narration | ElevenLabs free tier (10K chars/mo, **non-commercial only**) | ElevenLabs Starter ($5/mo, commercial) - **required for YouTube monetization** |
+| Narration + avatar | **Google Vids** via your existing Google AI Pro / Workspace ($0 incremental) | Synthesia / HeyGen ($24+/mo) - skip, Vids handles it |
 | Thumbnail | I generate SVG; you can upload as-is | Canva (free) for tweaks |
 | Upload | YouTube Studio (free) | - |
 
-**Minimum monthly cost: $5/mo (ElevenLabs Starter).** Could go fully free with manual TTS (worse quality).
+**Minimum monthly cost: $0.** Everything runs through your existing Google AI Pro. No API keys, no extra subscriptions.
 
 ## YouTube channel setup (one-time, ~30 min you-time)
 
@@ -84,19 +90,18 @@ You'll need to:
 - [ ] Add channel links to techtuate.com, GitHub, BMC.
 - [ ] Set default thumbnails template (I'll provide).
 - [ ] Enable "advanced features" (needs phone verification, ~2 min).
-- [ ] Sign up for ElevenLabs Starter ($5/mo).
+- [ ] (Skipping - using Google AI Pro you already have for narration + avatar.)
+- [ ] **On the test video: lock the avatar look + voice.** Save the Veo prompt that produced it as the canonical brand prompt - reuse on every subsequent video so the channel feels consistent.
 
 ## What I do per video
 
 - Write the script (English, ~300 words for a 3-min video).
 - Write the recording instructions (numbered list of exact actions).
-- Generate AI narration via ElevenLabs (I'll use a consistent voice across all videos so we have an audio brand - probably "Adam" or "Brian" who sound conversational, not stiff).
-- Time-align narration to your screen capture (this is the only non-trivial step - I'll either provide an FFmpeg command or do it inside an editing template you can open).
-- Generate thumbnail.
+- Write the Google Vids script: one paragraph per scene, timing markers tied to your screen recording, avatar + voice style spec (locked on the first video, reused after).
+- Generate the thumbnail (SVG/PNG, palette-matched).
 - Write title, description, tags, end-screen text.
-- Clip the short.
-- Add captions / subtitles (auto-generated, then corrected).
-- Write the comment for your pinned reply ("link to free tool here", "answers to common questions").
+- Specify the 60-sec short clip points (which seconds of the long video to extract).
+- Write the pinned-reply comment for your channel.
 
 ## Revenue model for YouTube specifically
 

@@ -11,7 +11,7 @@
 #
 # Requires the GitHub CLI: https://cli.github.com/
 
-set -euo pipefail
+set -eo pipefail
 
 # ---- repo target ----
 REPO="${GH_REPO:-strata-coreai/techtuate}"
@@ -42,7 +42,7 @@ gh api repos/$REPO/milestones -f title="Day 1 setup" -f state="open" \
 gh api repos/$REPO/milestones -f title="Week 2 - HN launch" -f state="open" \
   -f description="HN Show HN post + Reddit cross-posts" \
   -f due_on="$(date -u -d '+14 days' +%Y-%m-%dT23:59:59Z 2>/dev/null || date -u -v+14d +%Y-%m-%dT23:59:59Z)" || true
-gh api repos/$REPO/milestones -f title="Day 90 - $500/mo target" -f state="open" \
+gh api repos/$REPO/milestones -f title='Day 90 - $500/mo target' -f state="open" \
   -f description="Coffees + sponsor + affiliate + YT-driven traffic" \
   -f due_on="$(date -u -d '+90 days' +%Y-%m-%dT23:59:59Z 2>/dev/null || date -u -v+90d +%Y-%m-%dT23:59:59Z)" || true
 
