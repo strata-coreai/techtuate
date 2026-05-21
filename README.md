@@ -47,7 +47,7 @@ Web Analytics and Buy Me a Coffee placeholders are in `index.html` — search th
 
 | Tool | Path | Status |
 | --- | --- | --- |
-| PDF editor     | `/pdf-editor/`      | live (beta) — annotations, form fill, page ops, images |
+| PDF editor     | `/pdf-editor/`      | live (beta) — annotations, form fill, page ops, images, compress |
 | JSON Formatter | `/json-formatter/`  | live                                                    |
 
 ## PDF editor — planned build sequence
@@ -72,6 +72,9 @@ Scope: annotation/markup, form filling, page operations (merge/split/reorder/rot
 6. **Form filling**
    Use pdf-lib's form API (`getForm()`, `getTextField()`, `getCheckBox()`, …) to expose detected form fields as a side panel. Type values in the panel, fill the visual overlay on top of the rendered page in sync. Save flattens (or doesn't, configurable).
 
+7. **Compress / reduce size** *(shipped 2026-05-21)*
+   Three modes (Light / Medium / Aggressive). Light re-saves through pdf-lib for object-stream dedup (~10-30% smaller). Medium / Aggressive re-encodes embedded images to lower-quality JPEG via Canvas, downsamples oversized ones, replaces the XObject refs in the PDF. Runs in a Web Worker so the UI stays responsive. Spec at `docs/specs/pdf-compress.md`.
+
 Each step has a clean stopping point and shippable value on its own.
 
 ## Local development
@@ -84,6 +87,4 @@ npm run dev:pdf-editor
 npm run build
 ```
 
-Open `http://localhost:5173/pdf-editor/` for the PDF editor dev server (it serves the app at its prod base path, matching production behavior).
-
-To preview the landing page locally, just open `index.html` directly in a browser — it's a single self-contained file.
+Open `http://localhost:5173/pdf-editor/` for the PDF editor dev server (it serves the app at its prod base path, matching produ

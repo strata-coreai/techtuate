@@ -10,6 +10,10 @@ import { FormPanel, getFieldType, getFieldOptions, getFieldCurrentValue, applyFo
 import { exportPdf, suffixFilename } from './lib/pdfExport.js';
 import { getPdfPageSize } from './lib/coords.js';
 import { embedImagesToBuffer } from './lib/imageEmbed.js';
+import { compressPdf } from './lib/pdfCompress.js';
+import { CompressPanel } from './components/CompressPanel.jsx';
+import { CoffeePrompt } from './components/CoffeePrompt.jsx';
+import { formatBytes } from './lib/format.js';
 
 const SCALE_OPTIONS = [
   { label: '50%',  value: 0.5  },
@@ -97,12 +101,40 @@ export default function App() {
   const [flattenForm, setFlattenForm] = useState(false);
   const [showFormPanel, setShowFormPanel] = useState(false);
 
+  const [showCompressPanel, setShowCompressPanel] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [compressResult, setCompressResult] = useState(null);
+  const [compressError, setCompressError] = useState(null);
+
   const fileInputRef = useRef(null);
   const addPagesInputRef = useRef(null);
   const addImagesInputRef = useRef(null);
   const frameRefs = useRef(new Map());
   const sourceDocCounter = useRef(0);
   const pdfjsDocsRef = useRef(new Map());
+
+  // Coffee prompt: show once per browser session at first save/export.
+  // Per-session by design: never nag, never block (escape = save for free).
+  const [coffeeOpen, setCoffeeOpen] = useState(false);
+  const coffeeResolverRef = useRef(null);
+  const maybeAskForCoffee = useCallback(() => {
+    try {
+      if (sessionStorage.getItem('tt:coffeeAsked')) return Promise.resolve();
+    } catch {}
+    return new Promise((resolve) => {
+      coffeeResolverRef.current = () => {
+        try { sessionStorage.setItem('tt:coffeeAsked', '1'); } catch {}
+        coffeeResolverRef.current = null;
+        setCoffeeOpen(false);
+        resolve();
+      };
+      setCoffeeOpen(true);
+    });
+  }, []);
+  const askThenExport = useCallback(async (arrayBuffer, opts) => {
+    await maybeAskForCoffee();
+    return exportPdf(arrayBuffer, opts);
+  }, [maybeAskForCoffee]);
 
   useEffect(() => {
     return () => {
@@ -111,6 +143,12 @@ export default function App() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!compressResult) return;
+    const t = setTimeout(() => setCompressResult(null), 8000);
+    return () => clearTimeout(t);
+  }, [compressResult]);
 
   const isOpen = sourceDocs.size > 0;
   const numPages = pageOrder.length;
@@ -412,23 +450,45 @@ export default function App() {
     setSaving(true); setSaveError(null);
     try {
       const mutate = !isStructurallyModified ? directMutate : buildMutate(pageOrder);
-      await exportPdf(sourceDocs.get('a').arrayBuffer, {
+      await askThenExport(sourceDocs.get('a').arrayBuffer, {
         fileName: suffixFilename(primaryFileName, '-edited'),
         mutate,
       });
       setSavedFlash(true); setTimeout(() => setSavedFlash(false), 1800);
     } catch (e) { setSaveError(e?.message || 'Could not save.'); }
     finally { setSaving(false); }
-  }, [isOpen, saving, sourceDocs, primaryFileName, pageOrder, buildMutate, directMutate, isStructurallyModified]);
+  }, [isOpen, saving, sourceDocs, primaryFileName, pageOrder, buildMutate, directMutate, isStructurallyModified, askThenExport]);
+
+  const onCompress = useCallback(async (mode) => {
+    if (!isOpen || compressing) return;
+    setCompressing(true); setCompressError(null);
+    try {
+      const { mutate, summary } = await compressPdf(
+        sourceDocs.get('a').arrayBuffer,
+        { mode }
+      );
+      const { bytes } = await askThenExport(sourceDocs.get('a').arrayBuffer, {
+        fileName: suffixFilename(primaryFileName, '-compressed'),
+        mutate,
+      });
+      const origSize = sourceDocs.get('a').arrayBuffer.byteLength;
+      setCompressResult({ origSize, newSize: bytes.byteLength, warnings: summary.warnings });
+      setShowCompressPanel(false);
+    } catch (e) {
+      setCompressError(e?.message || 'Compression failed.');
+    } finally {
+      setCompressing(false);
+    }
+  }, [isOpen, compressing, sourceDocs, primaryFileName, askThenExport]);
 
   const onExtract = useCallback(async (from, to) => {
     try {
-      await exportPdf(sourceDocs.get('a').arrayBuffer, {
+      await askThenExport(sourceDocs.get('a').arrayBuffer, {
         fileName: suffixFilename(primaryFileName, `-pages-${from}-${to}`),
         mutate: buildMutate(pageOrder.slice(from - 1, to)),
       });
     } catch (e) { setSaveError(e?.message || 'Could not extract.'); }
-  }, [sourceDocs, primaryFileName, pageOrder, buildMutate]);
+  }, [sourceDocs, primaryFileName, pageOrder, buildMutate, askThenExport]);
 
   const onPickFile = e => { const f = e.target.files?.[0]; if (f) loadPrimaryFile(f); e.target.value = ''; };
   const onAddPagesFile = e => { const f = e.target.files?.[0]; if (f) addPagesFromFile(f); e.target.value = ''; };
@@ -478,6 +538,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <CoffeePrompt open={coffeeOpen} onResolve={() => coffeeResolverRef.current?.()} />
       <header className="topbar">
         <a className="brand" href="/" title="Back to techtuate"><span className="brand-mark" aria-hidden="true"></span><span>tech<span>tuate</span></span></a>
         <span className="sep">/</span><span className="tool-name">pdf-editor</span>
@@ -516,6 +577,12 @@ export default function App() {
                 <button className="btn" onClick={() => addImagesInputRef.current?.click()}>+ images</button>
                 <button className="btn" onClick={() => setShowExtract(true)}>extract…</button>
                 <button
+                  className={`btn${showCompressPanel ? ' primary' : ''}`}
+                  onClick={() => { setShowCompressPanel(v => !v); setCompressResult(null); setCompressError(null); }}
+                >
+                  compress
+                </button>
+                <button
                   className={`btn${showFormPanel ? ' primary' : ''}`}
                   onClick={() => setShowFormPanel(v => !v)}
                   title="Toggle form fields panel"
@@ -525,8 +592,29 @@ export default function App() {
                 <button className="btn primary" onClick={onSave} disabled={saving || !isOpen}>{saving ? <span className="loading">saving…</span> : savedFlash ? '✓ saved' : 'save copy'}</button>
               </div>
             </div>
+            {showCompressPanel && (
+              <CompressPanel
+                origSize={primarySize}
+                compressing={compressing}
+                onCompress={onCompress}
+                onCancel={() => { setShowCompressPanel(false); setCompressError(null); }}
+              />
+            )}
             <AnnotationToolbar activeTool={activeTool} setActiveTool={setActiveTool} activeColor={activeColor} setActiveColor={setActiveColor} strokeWidth={strokeWidth} setStrokeWidth={setStrokeWidth} />
             {saveError && <div className="error">{saveError}</div>}
+            {compressError && <div className="error">{compressError}</div>}
+            {compressResult && (
+              <div className="compress-result">
+                <span>
+                  Reduced from {formatBytes(compressResult.origSize)} to {formatBytes(compressResult.newSize)}
+                  {' '}({Math.round((1 - compressResult.newSize / compressResult.origSize) * 100)}% smaller)
+                </span>
+                {compressResult.warnings.map((w, i) => (
+                  <div key={i} className="compress-warn">{w}</div>
+                ))}
+                <button className="btn ghost icon" onClick={() => setCompressResult(null)}>close</button>
+              </div>
+            )}
             <div className="pages">
               {pageOrder.map((entry, index) => {
                 const src = sourceDocs.get(entry.sourceDocId);

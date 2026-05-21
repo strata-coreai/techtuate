@@ -533,7 +533,7 @@ button, input, select { font: inherit; color: inherit; }
   box-shadow: 3px 3px 0 var(--ink);
 }
 
-/* annotation overlay canvas — pointer events only when a draw tool is active */
+/* annotation overlay canvas - pointer events only when a draw tool is active */
 .annotation-overlay { display: block; }
 
 /* ---- back link ---- */
@@ -775,4 +775,224 @@ button, input, select { font: inherit; color: inherit; }
 @media (max-width: 800px) {
   .workspace.with-form { grid-template-columns: 1fr; }
   .form-sidebar { display: none; }
+}
+
+/* ---- compress panel ---- */
+.compress-panel {
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.compress-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.compress-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.compress-orig {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.compress-modes {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.compress-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 12px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+
+.compress-mode input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.compress-mode.selected {
+  border-color: var(--ink);
+  background: var(--yellow-soft);
+}
+
+.compress-mode:hover:not(.selected) {
+  border-color: var(--ink-dim);
+}
+
+.compress-mode-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.compress-mode-desc {
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  line-height: 1.4;
+}
+
+.compress-mode-est {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  margin-top: 4px;
+}
+
+.compress-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ---- compress result toast ---- */
+.compress-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 2px solid var(--ink);
+  background: var(--yellow);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.compress-warn {
+  width: 100%;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-mute);
+}
+
+/* responsive: stack compress modes vertically below 480px */
+@media (max-width: 480px) {
+  .compress-modes {
+    flex-direction: column;
+  }
+  .compress-mode {
+    min-width: unset;
+  }
+}
+
+/* ============================================================
+   Coffee prompt: shown once per session on first save/export.
+   Both choices proceed with download. No close-X. Escape = save free.
+   ============================================================ */
+.coffee-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.36);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: coffee-fade 160ms ease-out;
+}
+@keyframes coffee-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.coffee-card {
+  background: var(--yellow);
+  color: var(--ink);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 22px 24px 18px;
+  max-width: 440px;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  animation: coffee-pop 200ms cubic-bezier(.2,.9,.3,1.1);
+}
+@keyframes coffee-pop {
+  from { transform: translateY(8px) scale(0.98); opacity: 0; }
+  to   { transform: translateY(0) scale(1);    opacity: 1; }
+}
+.coffee-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+.coffee-body {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 18px;
+  color: var(--ink);
+}
+.coffee-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.coffee-actions .btn {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 16px;
+}
+.coffee-actions .btn.primary {
+  background: var(--ink);
+  color: var(--yellow);
+  border-color: var(--ink);
+}
+.coffee-actions .btn.primary:hover:not(:disabled) {
+  background: var(--bg);
+  color: var(--ink);
+}
+.coffee-actions .btn.ghost {
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.coffee-actions .btn.ghost:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--ink);
+}
+.coffee-foot {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-mute);
+  line-height: 1.4;
+}
+
+/* mobile: stack the two buttons */
+@media (max-width: 480px) {
+  .coffee-card { padding: 18px 18px 14px; }
+  .coffee-title { font-size: 19px; }
+  .coffee-actions { flex-direction: column; }
+  .coffee-actions .btn { width: 100%; justify-content: center; }
 }
