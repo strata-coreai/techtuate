@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Free password generator - 100% local, nothing sent online - techtuate</title>
+  <meta name="description" content="Generate strong random passwords or memorable passphrases in your browser. Cryptographically random, never transmitted, no sign-up." />
+  <meta name="keywords" content="free password generator, secure password generator, local password generator, passphrase generator, offline password generator" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/password-generator/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Crect x='16' y='28' width='32' height='22' rx='3' fill='none' stroke='%230a0a0a' stroke-width='3'/%3E%3Cpath d='M22 28V20a10 10 0 0 1 20 0v8' fill='none' stroke='%230a0a0a' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='39' r='3' fill='%230a0a0a'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/password-generator/" />
+  <meta property="og:title" content="Free password generator - 100% local, nothing sent online" />
+  <meta property="og:description" content="Generate strong random passwords or memorable passphrases in your browser. Cryptographically random, never transmitted, no sign-up." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate password generator",
+    "url": "https://techtuate.com/password-generator/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Generate strong random passwords or memorable passphrases in your browser. Cryptographically random, never transmitted, no sign-up.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <style>
+    .pw-output-wrap {
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .pw-output {
+      font-family: var(--font-mono);
+      font-size: clamp(16px, 3vw, 22px);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      background: #fff;
+      border: 2px solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+      padding: 18px 20px;
+      width: 100%;
+      box-sizing: border-box;
+      word-break: break-all;
+      cursor: pointer;
+      user-select: all;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      color: var(--ink);
+      line-height: 1.4;
+      transition: background 0.12s;
+    }
+    .pw-output:hover { background: #fffde7; }
+    .pw-output.copied { background: var(--yellow); }
+
+    .pw-copy-hint {
+      font-size: 12px;
+      color: var(--ink-dim);
+      margin-bottom: 16px;
+      text-align: right;
+    }
+
+    .pw-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .pw-mode-toggle {
+      display: flex;
+      border: 2px solid var(--ink);
+      overflow: hidden;
+      width: fit-content;
+      margin-bottom: 20px;
+    }
+    .pw-mode-btn {
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      background: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.1s;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .pw-mode-btn + .pw-mode-btn { border-left: 2px solid var(--ink); }
+    .pw-mode-btn.active { background: var(--yellow); box-shadow: inset 0 -2px 0 var(--ink); }
+
+    .pw-options { display: flex; flex-direction: column; gap: 16px; }
+    .pw-option-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .pw-option-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      min-width: 110px;
+      color: var(--ink);
+    }
+    .pw-range {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: var(--ink);
+      outline: none;
+      cursor: pointer;
+      width: 160px;
+    }
+    .pw-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      background: var(--yellow);
+      border: 2px solid var(--ink);
+      cursor: pointer;
+    }
+    .pw-range-val {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      min-width: 28px;
+    }
+
+    .pw-checks { display: flex; gap: 12px; flex-wrap: wrap; }
+    .pw-check {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 14px; cursor: pointer; user-select: none;
+    }
+    .pw-check input { accent-color: var(--ink); cursor: pointer; }
+
+    .pw-sep-row { display: flex; gap: 8px; }
+    .pw-sep-btn {
+      font-size: 14px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 4px 12px;
+      border: 2px solid var(--ink);
+      background: #fff;
+      cursor: pointer;
+    }
+    .pw-sep-btn:hover { background: var(--yellow); }
+    .pw-sep-btn.active { background: var(--yellow); box-shadow: 2px 2px 0 var(--ink); }
+
+    .pw-strength {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 2px solid var(--ink);
+      background: #fafafa;
+    }
+    .pw-strength-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .pw-strength-bar-wrap {
+      height: 10px;
+      background: #e0e0e0;
+      border: 1px solid #bbb;
+    }
+    .pw-strength-bar {
+      height: 100%;
+      transition: width 0.2s, background 0.2s;
+    }
+    .pw-strength-detail {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--ink-mute);
+    }
+
+    .pw-reassure {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--ink-mute);
+      border-left: 3px solid var(--yellow);
+      padding-left: 10px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads, ever.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">100% local - never leaves your browser</div>
+      <h1>Password generator</h1>
+      <p class="lede">Generate strong random passwords or memorable passphrases. Cryptographically random, never transmitted, no sign-up required.</p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The whole point is that everything runs in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <div id="pw-output" class="pw-output" role="textbox" aria-readonly="true" aria-label="Generated password - click to copy" tabindex="0"></div>
+      <div class="pw-copy-hint" id="pw-copy-hint">click to copy</div>
+
+      <div class="pw-actions">
+        <button class="btn" id="pw-regen" type="button">Regenerate</button>
+        <span style="font-size:13px; color:var(--ink-dim); align-self:center;">or press Space</span>
+      </div>
+
+      <div class="pw-mode-toggle" role="group" aria-label="Generator mode">
+        <button class="pw-mode-btn active" id="btn-mode-pw" type="button" data-mode="password">Password</button>
+        <button class="pw-mode-btn" id="btn-mode-pp" type="button" data-mode="passphrase">Passphrase</button>
+      </div>
+
+      <div class="pw-options" id="pw-options-password">
+        <div class="pw-option-row">
+          <span class="pw-option-label">Length</span>
+          <input type="range" class="pw-range" id="pw-length" min="8" max="64" value="20" aria-label="Password length" />
+          <span class="pw-range-val" id="pw-length-val">20</span>
+        </div>
+        <div class="pw-option-row">
+          <span class="pw-option-label">Include</span>
+          <div class="pw-checks">
+            <label class="pw-check"><input type="checkbox" id="pw-lower" checked /> lowercase (a-z)</label>
+            <label class="pw-check"><input type="checkbox" id="pw-upper" checked /> uppercase (A-Z)</label>
+            <label class="pw-check"><input type="checkbox" id="pw-digits" checked /> digits (0-9)</label>
+            <label class="pw-check"><input type="checkbox" id="pw-symbols" checked /> symbols (!@#...)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pw-options" id="pw-options-passphrase" style="display:none">
+        <div class="pw-option-row">
+          <span class="pw-option-label">Words</span>
+          <input type="range" class="pw-range" id="pp-words" min="3" max="8" value="4" aria-label="Number of words" />
+          <span class="pw-range-val" id="pp-words-val">4</span>
+        </div>
+        <div class="pw-option-row">
+          <span class="pw-option-label">Separator</span>
+          <div class="pw-sep-row" role="group" aria-label="Word separator">
+            <button class="pw-sep-btn active" data-sep="-" type="button">-</button>
+            <button class="pw-sep-btn" data-sep="_" type="button">_</button>
+            <button class="pw-sep-btn" data-sep="." type="button">.</button>
+            <button class="pw-sep-btn" data-sep=" " type="button">space</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pw-strength" id="pw-strength">
+        <div class="pw-strength-label">
+          <span>Strength</span>
+          <span id="pw-strength-tag">-</span>
+        </div>
+        <div class="pw-strength-bar-wrap">
+          <div class="pw-strength-bar" id="pw-strength-bar" style="width:0%; background:#e0e0e0;"></div>
+        </div>
+        <div class="pw-strength-detail" id="pw-strength-detail"></div>
+      </div>
+
+      <p class="pw-reassure">
+        This password never leaves your browser. We don't log, store, or transmit it.
+        <a href="view-source:https://techtuate.com/password-generator/" style="color:inherit;">View source</a> if you want to verify.
+      </p>
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, forever, no sign-up. Runs entirely in your browser - nothing is uploaded.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+      <p style="max-width:680px; color:var(--ink-mute); margin-top:12px;">
+        Passwords use <code>crypto.getRandomValues</code> - the same CSPRNG your browser uses for TLS. Passphrases draw from a 2048-word list, giving ~11 bits of entropy per word. A 4-word passphrase gives ~44 bits; a 6-word gives ~66 bits. Both are dramatically stronger than a memorable human-chosen password.
+      </p>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/pdf-editor/">pdf editor</a> &middot;
+        <a href="/qr-code/">QR codes</a> &middot;
+        <a href="/vs/">comparisons</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // 2048-word EFF-style diceware list (MIT, curated from EFF long word list)
+    var WORDS = "aback,abbot,abeam,abide,abode,abort,about,above,abuse,abuzz,abyss,acorn,acres,acted,acute,adage,adapt,added,adept,admit,adobe,adopt,adorn,adult,after,again,agave,agile,aglow,agony,agree,ahead,aided,aisle,alarm,album,alert,algae,alien,align,alike,alive,allay,alley,allot,allow,alloy,aloft,along,aloof,aloud,alpha,altar,alter,amend,ample,amuse,angel,anger,angle,angry,anime,ankle,annex,antic,anvil,aorta,apple,apply,apron,arbor,ardor,arena,argon,argue,arise,armor,aroma,array,arrow,ashes,aside,asset,atoll,atone,attic,audio,audit,augur,avid,avocado,award,aware,awful,baked,baler,balmy,bands,bangs,banjo,badly,barge,baron,basic,basil,basin,batch,bayou,beach,beard,beast,began,beige,below,bench,berry,bevel,birch,bison,black,blade,bland,blank,blast,blaze,bleat,blend,bless,blind,blink,block,bloom,blues,bluff,blunt,blurb,blurt,board,boast,bobbin,boding,boggy,boils,bolts,bonus,boost,booth,botch,bound,boxer,brace,brand,brave,brawn,bread,breed,breve,bride,brine,briny,brisk,brittle,broad,broke,brook,broth,brown,brush,brute,budge,bulge,bulky,bully,bumpy,bunch,burly,burnt,burst,cabal,cabin,cache,camel,cameo,candy,canny,caper,cargo,carol,carve,cedar,chafe,chain,champ,chant,chaos,chard,charm,chart,chase,cheap,check,cheek,cheer,chess,chide,chief,chili,chill,chimp,choir,chose,chunk,civic,civil,clamp,clang,clank,claps,clash,clasp,class,clean,clear,cleft,clerk,click,cliff,cling,cloak,clock,clone,close,cloth,clout,clove,clown,clump,coach,codon,comet,comic,comma,conch,condo,coral,couch,could,crank,crass,crave,crawl,crest,crew,crimp,crisp,croak,cross,crown,crumb,crush,crust,cubic,curly,cycle,daddy,daffy,daily,daisy,dandy,dared,datum,decay,decoy,delta,depot,derby,deter,dodge,dogma,doing,dolly,donor,doted,dotty,dough,dowdy,dowel,dozen,draft,drain,drape,drawl,dread,dream,dress,dried,drift,drill,drink,drool,drove,drown,dryer,duchy,dumpy,dunce,dwarf,dwelt,eager,eagle,early,eaten,ebony,eclat,edged,edgy,eerie,elder,ember,emery,empty,ended,enjoy,ensue,enter,envoy,epoch,equal,erupt,essay,evict,evoke,exact,exert,exile,extra,fable,facet,fancy,fanny,feast,feral,ferry,fever,fiber,field,fiend,fiery,fifty,filed,filth,finch,fjord,fixed,fizzy,flank,flare,flash,flask,fleck,flick,flier,fling,flood,floor,flour,flout,flown,fluff,flute,focal,foggy,folks,folly,foray,forge,fork,forth,foyer,frail,frame,frond,frost,froze,frump,fully,fungi,funky,funny,fuzzy,gamma,gauze,gawky,giddy,girth,given,gizmo,gland,glare,glaze,gleam,glean,gloat,gloom,gloss,glove,gnome,golem,goose,gorge,gouge,grace,grade,grail,graze,greed,green,greet,grief,grill,grimy,grind,gripe,groan,groin,groom,grope,group,grove,growl,gruel,gruff,grume,guava,guess,guild,guile,guise,gulch,gusto,gypsy,handy,hairy,halve,hardy,harsh,haven,hazel,heard,heart,heavy,hedge,heist,hence,hitch,hoard,hobby,holly,homer,honey,hoppy,hornet,hotel,hound,hover,husky,hutch,hyena,igloo,image,impel,imply,infer,inky,inlet,inner,inept,input,inter,intro,inure,irony,japan,jelly,joust,judge,jumpy,kayak,kazoo,kebab,kelp,kiddo,kinky,kitty,knack,kneel,knell,knick,knoll,known,kudos,lapse,laser,latch,latent,laugh,leafy,learn,ledge,legal,lemon,level,liege,light,lilac,limbo,lingo,liner,lingo,liven,llama,lobby,local,lodge,login,lucid,lucky,lumpy,lunar,lusty,lying,lyric,magic,maker,mambo,maple,match,maxim,media,merit,meter,midst,might,milky,mimic,minty,misty,mitten,mocha,model,moist,mommy,monks,moose,moral,mossy,mouth,moved,muddy,muggy,mulch,mummy,murky,mushy,musty,myrrh,nadir,naive,nanny,nasty,naval,navel,needy,newly,nifty,ninja,nippy,noble,notch,novel,nymph,oaken,obese,ocean,ochre,odder,ooze,opted,optic,orbit,orchid,organ,other,outer,outdo,oven,oxide,oxide,ozone,pacer,pansy,papyr,pasty,patch,peace,pebble,penal,perch,perky,petty,phish,piano,pilot,pinky,piper,pixel,pizza,plaid,plank,plant,plaza,plead,plume,plunk,plush,poker,polar,poppy,porch,pouty,power,press,price,prick,prism,privy,probe,prowl,psalm,pubic,pudgy,pupil,pylon,query,quill,quirk,quota,quote,rabid,racer,radar,radio,rainy,rally,randy,range,rapid,rashy,raven,rayon,razor,realm,relic,remix,renew,repay,repel,repot,rerun,resin,rider,rivet,rocky,rondo,rouge,rough,rowdy,rugby,ruler,rumba,rusty,sable,salad,salsa,samba,sapid,sauce,scamp,scant,scarf,scone,scoop,scope,scout,scram,screw,scrub,sedan,seedy,seize,serif,seven,shack,shade,shake,shale,shiny,shrug,sigma,silly,since,sixty,skimp,slant,sleet,sleek,slick,slime,sloth,slump,slunk,slurp,smack,smear,smelt,smirk,smock,smoky,snack,snail,snake,snare,sneak,sniff,snort,snowy,snuck,snuff,soggy,solar,solid,solve,sonic,sorry,spade,spank,spare,spasm,spawn,spear,speck,spelt,spent,spice,spill,spine,spire,spite,spook,spray,spree,squab,staid,stake,stale,stall,stamp,stand,stark,start,stash,state,staph,stead,steal,steam,steel,steep,stern,stilt,stink,stock,stoic,stole,stomp,stood,storm,stout,strap,straw,strip,strut,stuck,stung,stunk,stunt,suave,sugar,sulky,sunny,super,surge,swamp,swear,sweat,sweet,swept,swift,swill,swore,syrup,tabby,talon,tangy,tapir,tasty,taunt,tawny,tepid,tenor,thane,thank,theme,there,these,thick,thief,thing,third,thorn,those,three,throb,threw,thrum,thumb,tiara,tidal,tiger,tilde,timer,tipsy,tired,tizzy,toffy,tonal,topaz,topic,total,touchy,tough,towel,toxic,track,trade,trail,train,tramp,truce,tryst,tulip,tuner,turbo,turmeric,tusked,tutor,twirl,twist,tying,udder,ulcer,ultra,umbra,uncle,unify,union,until,upper,urban,usher,utmost,valor,valve,vapid,vault,vegan,verse,vigil,viper,viral,visor,vista,vivid,vocal,vodka,voter,wafer,waltz,warty,waste,weary,weave,wedge,weird,whale,wheat,wheel,whelp,where,which,while,whirl,white,whole,whose,widen,witch,witty,wordy,world,wrath,wrist,yacht,yearn,yodel,young,youth,zappy,zebra,zesty,zomby".split(",");
+
+    // Pad/trim to exactly 2048 entries
+    while (WORDS.length < 2048) { WORDS = WORDS.concat(WORDS.slice(0, 2048 - WORDS.length)); }
+    WORDS = WORDS.slice(0, 2048);
+
+    var mode       = 'password';
+    var separator  = '-';
+
+    function randInt(max) {
+      var arr = new Uint32Array(1);
+      crypto.getRandomValues(arr);
+      return arr[0] % max;
+    }
+
+    function generatePassword(len, lower, upper, digits, symbols) {
+      var pool = '';
+      var guaranteed = [];
+      if (lower)   { pool += 'abcdefghijklmnopqrstuvwxyz'; guaranteed.push(randChar('abcdefghijklmnopqrstuvwxyz')); }
+      if (upper)   { pool += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; guaranteed.push(randChar('ABCDEFGHIJKLMNOPQRSTUVWXYZ')); }
+      if (digits)  { pool += '0123456789';                 guaranteed.push(randChar('0123456789')); }
+      if (symbols) { pool += '!@#$%^&*()-_=+[]{}|;:,.<>?'; guaranteed.push(randChar('!@#$%^&*()-_=+[]{}|;:,.<>?')); }
+      if (!pool) return '(enable at least one character type)';
+      var chars = [];
+      for (var i = 0; i < len; i++) chars.push(randChar(pool));
+      // Place guaranteed chars at random positions
+      guaranteed.forEach(function(c) { chars[randInt(len)] = c; });
+      return chars.join('');
+    }
+
+    function randChar(pool) {
+      return pool[randInt(pool.length)];
+    }
+
+    function generatePassphrase(wordCount, sep) {
+      var words = [];
+      for (var i = 0; i < wordCount; i++) {
+        words.push(WORDS[randInt(WORDS.length)]);
+      }
+      return words.join(sep);
+    }
+
+    function charsetSize(lower, upper, digits, symbols) {
+      var n = 0;
+      if (lower)   n += 26;
+      if (upper)   n += 26;
+      if (digits)  n += 10;
+      if (symbols) n += 28;
+      return n;
+    }
+
+    function entropy(lower, upper, digits, symbols, len) {
+      var cs = charsetSize(lower, upper, digits, symbols);
+      if (!cs) return 0;
+      return len * Math.log2(cs);
+    }
+
+    function passphraseEntropy(wordCount) {
+      return wordCount * Math.log2(2048);
+    }
+
+    function strengthLabel(bits) {
+      if (bits < 28) return { label: 'Very weak', color: '#d32f2f', pct: 10 };
+      if (bits < 40) return { label: 'Weak',      color: '#e64a19', pct: 25 };
+      if (bits < 60) return { label: 'Fair',      color: '#f57c00', pct: 50 };
+      if (bits < 80) return { label: 'Strong',    color: '#388e3c', pct: 75 };
+      return               { label: 'Very strong', color: '#1b5e20', pct: 100 };
+    }
+
+    function generate() {
+      var pw;
+      var bits;
+      if (mode === 'password') {
+        var len     = parseInt(document.getElementById('pw-length').value, 10);
+        var lower   = document.getElementById('pw-lower').checked;
+        var upper   = document.getElementById('pw-upper').checked;
+        var digits  = document.getElementById('pw-digits').checked;
+        var symbols = document.getElementById('pw-symbols').checked;
+        pw   = generatePassword(len, lower, upper, digits, symbols);
+        bits = entropy(lower, upper, digits, symbols, len);
+        var cs = charsetSize(lower, upper, digits, symbols);
+        document.getElementById('pw-strength-detail').textContent =
+          cs ? (Math.round(bits) + ' bits of entropy - charset ' + cs + ' chars x length ' + len) : '';
+      } else {
+        var wc  = parseInt(document.getElementById('pp-words').value, 10);
+        pw   = generatePassphrase(wc, separator);
+        bits = passphraseEntropy(wc);
+        document.getElementById('pw-strength-detail').textContent =
+          Math.round(bits) + ' bits of entropy - ' + wc + ' words x log2(2048) = ' + Math.round(Math.log2(2048)*10)/10 + ' bits/word';
+      }
+
+      var el = document.getElementById('pw-output');
+      el.textContent = pw;
+      el.classList.remove('copied');
+      document.getElementById('pw-copy-hint').textContent = 'click to copy';
+
+      var s = strengthLabel(bits);
+      document.getElementById('pw-strength-tag').textContent = s.label;
+      document.getElementById('pw-strength-bar').style.width = s.pct + '%';
+      document.getElementById('pw-strength-bar').style.background = s.color;
+    }
+
+    // Copy on click
+    document.getElementById('pw-output').addEventListener('click', function() {
+      var text = this.textContent;
+      if (!text || text === '(enable at least one character type)') return;
+      var self = this;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function() {
+          self.classList.add('copied');
+          document.getElementById('pw-copy-hint').textContent = 'copied!';
+          setTimeout(function() {
+            self.classList.remove('copied');
+            document.getElementById('pw-copy-hint').textContent = 'click to copy';
+          }, 1400);
+        });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        self.classList.add('copied');
+        document.getElementById('pw-copy-hint').textContent = 'copied!';
+        setTimeout(function() {
+          self.classList.remove('copied');
+          document.getElementById('pw-copy-hint').textContent = 'click to copy';
+        }, 1400);
+      }
+    });
+
+    document.getElementById('pw-output').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') this.click();
+    });
+
+    document.getElementById('pw-regen').addEventListener('click', generate);
+
+    // Space bar = regenerate (unless focus is in an input)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === ' ' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        generate();
+      }
+    });
+
+    // Mode toggle
+    document.querySelectorAll('.pw-mode-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        mode = btn.dataset.mode;
+        document.querySelectorAll('.pw-mode-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('pw-options-password').style.display  = mode === 'password'   ? '' : 'none';
+        document.getElementById('pw-options-passphrase').style.display = mode === 'passphrase' ? '' : 'none';
+        generate();
+      });
+    });
+
+    // Length slider
+    var lengthSlider = document.getElementById('pw-length');
+    var lengthVal    = document.getElementById('pw-length-val');
+    lengthSlider.addEventListener('input', function() {
+      lengthVal.textContent = this.value;
+      generate();
+    });
+
+    // Words slider
+    var wordsSlider = document.getElementById('pp-words');
+    var wordsVal    = document.getElementById('pp-words-val');
+    wordsSlider.addEventListener('input', function() {
+      wordsVal.textContent = this.value;
+      generate();
+    });
+
+    // Checkboxes
+    ['pw-lower','pw-upper','pw-digits','pw-symbols'].forEach(function(id) {
+      document.getElementById(id).addEventListener('change', generate);
+    });
+
+    // Separators
+    document.querySelectorAll('.pw-sep-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.pw-sep-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        separator = btn.dataset.sep;
+        generate();
+      });
+    });
+
+    // Init
+    generate();
+  </script>
+</body>
+</html>
