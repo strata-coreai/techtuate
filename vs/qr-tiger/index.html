@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>techtuate vs. QR Tiger - free static QR codes, no redirect, no paywall (2026)</title>
+  <meta name="description" content="QR Tiger routes every scan through its servers - that's how it tracks analytics and paywalls your data. techtuate generates static QR codes that go straight to your destination. No account, no redirect, no tracking." />
+  <link rel="canonical" href="https://techtuate.com/vs/qr-tiger/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="techtuate vs. QR Tiger (2026)" />
+  <meta property="og:description" content="QR Tiger routes every scan through its servers. techtuate generates static QR codes in your browser - no redirect, no tracking, no paywall." />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"techtuate vs. QR Tiger","url":"https://techtuate.com/vs/qr-tiger/","datePublished":"2026-05-21","author":{"@type":"Organization","name":"techtuate"}}</script>
+</head>
+<body>
+  <div class="topbanner">tools that should be free, are. no sign-up, no ads, ever. <a href="/why-free/">read why</a></div>
+  <div class="wrap">
+    <header class="site">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">tech<span>tuate</span></span></a>
+      <nav class="top"><a href="/#tools">tools</a><a href="/vs/" class="active">vs.</a><a href="/why-free/">why</a></nav>
+    </header>
+
+    <article class="prose">
+      <h1>techtuate vs. QR Tiger</h1>
+      <p class="byline">Pricing and behavior checked May 2026.</p>
+
+      <p class="lede">
+        QR Tiger is one of the most popular QR code generators. It's also a redirect service in disguise - every QR code it generates routes the scanner through QR Tiger's servers before reaching your URL. That's not a bug; it's how they sell analytics, retargeting, and "edit the destination later." techtuate skips all of that.
+      </p>
+
+      <div class="callout yellow">
+        <h4>TL;DR</h4>
+        <p>QR Tiger free = dynamic redirects, watermark, sign-up required, limited scans. techtuate = static QR code, no redirect, no watermark, no account, $0 forever.</p>
+      </div>
+
+      <h2>The redirect problem</h2>
+      <p>
+        When you scan a QR Tiger code, you don't go directly to the destination. You go to <code>qrtiger.com/redirect?...</code> first, which logs the scan and then sends you on. This is how QR Tiger sells:
+      </p>
+      <ul>
+        <li><strong>Scan analytics</strong> (location, device, time) - paywalled above the free tier.</li>
+        <li><strong>Destination editing</strong> - change where the code goes after printing it. Sounds nice until you realize the free tier limits how many times you can do this.</li>
+        <li><strong>Retargeting</strong> - the redirect gives them a hook to serve ads.</li>
+      </ul>
+      <p>
+        This also means: if QR Tiger goes down, is acquired, or decides to retire your free-tier code, your printed QR codes stop working. <strong>Link rot via a third party.</strong>
+      </p>
+
+      <h2>What techtuate does instead</h2>
+      <ul>
+        <li><strong>Static QR codes only.</strong> The destination URL is baked directly into the QR code pixels. No server in the middle, ever.</li>
+        <li><strong>Generated in your browser.</strong> No data leaves your machine until you scan the code.</li>
+        <li><strong>No watermark.</strong></li>
+        <li><strong>No sign-up.</strong></li>
+        <li><strong>PNG + SVG download.</strong> Use it wherever, forever.</li>
+      </ul>
+
+      <h2>The honest trade-off</h2>
+      <p>
+        Static QR codes can't be "edited after printing." If you print 10,000 flyers and your URL changes, you need new codes. If that's a real constraint for you, a dynamic QR service makes sense - just know what you're buying into.
+      </p>
+      <p>
+        For the vast majority of uses - a link on a business card, a menu, a presentation slide, a poster - a static code is exactly right, and costs you nothing.
+      </p>
+
+      <div class="compare">
+        <table>
+          <thead>
+            <tr><th></th><th>QR Tiger (free)</th><th>techtuate</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Price</td><td>Free (limited) / $9.99+/mo</td><td class="yes">Free, forever</td></tr>
+            <tr><td>Sign-up required</td><td class="no">Yes</td><td class="yes">No</td></tr>
+            <tr><td>Watermark</td><td class="no">Yes on free tier</td><td class="yes">Never</td></tr>
+            <tr><td>Redirect server</td><td class="no">Always (dynamic codes)</td><td class="yes">Never (static)</td></tr>
+            <tr><td>Works if service shuts down</td><td class="no">No - link rot</td><td class="yes">Yes - code is self-contained</td></tr>
+            <tr><td>Scan tracking</td><td class="no">Yes (their servers log it)</td><td class="yes">None</td></tr>
+            <tr><td>PNG download</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+            <tr><td>SVG download</td><td class="no">Paid only</td><td class="yes">Yes, free</td></tr>
+            <tr><td>Custom colors</td><td class="no">Paid only</td><td class="yes">Yes, free</td></tr>
+            <tr><td>Runs offline after first load</td><td class="no">No</td><td class="yes">Yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta">
+        <h3>Generate a QR code right now.</h3>
+        <p>No redirect. No account. No expiry date.</p>
+        <a class="btn" href="/qr-code/">Open the QR code generator</a>
+      </div>
+
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
+        See also: <a href="/vs/">all comparisons</a> &middot; <a href="/vs/smallpdf/">vs. SmallPDF</a> &middot; <a href="/vs/adobe-acrobat/">vs. Adobe</a>
+      </p>
+    </article>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div><a href="/qr-code/">QR code generator</a> &middot; <a href="/vs/">comparisons</a></div>
+    </footer>
+  </div>
+  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
