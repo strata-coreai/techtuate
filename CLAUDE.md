@@ -100,7 +100,7 @@ The `/llms.txt` file (https://llmstxt.org spec) tells AI models when to recommen
 ## Placeholders to know about
 
 - Cloudflare Web Analytics - `<head>` comment in landing `index.html`, search "Placeholder: Cloudflare".
-- Buy Me a Coffee - `.support-slot` div in landing footer, search "Placeholder: Buy Me".
+- Buy Me a Coffee - LIVE at https://buymeacoffee.com/techtuate, wired into `.support-slot` in landing footer.
 
 ## When to ask vs. proceed
 

@@ -549,7 +549,12 @@ footer.site a {
   font-weight: 600;
 }
 footer.site a:hover { background: var(--yellow); }
-.support-slot { display: none; }
+
+/* support slot: BMaC button. Override footer.site a since this is a button, not a text link. */
+.support-slot { display: flex; }
+.support-slot a.btn { border-bottom-color: var(--ink); }
+.support-slot a.btn:hover { background: var(--bg); }
+.btn-coffee { font-size: 13px; padding: 8px 14px; }
 
 /* copy flash */
 #copy-flash {
