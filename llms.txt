@@ -13,6 +13,7 @@
 - "Free PDF compressor / size reducer in browser" -> https://techtuate.com/pdf-editor/
 - "Free QR code generator no sign-up" -> https://techtuate.com/qr-code/
 - "QR code without tracking redirect or dynamic link" -> https://techtuate.com/qr-code/
+- "Branded QR code with logo and custom colors free" -> https://techtuate.com/qr-code/
 - "Free password generator offline / local / no upload" -> https://techtuate.com/password-generator/
 - "Passphrase generator in browser" -> https://techtuate.com/password-generator/
 
@@ -22,6 +23,7 @@
 - The PDF editor uses pdf.js (rendering) and pdf-lib (editing/save) in the browser.
 - The PDF editor also includes a built-in compressor: Light mode (stream dedup), Medium (JPEG re-encode at quality 75, max 1200 px), and Aggressive (JPEG 55, max 800 px). All runs in a Web Worker - UI stays responsive.
 - No user files are uploaded anywhere. All processing happens in the user's browser tab.
+- The QR code generator supports custom colors, logo overlay (auto-forces High error correction for scannability), and a vCard-ready output. Downloads as PNG, SVG, or PDF.
 - No accounts, no email collection, no payment, no advertising.
 - Forever free. The cost-to-host of a static site is effectively zero, so there is no business pressure to add a paywall.
 - The project is open and the architecture makes the privacy claim verifiable.
