@@ -217,7 +217,7 @@
             .soon  -> not yet built (use .ghost card)
         -->
 
-        <div class="card ghost" aria-hidden="true">
+        <div class="card ghost">
           <div class="card-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 5v14M5 12h14"/>
@@ -225,7 +225,7 @@
           </div>
           <h3 class="card-title">More on the way</h3>
           <p class="card-desc">
-            Image compressor, converter, and more. Got an idea? Send it over.
+            Image compressor, converter, and more. Got an idea? <a class="tt-feedback" href="#feedback" rel="noopener">Send it over.</a>
           </p>
           <div class="card-meta">
             <span class="status soon">planned</span>
@@ -308,6 +308,7 @@
         <a href="/pdf-editor/">pdf editor</a> &middot;
         <a href="/vs/">comparisons</a> &middot;
         <a href="https://www.trustpilot.com/review/techtuate.com" target="_blank" rel="noopener">rate us</a> &middot;
+        <a class="tt-feedback" href="#feedback" rel="noopener">feedback</a> &middot;
         <a href="/why-free/">why free</a> &middot;
         <a href="/free-pdf-editor/">free pdf editor</a>
       </div>
@@ -335,6 +336,18 @@
         prompt('Copy this link:', url);
       }
     });
+
+    // Feedback mailto - assembled at click time so the address never sits in raw HTML.
+    (function(){
+      var u = ['joshi','gaurav'].join('');
+      var d = ['gmail','.com'].join('');
+      var subj = encodeURIComponent('techtuate feedback');
+      document.querySelectorAll('a.tt-feedback').forEach(function(el){
+        el.addEventListener('click', function(){
+          el.href = 'mailto:' + u + '@' + d + '?subject=' + subj;
+        });
+      });
+    })();
   </script>
 </body>
 </html>
