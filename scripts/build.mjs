@@ -51,6 +51,7 @@ const STATIC_DIRS = [
   'free-pdf-editor',
   'qr-code',
   'password-generator',
+  'svg-converter',
 ];
 
 function log(...args) { console.log('[build]', ...args); }
