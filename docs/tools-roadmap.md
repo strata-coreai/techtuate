@@ -33,6 +33,7 @@ These six alone would 5-10x the surface area of the site. Each ships in under a 
 | 12 | **Tip calculator** | `tip-calculator` | High | Trivial | n/a | Evergreen. |
 | 13 | **EXIF metadata viewer/stripper** | `exif` | Moderate | Easy | Critical | Privacy story is the entire pitch. Strip GPS before posting a photo. |
 | 14 | **Color picker / palette** | `color` | Moderate | Easy | Low | Designer-friendly. Picker, contrast checker, hex/rgb/hsl converter. |
+| 15 | **Name card / business card generator** | `name-card` | **150K/mo US** ("business card maker") | Medium | High | Templates + custom QR + edit fields + PDF download. Direct funnel from the QR generator's "made with techtuate" banner (users who customize QR often want a place to USE that QR - their card). Canva owns this market with paid templates; the free-forever-with-vCard-QR angle is wide open. Spec: docs/specs/name-card.md |
 
 ## Tier 3 - useful, lower ROI (build when scratching an itch)
 

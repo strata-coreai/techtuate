@@ -37,7 +37,7 @@ How it works: pdf.js for rendering, pdf-lib for editing, both running in the bro
 
 Source code: https://github.com/strata-coreai/techtuate
 
-Six more tools planned (image compressor, QR code, password gen, JSON formatter, word counter, image-to-PDF), shipping roughly one a week. The vs/ page compares techtuate honestly against Adobe / SmallPDF / iLovePDF / Sejda / PDFescape / pdfFiller - including what each of them does better.
+Three more tools live alongside the PDF editor: a JSON formatter, a password generator, and a QR generator with logo + custom colors (the kind Bitly paywalls at $10/mo and QR.io at $7/mo - here it's free, and the QR you download is yours, your file never touched my server). Image compressor, word counter, image-to-PDF, and a name card maker queued for the coming weeks. The /vs/ pages compare techtuate honestly against Adobe / SmallPDF / iLovePDF / Sejda / PDFescape / pdfFiller (plus Bitly / QR.io for the QR side) - including what each of them does better.
 
 Happy to answer questions about the tech, the architecture, the "free forever" claim, or why I'm doing this at all.
 ```
@@ -86,6 +86,14 @@ Not yet. Browser-side OCR requires shipping a model (Tesseract is 5-15 MB, moder
 ### Q: How does it compare to (SmallPDF / iLovePDF / Adobe / etc.)?
 
 I wrote https://techtuate.com/vs/ comparing techtuate to each major paid alternative - honest table with pricing, free-tier limits, sign-up requirement, watermark, upload behavior. Spoiler: paid tools are better at OCR, e-signature flows, and Office-format conversion. We're better at "do the thing without an account and without uploading your file."
+
+### Q: $10/mo for Bitly is not exactly "paywalled" - that's a fair price?
+
+Sure - and Bitly does more than just the QR (tracking, dynamic codes, the actual link shortener). The point isn't that $10/mo is unreasonable - it's that "I want a one-off branded QR for a poster" should not require subscribing to anything. If the cost-to-serve is essentially zero, the price should be too. Same logic as the PDF editor: when there's no server doing the work, "free forever" stops being marketing and becomes the natural state.
+
+### Q: What about QRCode Monkey / [other free QR generator]?
+
+Fair point - several free QR generators support logos. The differentiation here isn't "we're the only free one" - it's that everything happens in your browser, no signup, the QR you download is exactly what you encoded with no redirect server in the middle. Most "free" QR sites quietly route through their domain so they can repoint the destination later (or harvest scan data). Ours doesn't have a server to route through. You can verify in DevTools Network tab.
 
 ### Q: Why "techtuate" - what does the name mean?
 
