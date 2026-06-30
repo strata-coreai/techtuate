@@ -1,23 +1,9 @@
 // Builds the whole techtuate site into ./dist for Cloudflare Pages.
 //
-// Output layout:
-//   dist/
-//     index.html           (root landing)
-//     robots.txt           (root file)
-//     sitemap.xml          (root file)
-//     llms.txt             (root file)
-//     assets/              (shared CSS for marketing pages)
-//     vs/                  (comparison hub + per-competitor pages)
-//     why-free/            (article)
-//     free-pdf-editor/     (SEO landing)
-//     pdf-editor/          (built Vite app from pdf-editor/dist)
-//
 // Adding a new tool: drop a folder into the repo root, either
 //   (a) a Vite/React app that builds to ./<name>/dist, OR
 //   (b) plain static files (will be copied as-is).
 // Then add the folder name to the TOOLS array below.
-//
-// Adding a new marketing page: drop it under STATIC_DIRS or ROOT_STATIC.
 
 import { execSync } from 'node:child_process';
 import { cpSync, mkdirSync, rmSync, existsSync, copyFileSync } from 'node:fs';
@@ -43,7 +29,6 @@ const ROOT_STATIC_FILES = [
 ];
 
 // Whole directories at the repo root to copy as-is (recursively).
-// These are static marketing/SEO pages and shared assets.
 const STATIC_DIRS = [
   'assets',
   'vs',
@@ -52,6 +37,7 @@ const STATIC_DIRS = [
   'qr-code',
   'password-generator',
   'svg-converter',
+  'sql-to-excel',
 ];
 
 function log(...args) { console.log('[build]', ...args); }

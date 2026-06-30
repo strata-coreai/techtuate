@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>techtuate vs. SQLite Online - preview SQL safely + export to Excel (2026)</title>
+  <meta name="description" content="SQLite Online runs your SQL in a full in-browser IDE. techtuate's SQL to table tool never runs it - it previews the rows a script adds and flags what it deletes or changes, then exports to Excel. Two different jobs." />
+  <meta name="keywords" content="sqliteonline alternative, sql to excel, sql preview, sql to table, view sql online, sql safety check, sqliteonline vs" />
+  <link rel="canonical" href="https://techtuate.com/vs/sqliteonline/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://techtuate.com/vs/sqliteonline/" />
+  <meta property="og:title" content="techtuate vs. SQLite Online (2026)" />
+  <meta property="og:description" content="A live SQL IDE vs. a safe, read-only SQL previewer with one-click Excel export. When to reach for each." />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"techtuate vs. SQLite Online","url":"https://techtuate.com/vs/sqliteonline/","datePublished":"2026-06-30","author":{"@type":"Organization","name":"techtuate"}}</script>
+</head>
+<body>
+  <div class="topbanner">tools that should be free, are. no sign-up, no ads, ever. <a href="/why-free/">read why</a></div>
+  <div class="wrap">
+    <header class="site">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">tech<span>tuate</span></span></a>
+      <nav class="top"><a href="/#tools">tools</a><a href="/vs/" class="active">vs.</a><a href="/why-free/">why</a></nav>
+    </header>
+
+    <article class="prose">
+      <h1>techtuate vs. SQLite Online</h1>
+      <p class="byline">Checked June 2026. Both are free and run in your browser - this is about which job each one is built for.</p>
+
+      <p class="lede">
+        SQLite Online is an excellent free SQL playground. You paste SQL, it runs, you see results. techtuate's SQL to table tool does the opposite on purpose: it never runs your SQL. It reads the script, shows you the rows an INSERT would add, and tells you in plain English what anything else would delete or change - before you run it for real somewhere else.
+      </p>
+
+      <div class="callout yellow">
+        <h4>TL;DR</h4>
+        <p>SQLite Online = a real engine that executes your SQL across SQLite, Postgres, MySQL and more. techtuate = a read-only previewer that never executes, flags destructive statements, and exports the new rows straight to a real .xlsx workbook. Use the first to run queries, the second to sanity-check a script and pull its data into Excel.</p>
+      </div>
+
+      <h2>What SQLite Online is great at</h2>
+      <p>Credit where it's due - it's a genuinely good, free tool, and for a lot of work it's the right one:</p>
+      <ul>
+        <li><strong>It actually runs SQL.</strong> SELECTs, JOINs, CTEs, the whole language, against a real engine.</li>
+        <li><strong>Many engines.</strong> SQLite, DuckDB, PGLite, MariaDB/MySQL, PostgreSQL, and MS SQL Server.</li>
+        <li><strong>No sign-up to start</strong>, and it can connect to remote databases via share links when you need that.</li>
+        <li><strong>A full IDE feel</strong> - schema browser, query history, AI error help.</li>
+      </ul>
+
+      <h2>Where the two tools differ</h2>
+      <p>The gap isn't price - both are free. It's what happens to your SQL:</p>
+      <ul>
+        <li><strong>Execution vs. preview.</strong> SQLite Online executes what you paste. If a script has a stray <code>DELETE</code> with no <code>WHERE</code>, running it does the damage. techtuate never executes - it just shows you that the <code>DELETE</code> would remove every row, so you catch it first.</li>
+        <li><strong>Plain-English change notes.</strong> techtuate labels every statement ADDS / CHANGES / DELETES and warns loudly on the irreversible ones (DROP, TRUNCATE, WHERE-less UPDATE/DELETE). You don't need to read the SQL closely to see the blast radius.</li>
+        <li><strong>One-click Excel.</strong> techtuate turns the INSERT rows into a real multi-sheet <code>.xlsx</code> (one sheet per table) plus per-table CSV. Exporting from a query IDE usually means CSV first, then opening that in Excel.</li>
+        <li><strong>Nothing to load or connect.</strong> Paste a script, read it. No engine to pick, no schema to set up, no remote connection - so for this job nothing leaves your tab at all.</li>
+      </ul>
+
+      <h2>When to use which</h2>
+      <p>Reach for <strong>SQLite Online</strong> when you want to actually run queries, explore a dataset, or test logic against a real engine.</p>
+      <p>Reach for <strong>techtuate's SQL to table</strong> when someone hands you a migration or a generated script and you want to know - fast and safely - what it adds, what it would wreck, and to lift its data into a spreadsheet without running anything.</p>
+
+      <div class="cta">
+        <h3>Check a script before you run it.</h3>
+        <p>Paste SQL, see the rows and the risks, download to Excel. No sign-up, no upload.</p>
+        <a class="btn" href="/sql-to-excel/">Open SQL to table</a>
+      </div>
+
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
+        See also: <a href="/vs/">all comparisons</a> &middot; <a href="/sql-to-excel/">SQL to table</a> &middot; <a href="/json-formatter/">JSON formatter</a>
+      </p>
+    </article>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div><a href="/sql-to-excel/">sql to table</a> &middot; <a href="/vs/">comparisons</a></div>
+    </footer>
+  </div>
+  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>

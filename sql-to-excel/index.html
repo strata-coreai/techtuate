@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Free SQL to Excel + change preview - in your browser - techtuate</title>
+  <meta name="description" content="Paste SQL to see the rows it adds as a downloadable Excel or CSV table, plus plain-English notes on what it deletes or changes. Runs in your browser, nothing is uploaded." />
+  <meta name="keywords" content="sql to excel, sql to table, sql to csv, convert sql to excel, sql insert to excel, view sql online, sql preview, what does this sql do, free sql to excel no upload" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/sql-to-excel/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cellipse cx='32' cy='20' rx='16' ry='7' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M16 20 v24 c0 3.9 7.2 7 16 7 s16-3.1 16-7 V20' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M16 32 c0 3.9 7.2 7 16 7 s16-3.1 16-7' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/sql-to-excel/" />
+  <meta property="og:title" content="SQL to Excel + change preview - free, no upload" />
+  <meta property="og:description" content="Paste SQL, get the new rows as an Excel/CSV table plus plain-English notes on what it deletes or changes. Everything runs in your browser." />
+  <meta property="og:image" content="https://techtuate.com/assets/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://techtuate.com/assets/og-default.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate SQL to Excel",
+    "url": "https://techtuate.com/sql-to-excel/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Paste SQL to see the rows it adds as a downloadable Excel or CSV table, plus plain-English notes on what it deletes or changes. Runs entirely in your browser - nothing is uploaded.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <style>
+    .sql-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-top: 8px; }
+    @media (max-width: 820px) { .sql-layout { grid-template-columns: 1fr; } }
+
+    .pane-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--ink-mute); margin-bottom: 8px; display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+    .sql-input {
+      width: 100%; min-height: 360px; resize: vertical;
+      border: 2px solid var(--ink); border-radius: var(--r-md);
+      padding: 14px; font-family: var(--font-mono); font-size: 13px; line-height: 1.55;
+      background: var(--bg); color: var(--ink); white-space: pre; overflow-wrap: normal; overflow-x: auto;
+    }
+    .sql-input.drag-over { background: var(--yellow-wash); border-color: var(--yellow-deep); }
+    .input-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .mini-btn {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+      padding: 6px 11px; background: var(--bg); border: 2px solid var(--ink);
+      border-radius: 999px; cursor: pointer; transition: background .12s;
+    }
+    .mini-btn:hover { background: var(--yellow); }
+
+    .summary-bar {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+      font-family: var(--font-mono); font-size: 12px;
+    }
+    .sum-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px; border: 2px solid var(--ink); border-radius: 999px; font-weight: 700;
+    }
+    .sum-chip.adds { background: var(--bg); }
+    .sum-chip.changes { background: var(--yellow); }
+    .sum-chip.deletes { background: var(--ink); color: var(--bg); }
+
+    .notes { display: flex; flex-direction: column; gap: 10px; }
+    .note-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      border: 2px solid var(--ink); border-radius: var(--r-md);
+      padding: 12px 14px; background: var(--bg);
+    }
+    .note-row.danger { background: var(--yellow-wash); box-shadow: 3px 3px 0 var(--ink); }
+    .badge {
+      flex-shrink: 0; font-family: var(--font-mono); font-size: 10.5px; font-weight: 800;
+      letter-spacing: 0.04em; padding: 4px 8px; border: 2px solid var(--ink); border-radius: 6px;
+      min-width: 62px; text-align: center;
+    }
+    .badge.add { background: var(--bg); }
+    .badge.change { background: var(--yellow); }
+    .badge.delete { background: var(--ink); color: var(--bg); }
+    .badge.info { background: var(--bg-soft); color: var(--ink-mute); border-color: var(--ink-dim); }
+    .note-text { font-size: 14px; line-height: 1.5; }
+    .note-text .tbl { font-family: var(--font-mono); font-weight: 700; }
+    .note-text .warn {
+      display: inline-block; margin-top: 4px; font-family: var(--font-mono);
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+      background: var(--ink); color: var(--yellow); padding: 2px 7px; border-radius: 999px;
+    }
+
+    .table-card { border: 2px solid var(--ink); border-radius: var(--r-md); margin-top: 18px; overflow: hidden; }
+    .table-card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+      padding: 10px 14px; background: var(--bg-soft); border-bottom: 2px solid var(--ink);
+    }
+    .table-card-head h4 { margin: 0; font-family: var(--font-display); font-size: 16px; font-weight: 800; }
+    .table-card-head .rowcount { font-family: var(--font-mono); font-size: 11px; color: var(--ink-mute); }
+    .table-scroll { overflow-x: auto; }
+    table.data { border-collapse: collapse; width: 100%; font-size: 13px; }
+    table.data th, table.data td {
+      padding: 7px 11px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line);
+      text-align: left; white-space: nowrap; vertical-align: top;
+    }
+    table.data thead th {
+      font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+      background: var(--yellow-soft); border-bottom: 2px solid var(--ink); position: sticky; top: 0;
+    }
+    table.data td.num { font-family: var(--font-mono); text-align: right; }
+    table.data td.null { color: var(--ink-dim); font-style: italic; }
+
+    .empty-state { color: var(--ink-mute); font-size: 14px; padding: 18px 2px; }
+    .results-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 14px; }
+    .xlsx-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; transform: none; }
+    .csv-link { font-family: var(--font-mono); font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid var(--ink); background: var(--bg); border-radius: 999px; padding: 5px 11px; }
+    .csv-link:hover { background: var(--yellow); }
+  </style>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads, ever.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">free sql to excel + change preview</div>
+      <h1>SQL to table</h1>
+      <p class="lede">
+        Paste SQL and see two things at once: the rows it would add, as a table you can download to Excel or CSV,
+        and plain-English notes on anything it deletes or changes. It never runs your SQL and nothing is uploaded.
+      </p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>Everything runs in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <div class="sql-layout">
+        <!-- input -->
+        <div>
+          <div class="pane-label"><span>your SQL</span><span id="stmtCount"></span></div>
+          <textarea class="sql-input" id="sqlInput" spellcheck="false" placeholder="Paste SQL here, or drop a .sql file..."></textarea>
+          <div class="input-actions">
+            <button class="mini-btn" id="sampleBtn" type="button">load sample</button>
+            <button class="mini-btn" id="clearBtn" type="button">clear</button>
+            <span class="csv-link" id="pickFileBtn" role="button" tabindex="0">open .sql file</span>
+            <input type="file" id="fileInput" accept=".sql,.txt,text/plain" hidden />
+          </div>
+        </div>
+
+        <!-- preview -->
+        <div>
+          <div class="pane-label"><span>what this SQL does</span></div>
+          <div id="summaryBar" class="summary-bar"></div>
+          <div id="notes" class="notes">
+            <div class="empty-state">Notes will appear here as you type. Each statement gets a short, plain-English note.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- results / tables -->
+      <section style="margin-top: 36px;" id="resultsSection" hidden>
+        <div class="results-head">
+          <div class="section-head" style="border:none; margin:0; padding:0;"><h2>Rows to be added</h2></div>
+          <button class="btn xlsx-btn" id="xlsxBtn" type="button" disabled>Download Excel (.xlsx)</button>
+        </div>
+        <div id="tables"></div>
+      </section>
+
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Reads SQL entirely in your browser - it never connects to a database and never uploads your code or data.
+        It pulls the rows out of <code>INSERT</code> statements into a clean table you can export to Excel or CSV,
+        and reads every other statement to tell you, in plain English, whether it adds, changes, or deletes data.
+        Handy for reviewing a migration or a generated script before you run it. Part of
+        <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>.
+      </p>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/pdf-editor/">pdf editor</a> &middot;
+        <a href="/sql-to-excel/">sql to excel</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    /* ============================================================
+       SQL parsing - no engine, just reads what the statements say
+       ============================================================ */
+
+    function ident(raw) {
+      if (!raw) return raw;
+      return raw.trim().replace(/^[`"\[]/, '').replace(/[`"\]]$/, '');
+    }
+
+    // Split a SQL string into statements, respecting strings + comments.
+    function splitStatements(sql) {
+      const out = [];
+      let cur = '', i = 0;
+      const n = sql.length;
+      while (i < n) {
+        const c = sql[i], c2 = sql[i + 1];
+        if (c === '-' && c2 === '-') { let j = i + 2; while (j < n && sql[j] !== '\n') j++; i = j; continue; }
+        if (c === '/' && c2 === '*') { let j = i + 2; while (j < n && !(sql[j] === '*' && sql[j + 1] === '/')) j++; i = j + 2; continue; }
+        if (c === "'" || c === '"' || c === '`') {
+          const q = c; cur += c; let j = i + 1;
+          while (j < n) {
+            if (sql[j] === q) {
+              if (sql[j + 1] === q) { cur += q + q; j += 2; continue; }
+              cur += q; j++; break;
+            }
+            if (q === "'" && sql[j] === '\\' && j + 1 < n) { cur += sql[j] + sql[j + 1]; j += 2; continue; }
+            cur += sql[j]; j++;
+          }
+          i = j; continue;
+        }
+        if (c === ';') { if (cur.trim()) out.push(cur.trim()); cur = ''; i++; continue; }
+        cur += c; i++;
+      }
+      if (cur.trim()) out.push(cur.trim());
+      return out;
+    }
+
+    // Split a clause on top-level commas (respecting strings + parens).
+    function splitTopLevel(text) {
+      const parts = []; let cur = '', depth = 0, inStr = false, q = '';
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inStr) {
+          cur += c;
+          if (c === q) { if (text[i + 1] === q) { cur += q; i++; } else inStr = false; }
+          else if (q === "'" && c === '\\' && i + 1 < text.length) { cur += text[i + 1]; i++; }
+          continue;
+        }
+        if (c === "'" || c === '"' || c === '`') { inStr = true; q = c; cur += c; continue; }
+        if (c === '(') { depth++; cur += c; continue; }
+        if (c === ')') { depth--; cur += c; continue; }
+        if (c === ',' && depth === 0) { parts.push(cur); cur = ''; continue; }
+        cur += c;
+      }
+      if (cur.trim() !== '' || parts.length) parts.push(cur);
+      return parts.map(s => s.trim()).filter(s => s.length);
+    }
+
+    // Pull out parenthesised value tuples from a VALUES clause.
+    function scanTuples(text) {
+      const tuples = []; let i = 0; const n = text.length;
+      while (i < n) {
+        while (i < n && text[i] !== '(') i++;
+        if (i >= n) break;
+        i++; let depth = 1, cur = '', vals = [], inStr = false, q = '';
+        while (i < n && depth > 0) {
+          const c = text[i];
+          if (inStr) {
+            cur += c;
+            if (c === q) { if (text[i + 1] === q) { cur += q; i += 2; continue; } inStr = false; }
+            else if (q === "'" && c === '\\' && i + 1 < n) { cur += text[i + 1]; i += 2; continue; }
+            i++; continue;
+          }
+          if (c === "'" || c === '"' || c === '`') { inStr = true; q = c; cur += c; i++; continue; }
+          if (c === '(') { depth++; cur += c; i++; continue; }
+          if (c === ')') { depth--; if (depth === 0) { vals.push(cur); i++; break; } cur += c; i++; continue; }
+          if (c === ',' && depth === 1) { vals.push(cur); cur = ''; i++; continue; }
+          cur += c; i++;
+        }
+        tuples.push(vals.map(v => v.trim()));
+      }
+      return tuples;
+    }
+
+    // Turn a raw value token into a typed value.
+    function normValue(raw) {
+      const t = (raw || '').trim();
+      if (t === '') return { type: 'null', text: '' };
+      if (/^null$/i.test(t)) return { type: 'null', text: '' };
+      if (t[0] === "'" && t[t.length - 1] === "'") {
+        return { type: 'string', text: t.slice(1, -1).replace(/''/g, "'").replace(/\\'/g, "'").replace(/\\\\/g, '\\') };
+      }
+      if (t[0] === '"' && t[t.length - 1] === '"') {
+        return { type: 'string', text: t.slice(1, -1).replace(/""/g, '"') };
+      }
+      if (/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(t)) return { type: 'number', text: t };
+      return { type: 'string', text: t }; // expression like NOW(), TRUE, etc.
+    }
+
+    function q(name) { return name || 'the target table'; }
+
+    // Plain-English note for one statement.
+    function analyze(stmt) {
+      const s = stmt.trim();
+      const KW = (s.match(/^\(*\s*([a-zA-Z]+)/) || [])[1];
+      const kw = KW ? KW.toUpperCase() : '';
+      const hasWhere = /\bWHERE\b/i.test(s);
+      const idRe = "([`\"\\[]?[\\w.]+[`\"\\]]?)";
+      const grab = re => ident((s.match(re) || [])[1]);
+
+      if (kw === 'INSERT') {
+        const tbl = grab(new RegExp("\\bINTO\\s+" + idRe, "i"));
+        if (/ON\s+DUPLICATE\s+KEY/i.test(s))
+          return { sev: 'change', badge: 'CHANGES', table: tbl, note: 'May overwrite existing rows in ' + q(tbl) + ' when a key already exists.' };
+        return { sev: 'add', badge: 'ADDS', table: tbl, note: 'Adds new row(s) to ' + q(tbl) + '. Nothing existing is removed.' };
+      }
+      if (kw === 'REPLACE') {
+        const tbl = grab(new RegExp("REPLACE\\s+(?:INTO\\s+)?" + idRe, "i"));
+        return { sev: 'change', badge: 'CHANGES', table: tbl, note: 'Inserts row(s) into ' + q(tbl) + ', overwriting any existing row with the same key.' };
+      }
+      if (kw === 'UPDATE') {
+        const tbl = grab(new RegExp("^UPDATE\\s+" + idRe, "i"));
+        if (!hasWhere) return { sev: 'change', badge: 'CHANGES', table: tbl, warn: 'no WHERE - every row', note: 'Changes EVERY row in ' + q(tbl) + ' - there is no WHERE clause to limit it.' };
+        return { sev: 'change', badge: 'CHANGES', table: tbl, note: 'Changes existing rows in ' + q(tbl) + ' that match the WHERE condition.' };
+      }
+      if (kw === 'DELETE') {
+        const tbl = grab(new RegExp("FROM\\s+" + idRe, "i"));
+        if (!hasWhere) return { sev: 'delete', badge: 'DELETES', table: tbl, warn: 'no WHERE - all rows', note: 'Deletes ALL rows from ' + q(tbl) + ' - there is no WHERE clause. Cannot be undone.' };
+        return { sev: 'delete', badge: 'DELETES', table: tbl, note: 'Deletes rows from ' + q(tbl) + ' that match the WHERE condition. Cannot be undone.' };
+      }
+      if (kw === 'TRUNCATE') {
+        const tbl = grab(new RegExp("TRUNCATE\\s+(?:TABLE\\s+)?" + idRe, "i"));
+        return { sev: 'delete', badge: 'DELETES', table: tbl, warn: 'empties the table', note: 'Empties ' + q(tbl) + ' - removes every row. Cannot be undone.' };
+      }
+      if (kw === 'DROP') {
+        const what = ((s.match(/^DROP\s+(\w+)/i) || [])[1] || 'object').toLowerCase();
+        const tbl = grab(new RegExp("^DROP\\s+\\w+\\s+(?:IF\\s+EXISTS\\s+)?" + idRe, "i"));
+        return { sev: 'delete', badge: 'DELETES', table: tbl, warn: 'structure + data', note: 'Deletes the entire ' + what + ' ' + q(tbl) + ', including all of its data and structure. Cannot be undone.' };
+      }
+      if (kw === 'ALTER') {
+        const tbl = grab(new RegExp("ALTER\\s+TABLE\\s+" + idRe, "i"));
+        if (/\bDROP\s+(COLUMN\b|[`"\[]?\w)/i.test(s))
+          return { sev: 'delete', badge: 'DELETES', table: tbl, warn: 'column data lost', note: 'Removes a column from ' + q(tbl) + '. Any data in that column is lost.' };
+        return { sev: 'change', badge: 'CHANGES', table: tbl, note: 'Changes the structure of ' + q(tbl) + ' (for example adds or modifies a column).' };
+      }
+      if (kw === 'CREATE') {
+        const orReplace = /CREATE\s+OR\s+REPLACE/i.test(s);
+        const what = ((s.match(/^CREATE\s+(?:OR\s+REPLACE\s+)?(?:TEMPORARY\s+)?(\w+)/i) || [])[1] || 'object').toLowerCase();
+        const tbl = grab(new RegExp("^CREATE\\s+(?:OR\\s+REPLACE\\s+)?(?:TEMPORARY\\s+)?\\w+\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?" + idRe, "i"));
+        if (orReplace) return { sev: 'change', badge: 'CHANGES', table: tbl, note: 'Creates or replaces ' + what + ' ' + q(tbl) + ' - an existing one with this name would be overwritten.' };
+        return { sev: 'add', badge: 'ADDS', table: tbl, note: 'Creates a new ' + what + ' ' + q(tbl) + '. Nothing existing is changed.' };
+      }
+      if (kw === 'MERGE') {
+        const tbl = grab(new RegExp("MERGE\\s+(?:INTO\\s+)?" + idRe, "i"));
+        return { sev: 'change', badge: 'CHANGES', table: tbl, note: 'Inserts, updates, or deletes rows in ' + q(tbl) + ' depending on what matches. Can change existing data.' };
+      }
+      return { sev: 'info', badge: 'READ', table: null, note: (kw || 'This statement') + ' does not add, change, or delete stored data.' };
+    }
+
+    // Pull rows out of an INSERT (VALUES form, column-less, or MySQL SET form).
+    function extractInsert(stmt, tables) {
+      const intoRe = /\b(?:INTO)\s+([`"\[]?[\w.]+[`"\]]?)/i;
+      let m = stmt.match(intoRe);
+      if (!m && /^REPLACE/i.test(stmt)) m = stmt.match(/^REPLACE\s+(?:INTO\s+)?([`"\[]?[\w.]+[`"\]]?)/i);
+      if (!m) return;
+      const table = ident(m[1]);
+      const after = stmt.slice(m.index + m[0].length);
+
+      // find VALUES keyword position outside of any quotes/parens-of-columns
+      const valuesMatch = after.match(/\bVALUES?\b/i);
+      let columns = null, rows = [];
+
+      // optional column list before VALUES (or before end)
+      const colListMatch = after.match(/^\s*\(([\s\S]*?)\)\s*(?:VALUES?|SELECT|$)/i);
+      if (colListMatch && (!valuesMatch || after.indexOf(colListMatch[0]) < valuesMatch.index + 1)) {
+        columns = splitTopLevel(colListMatch[1]).map(ident);
+      }
+
+      if (valuesMatch) {
+        const tupleText = after.slice(valuesMatch.index + valuesMatch[0].length);
+        const tuples = scanTuples(tupleText);
+        rows = tuples.map(t => t.map(normValue));
+      } else {
+        // MySQL: INSERT INTO t SET a=1, b='x'
+        const setMatch = after.match(/\bSET\b([\s\S]*)$/i);
+        if (setMatch) {
+          const pairs = splitTopLevel(setMatch[1]);
+          const cols = [], vals = [];
+          for (const p of pairs) {
+            const eq = p.indexOf('=');
+            if (eq === -1) continue;
+            cols.push(ident(p.slice(0, eq)));
+            vals.push(normValue(p.slice(eq + 1)));
+          }
+          if (cols.length) { columns = cols; rows = [vals]; }
+        }
+      }
+
+      if (!rows.length) return; // e.g. INSERT ... SELECT - note still fires, just no table
+
+      const width = Math.max(columns ? columns.length : 0, ...rows.map(r => r.length));
+      if (!columns) { columns = []; for (let i = 0; i < width; i++) columns.push('col' + (i + 1)); }
+      while (columns.length < width) columns.push('col' + (columns.length + 1));
+
+      if (!tables[table]) tables[table] = { name: table, columns: columns.slice(), rows: [] };
+      const T = tables[table];
+      while (T.columns.length < width) T.columns.push('col' + (T.columns.length + 1));
+      for (const r of rows) {
+        const row = [];
+        for (let i = 0; i < T.columns.length; i++) row.push(r[i] || { type: 'null', text: '' });
+        T.rows.push(row);
+      }
+    }
+
+    function parseSql(sql) {
+      const statements = splitStatements(sql);
+      const notes = [], tables = {};
+      for (const st of statements) {
+        const a = analyze(st);
+        notes.push(a);
+        const kw = (st.match(/^\(*\s*([a-zA-Z]+)/) || [])[1];
+        if (kw && /^(INSERT|REPLACE)$/i.test(kw)) {
+          try { extractInsert(st, tables); } catch (e) { /* ignore one bad insert */ }
+        }
+      }
+      return { statements, notes, tables: Object.values(tables) };
+    }
+
+    /* ============================================================
+       Dependency-free .xlsx writer (zip STORE + CRC32)
+       ============================================================ */
+
+    const CRC_TABLE = (() => {
+      const t = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+      return t;
+    })();
+    function crc32(bytes) { let c = 0xFFFFFFFF; for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+    function concatBytes(arrs) { let len = 0; for (const a of arrs) len += a.length; const out = new Uint8Array(len); let o = 0; for (const a of arrs) { out.set(a, o); o += a.length; } return out; }
+    const _enc = new TextEncoder();
+    function u16(v) { return new Uint8Array([v & 0xFF, (v >>> 8) & 0xFF]); }
+    function u32(v) { return new Uint8Array([v & 0xFF, (v >>> 8) & 0xFF, (v >>> 16) & 0xFF, (v >>> 24) & 0xFF]); }
+
+    function zipStore(files) {
+      const locals = [], central = []; let offset = 0;
+      for (const f of files) {
+        const nameBytes = _enc.encode(f.name);
+        const data = f.bytes;
+        const crc = crc32(data);
+        const local = concatBytes([
+          u32(0x04034b50), u16(20), u16(0), u16(0), u16(0), u16(0),
+          u32(crc), u32(data.length), u32(data.length),
+          u16(nameBytes.length), u16(0), nameBytes, data
+        ]);
+        locals.push(local);
+        central.push(concatBytes([
+          u32(0x02014b50), u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+          u32(crc), u32(data.length), u32(data.length),
+          u16(nameBytes.length), u16(0), u16(0), u16(0), u16(0), u32(0),
+          u32(offset), nameBytes
+        ]));
+        offset += local.length;
+      }
+      const cd = concatBytes(central);
+      const end = concatBytes([
+        u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length),
+        u32(cd.length), u32(offset), u16(0)
+      ]);
+      return concatBytes([...locals, cd, end]);
+    }
+
+    function xmlEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function colName(n) { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
+
+    function sheetXml(table) {
+      const rowsXml = [];
+      // header
+      const head = table.columns.map((c, i) =>
+        '<c r="' + colName(i + 1) + '1" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(c) + '</t></is></c>').join('');
+      rowsXml.push('<row r="1">' + head + '</row>');
+      table.rows.forEach((row, ri) => {
+        const r = ri + 2;
+        const cells = row.map((v, ci) => {
+          const ref = colName(ci + 1) + r;
+          if (v.type === 'number') return '<c r="' + ref + '"><v>' + xmlEsc(v.text) + '</v></c>';
+          if (v.type === 'null') return '<c r="' + ref + '"/>';
+          return '<c r="' + ref + '" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(v.text) + '</t></is></c>';
+        }).join('');
+        rowsXml.push('<row r="' + r + '">' + cells + '</row>');
+      });
+      return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+        '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' +
+        rowsXml.join('') + '</sheetData></worksheet>';
+    }
+
+    function safeSheetName(name, used) {
+      let n = (name || 'Sheet').replace(/[\[\]:\*\?\/\\]/g, '_').slice(0, 31) || 'Sheet';
+      let base = n, k = 2;
+      while (used.has(n.toLowerCase())) { n = (base.slice(0, 28) + '_' + k).slice(0, 31); k++; }
+      used.add(n.toLowerCase());
+      return n;
+    }
+
+    function buildXlsx(tables) {
+      const used = new Set();
+      const sheets = tables.map((t, i) => ({ id: i + 1, name: safeSheetName(t.name, used), table: t }));
+
+      const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+        '<Default Extension="xml" ContentType="application/xml"/>' +
+        '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+        sheets.map(s => '<Override PartName="/xl/worksheets/sheet' + s.id + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') +
+        '</Types>';
+
+      const rootRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+        '</Relationships>';
+
+      const workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' +
+        sheets.map(s => '<sheet name="' + xmlEsc(s.name) + '" sheetId="' + s.id + '" r:id="rId' + s.id + '"/>').join('') +
+        '</sheets></workbook>';
+
+      const wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        sheets.map(s => '<Relationship Id="rId' + s.id + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + s.id + '.xml"/>').join('') +
+        '</Relationships>';
+
+      const files = [
+        { name: '[Content_Types].xml', bytes: _enc.encode(contentTypes) },
+        { name: '_rels/.rels', bytes: _enc.encode(rootRels) },
+        { name: 'xl/workbook.xml', bytes: _enc.encode(workbook) },
+        { name: 'xl/_rels/workbook.xml.rels', bytes: _enc.encode(wbRels) },
+        ...sheets.map(s => ({ name: 'xl/worksheets/sheet' + s.id + '.xml', bytes: _enc.encode(sheetXml(s.table)) }))
+      ];
+      return zipStore(files);
+    }
+
+    function buildCsv(table) {
+      const esc = v => {
+        const s = v.type === 'null' ? '' : v.text;
+        return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      };
+      const lines = [table.columns.map(c => /[",\n\r]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c).join(',')];
+      for (const row of table.rows) lines.push(row.map(esc).join(','));
+      return '﻿' + lines.join('\r\n');
+    }
+
+    function download(bytesOrStr, name, mime) {
+      const blob = bytesOrStr instanceof Uint8Array ? new Blob([bytesOrStr], { type: mime }) : new Blob([bytesOrStr], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    }
+
+    /* ============================================================
+       UI wiring
+       ============================================================ */
+
+    const sqlInput = document.getElementById('sqlInput');
+    const notesEl = document.getElementById('notes');
+    const summaryBar = document.getElementById('summaryBar');
+    const tablesEl = document.getElementById('tables');
+    const resultsSection = document.getElementById('resultsSection');
+    const xlsxBtn = document.getElementById('xlsxBtn');
+    const stmtCount = document.getElementById('stmtCount');
+    let currentTables = [];
+
+    const SAMPLE = [
+      "-- Example: a typical migration script",
+      "CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(80), city VARCHAR(80), balance DECIMAL(10,2));",
+      "",
+      "INSERT INTO customers (id, name, city, balance) VALUES",
+      "  (1, 'Ada Lovelace', 'London', 250.00),",
+      "  (2, 'Alan Turing', 'Manchester', 0),",
+      "  (3, 'Grace Hopper', 'New York', 1340.50);",
+      "",
+      "UPDATE customers SET balance = balance + 100 WHERE city = 'London';",
+      "",
+      "DELETE FROM customers WHERE balance = 0;",
+      "",
+      "-- careful: no WHERE clause",
+      "UPDATE customers SET city = 'Unknown';",
+      "",
+      "DROP TABLE old_customers;"
+    ].join('\n');
+
+    function badgeClass(sev) { return sev === 'add' ? 'add' : sev === 'change' ? 'change' : sev === 'delete' ? 'delete' : 'info'; }
+
+    function render() {
+      const sql = sqlInput.value;
+      if (!sql.trim()) {
+        notesEl.innerHTML = '<div class="empty-state">Notes will appear here as you type. Each statement gets a short, plain-English note.</div>';
+        summaryBar.innerHTML = '';
+        resultsSection.hidden = true;
+        stmtCount.textContent = '';
+        currentTables = [];
+        return;
+      }
+      const { notes, tables } = parseSql(sql);
+      currentTables = tables;
+
+      stmtCount.textContent = notes.length + (notes.length === 1 ? ' statement' : ' statements');
+
+      // summary
+      const counts = { add: 0, change: 0, delete: 0 };
+      notes.forEach(n => { if (counts[n.sev] !== undefined) counts[n.sev]++; });
+      const chips = [];
+      if (counts.add) chips.push('<span class="sum-chip adds">' + counts.add + ' adds</span>');
+      if (counts.change) chips.push('<span class="sum-chip changes">' + counts.change + ' change' + (counts.change === 1 ? '' : 's') + '</span>');
+      if (counts.delete) chips.push('<span class="sum-chip deletes">' + counts.delete + ' delete' + (counts.delete === 1 ? '' : 's') + '</span>');
+      summaryBar.innerHTML = chips.join('');
+
+      // notes
+      notesEl.innerHTML = notes.map(n => {
+        const danger = (n.sev === 'delete' || n.warn) ? ' danger' : '';
+        const warn = n.warn ? '<br><span class="warn">heads up: ' + xmlEsc(n.warn) + '</span>' : '';
+        const txt = xmlEsc(n.note).replace(/(the target table|"[^"]*")/, m => m); // keep as-is
+        return '<div class="note-row' + danger + '"><span class="badge ' + badgeClass(n.sev) + '">' + n.badge + '</span>' +
+          '<div class="note-text">' + xmlEsc(n.note) + warn + '</div></div>';
+      }).join('');
+
+      // tables
+      if (tables.length) {
+        resultsSection.hidden = false;
+        xlsxBtn.disabled = false;
+        tablesEl.innerHTML = tables.map((t, ti) => {
+          const head = t.columns.map(c => '<th>' + xmlEsc(c) + '</th>').join('');
+          const body = t.rows.map(row => '<tr>' + row.map(v => {
+            const cls = v.type === 'number' ? ' class="num"' : v.type === 'null' ? ' class="null"' : '';
+            const text = v.type === 'null' ? 'NULL' : xmlEsc(v.text);
+            return '<td' + cls + '>' + text + '</td>';
+          }).join('') + '</tr>').join('');
+          return '<div class="table-card">' +
+            '<div class="table-card-head"><div><h4>' + xmlEsc(t.name) + '</h4> ' +
+            '<span class="rowcount">' + t.rows.length + ' row' + (t.rows.length === 1 ? '' : 's') + ' &middot; ' + t.columns.length + ' columns</span></div>' +
+            '<span class="csv-link" data-csv="' + ti + '">download .csv</span></div>' +
+            '<div class="table-scroll"><table class="data"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div></div>';
+        }).join('');
+        tablesEl.querySelectorAll('[data-csv]').forEach(el => {
+          el.addEventListener('click', () => {
+            const t = currentTables[+el.dataset.csv];
+            download(buildCsv(t), (t.name || 'table') + '.csv', 'text/csv;charset=utf-8');
+          });
+        });
+      } else {
+        resultsSection.hidden = true;
+        xlsxBtn.disabled = true;
+        tablesEl.innerHTML = '';
+      }
+    }
+
+    let debounce;
+    sqlInput.addEventListener('input', () => { clearTimeout(debounce); debounce = setTimeout(render, 120); });
+
+    xlsxBtn.addEventListener('click', () => {
+      if (!currentTables.length) return;
+      download(buildXlsx(currentTables), 'sql-tables.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    });
+
+    document.getElementById('sampleBtn').addEventListener('click', () => { sqlInput.value = SAMPLE; render(); });
+    document.getElementById('clearBtn').addEventListener('click', () => { sqlInput.value = ''; render(); sqlInput.focus(); });
+
+    // file open + drop
+    const fileInput = document.getElementById('fileInput');
+    document.getElementById('pickFileBtn').addEventListener('click', () => fileInput.click());
+    document.getElementById('pickFileBtn').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+    fileInput.addEventListener('change', () => { const f = fileInput.files[0]; if (f) readFile(f); });
+    function readFile(f) { const r = new FileReader(); r.onload = e => { sqlInput.value = e.target.result; render(); }; r.readAsText(f); }
+    sqlInput.addEventListener('dragover', e => { e.preventDefault(); sqlInput.classList.add('drag-over'); });
+    sqlInput.addEventListener('dragleave', () => sqlInput.classList.remove('drag-over'));
+    sqlInput.addEventListener('drop', e => {
+      e.preventDefault(); sqlInput.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0]; if (f) { e.stopPropagation(); readFile(f); }
+    });
+
+    render();
+  </script>
+</body>
+</html>
