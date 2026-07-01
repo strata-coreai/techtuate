@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Image &amp; GIF resizer - free, in your browser, no sign-up - techtuate</title>
-  <meta name="description" content="Resize and compress images and animated GIFs in your browser. Set exact dimensions or a target file size. PNG, JPG, WebP, GIF. Free, no upload, no sign-up, no watermark." />
-  <meta name="keywords" content="free image resizer, resize gif, compress image online, resize image to kb, image resizer no upload, gif resizer, reduce image file size, resize png jpg webp" />
+  <title>Image &amp; GIF resizer + cropper - free, in your browser, no sign-up - techtuate</title>
+  <meta name="description" content="Resize, crop, and compress images and animated GIFs in your browser. Exact dimensions, aspect-ratio crop (1:1, 16:9, 12:5 and more), or a target file size. PNG, JPG, WebP, GIF. Free, no upload, no sign-up." />
+  <meta name="keywords" content="free image resizer, crop image online, resize gif, aspect ratio crop, 12:5 crop, compress image online, resize image to kb, image cropper no upload, gif resizer" />
   <meta name="color-scheme" content="light" />
   <link rel="canonical" href="https://techtuate.com/image-resize/" />
   <link rel="stylesheet" href="/assets/site.css" />
@@ -13,20 +13,20 @@
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://techtuate.com/image-resize/" />
-  <meta property="og:title" content="Image &amp; GIF resizer - free, in your browser, no sign-up" />
-  <meta property="og:description" content="Resize and compress images and animated GIFs in your browser. Exact dimensions or a target file size. Nothing is uploaded." />
+  <meta property="og:title" content="Image &amp; GIF resizer + cropper - free, in your browser, no sign-up" />
+  <meta property="og:description" content="Resize, crop, and compress images and animated GIFs. Exact dimensions, aspect-ratio crop, or a target file size. Nothing is uploaded." />
   <meta name="twitter:card" content="summary_large_image" />
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "techtuate Image & GIF resizer",
+    "name": "techtuate Image & GIF resizer and cropper",
     "url": "https://techtuate.com/image-resize/",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Web Browser",
     "browserRequirements": "Requires JavaScript. Requires modern browser.",
-    "description": "Resize and compress images and animated GIFs entirely in your browser. Set exact pixel dimensions or a target file size. Nothing is uploaded.",
+    "description": "Resize, crop, and compress images and animated GIFs entirely in your browser. Exact pixel dimensions, aspect-ratio crop, or a target file size. Nothing is uploaded.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
@@ -91,6 +91,17 @@
       cursor: pointer; font-family: inherit; transition: background .12s;
     }
     .ir-chip:hover { background: var(--yellow); }
+    .ir-chip.active { background: var(--ink); color: var(--yellow); }
+
+    .ir-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
+    .ir-seg button {
+      border: none; background: var(--bg); color: var(--ink); font-family: inherit;
+      font-weight: 700; font-size: 12.5px; padding: 7px 14px; cursor: pointer;
+    }
+    .ir-seg button.active { background: var(--ink); color: var(--yellow); }
+
+    .ir-bg-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+    .ir-bg-row input[type=color] { width: 40px; height: 30px; border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--bg); cursor: pointer; padding: 2px; }
 
     .ir-select, .ir-range { width: 100%; }
     .ir-select {
@@ -119,13 +130,29 @@
       background-position: 0 0, 0 9px, 9px -9px, -9px 0;
       overflow: hidden; padding: 14px;
     }
-    .ir-canvas-wrap img { max-width: 100%; max-height: 420px; display: block; image-rendering: auto; }
     .ir-placeholder { font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); text-align: center; }
+
+    /* crop stage */
+    .ir-stage { position: relative; display: inline-block; line-height: 0; max-width: 100%; touch-action: none; }
+    .ir-stage img { max-width: 100%; max-height: 420px; display: block; user-select: none; -webkit-user-drag: none; }
+    .ir-crop {
+      position: absolute; left: 0; top: 0; box-sizing: border-box;
+      border: 2px solid var(--yellow);
+      box-shadow: 0 0 0 9999px rgba(10, 10, 10, .45);
+      cursor: move;
+    }
+    .ir-crop::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(0,0,0,.55); pointer-events: none; }
+    .ir-hnd { position: absolute; width: 14px; height: 14px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 2px; box-sizing: border-box; }
+    .ir-hnd[data-dir=nw] { left: -8px; top: -8px; cursor: nwse-resize; }
+    .ir-hnd[data-dir=ne] { right: -8px; top: -8px; cursor: nesw-resize; }
+    .ir-hnd[data-dir=sw] { left: -8px; bottom: -8px; cursor: nesw-resize; }
+    .ir-hnd[data-dir=se] { right: -8px; bottom: -8px; cursor: nwse-resize; }
 
     .ir-result {
       margin-top: 16px; border: 2px solid var(--ink); border-radius: var(--r-md);
       padding: 14px 16px; background: var(--bg);
     }
+    .ir-result img { max-width: 100%; max-height: 240px; display: block; border: 2px solid var(--line); border-radius: var(--r-sm); margin-bottom: 12px; }
     .ir-stats { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-mono); font-size: 13px; margin-bottom: 14px; }
     .ir-stats div span { color: var(--ink-dim); }
     .ir-stats b { color: var(--ink); }
@@ -135,6 +162,7 @@
 
     .ir-go-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .btn[disabled] { opacity: .5; cursor: not-allowed; box-shadow: none; transform: none; }
+    .ir-linkbtn { background: none; border: none; color: var(--ink); font-family: inherit; font-size: 12px; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; }
   </style>
 </head>
 <body>
@@ -159,9 +187,9 @@
     </header>
 
     <section class="hero">
-      <div class="eyebrow">resize + compress, in your browser</div>
+      <div class="eyebrow">resize + crop + compress, in your browser</div>
       <h1>Image &amp; GIF resizer</h1>
-      <p class="lede">Drop an image or an animated GIF, set the size you want by pixels or by target file size, and download it. Nothing is uploaded - it all runs on your device.</p>
+      <p class="lede">Drop an image or an animated GIF. Crop it, fit it to an aspect ratio, set the size by pixels or by target file size, and download. Nothing is uploaded - it all runs on your device.</p>
     </section>
 
     <main>
@@ -189,24 +217,53 @@
           <div class="ir-options" id="ir-options" hidden>
 
             <div class="ir-row">
-              <span class="ir-label">Target dimensions (px)</span>
+              <span class="ir-label">Aspect ratio</span>
+              <div class="ir-presets" id="ir-ratios">
+                <button class="ir-chip active" data-ratio="free" type="button">Free</button>
+                <button class="ir-chip" data-ratio="orig" type="button">Original</button>
+                <button class="ir-chip" data-ratio="1:1" type="button">1:1</button>
+                <button class="ir-chip" data-ratio="4:3" type="button">4:3</button>
+                <button class="ir-chip" data-ratio="3:2" type="button">3:2</button>
+                <button class="ir-chip" data-ratio="16:9" type="button">16:9</button>
+                <button class="ir-chip" data-ratio="3:4" type="button">3:4</button>
+                <button class="ir-chip" data-ratio="2:3" type="button">2:3</button>
+                <button class="ir-chip" data-ratio="9:16" type="button">9:16</button>
+                <button class="ir-chip" data-ratio="5:4" type="button">5:4</button>
+                <button class="ir-chip" data-ratio="12:5" type="button">12:5</button>
+              </div>
+              <div style="margin-top:12px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <span class="ir-label" style="margin:0;">When it doesn't match</span>
+                <div class="ir-seg" id="ir-fit" role="group" aria-label="Fit mode">
+                  <button data-fit="cover" class="active" type="button">Crop to fill</button>
+                  <button data-fit="contain" type="button">Fit with padding</button>
+                </div>
+              </div>
+              <div class="ir-bg-row" id="ir-bg-row" hidden>
+                <label class="ir-check" for="ir-bg">Padding color <input type="color" id="ir-bg" value="#ffffff" /></label>
+                <label class="ir-check"><input type="checkbox" id="ir-bg-transparent" /> transparent</label>
+              </div>
+              <div class="ir-hint">Drag the box on the preview to crop. Pick a ratio to lock the box. "Crop to fill" trims to the ratio; "Fit with padding" keeps the whole image and adds a background.</div>
+              <button class="ir-linkbtn" id="ir-reset-crop" type="button" style="margin-top:8px;">Reset crop</button>
+            </div>
+
+            <div class="ir-row">
+              <span class="ir-label">Output size (px)</span>
               <div class="ir-dim">
-                <input class="ir-num" id="ir-w" type="number" min="1" inputmode="numeric" aria-label="Target width" />
+                <input class="ir-num" id="ir-w" type="number" min="1" inputmode="numeric" aria-label="Output width" />
                 <span class="ir-x">x</span>
-                <input class="ir-num" id="ir-h" type="number" min="1" inputmode="numeric" aria-label="Target height" />
+                <input class="ir-num" id="ir-h" type="number" min="1" inputmode="numeric" aria-label="Output height" />
                 <label class="ir-check"><input type="checkbox" id="ir-lock" checked /> lock ratio</label>
               </div>
               <div class="ir-presets" id="ir-presets">
                 <button class="ir-chip" data-scale="0.25" type="button">25%</button>
                 <button class="ir-chip" data-scale="0.5" type="button">50%</button>
                 <button class="ir-chip" data-scale="0.75" type="button">75%</button>
-                <button class="ir-chip" data-scale="1" type="button">100%</button>
                 <button class="ir-chip" data-scale="2" type="button">200%</button>
                 <button class="ir-chip" data-width="1920" type="button">1920w</button>
                 <button class="ir-chip" data-width="1280" type="button">1280w</button>
                 <button class="ir-chip" data-width="800" type="button">800w</button>
               </div>
-              <div class="ir-hint">Setting a size larger than the original upscales it (enhance). Quality is limited by the source.</div>
+              <div class="ir-hint">This is the final pixel size. Larger than the source upscales it (enhance); quality is limited by the original.</div>
             </div>
 
             <div class="ir-row">
@@ -238,18 +295,18 @@
             <div class="ir-row" id="ir-gif-note" hidden>
               <div class="callout wash" style="margin:0;">
                 <h4>Animated GIF</h4>
-                <p>This stays an animated GIF, all frames kept. Colors are optimized automatically. Big GIFs can take a few seconds.</p>
+                <p>This stays an animated GIF, all frames kept, cropped and fitted the same way. Colors are optimized automatically. Big GIFs can take a few seconds.</p>
               </div>
             </div>
 
             <div class="ir-go-row">
-              <button class="btn" id="ir-go" type="button">Resize</button>
+              <button class="btn" id="ir-go" type="button">Apply &amp; export</button>
               <span id="ir-status" style="font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim);"></span>
             </div>
           </div>
 
           <p class="ir-privacy">
-            Other resizers upload your photo to their server first. This one never does. Your file goes from your browser straight to your downloads folder - no account, no watermark, no size cap beyond what your device can hold in memory.
+            Other resizers and croppers upload your photo to their server first. This one never does. Your file goes from your browser straight to your downloads folder - no account, no watermark, no size cap beyond what your device can hold in memory.
           </p>
         </div>
 
@@ -257,10 +314,19 @@
         <div class="ir-preview-col">
           <div class="ir-canvas-wrap" id="ir-canvas-wrap">
             <div class="ir-placeholder" id="ir-ph">your image will<br>preview here</div>
-            <img id="ir-preview" alt="Preview" hidden />
+            <div class="ir-stage" id="ir-stage" hidden>
+              <img id="ir-preview" alt="Source preview" />
+              <div class="ir-crop" id="ir-crop" hidden>
+                <span class="ir-hnd" data-dir="nw"></span>
+                <span class="ir-hnd" data-dir="ne"></span>
+                <span class="ir-hnd" data-dir="sw"></span>
+                <span class="ir-hnd" data-dir="se"></span>
+              </div>
+            </div>
           </div>
 
           <div class="ir-result" id="ir-result" hidden>
+            <img id="ir-out-img" alt="Resized result" />
             <div class="ir-stats" id="ir-stats"></div>
             <button class="btn alt" id="ir-dl" type="button">Download</button>
             <div class="ir-warn" id="ir-warn" hidden></div>
@@ -277,11 +343,11 @@
         Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
       </p>
       <p style="max-width:680px; color:var(--ink-mute); margin-top:12px;">
-        Resize by exact pixels, by a percentage, or by a target file size (say, get a photo under 500 KB for an upload limit). Animated GIFs keep every frame - the tool decodes them, scales each frame, and re-encodes a fresh optimized GIF, all locally.
+        Resize by exact pixels, by a percentage, or by a target file size. Crop by dragging a box, or snap to an aspect ratio - 1:1, 4:3, 3:2, 16:9, 5:4, the portrait versions, and 12:5 for wide banners. Choose "crop to fill" to trim to the ratio, or "fit with padding" to keep the whole image and add a background color (or leave it transparent). Animated GIFs keep every frame and get cropped and fitted the same way, all locally.
       </p>
       <h3 style="margin-top: 28px; font-size: 18px;">Why "no upload" matters here</h3>
       <p style="max-width:680px; color:var(--ink-mute); margin-top:8px;">
-        Most online resizers (and every "compress to X KB" site) send your image to a server. For screenshots, ID scans, or anything private, that is a real leak. Your browser already has everything needed to decode, scale, and re-encode an image, so there is nothing to send anywhere.
+        Most online resizers and croppers (and every "compress to X KB" site) send your image to a server. For screenshots, ID scans, or anything private, that is a real leak. Your browser already has everything needed to decode, crop, scale, and re-encode an image, so there is nothing to send anywhere.
       </p>
       <p style="max-width:680px; margin-top:20px; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
         Comparison: <a href="/vs/ezgif/">vs. EZGIF</a> &middot; <a href="/vs/">all comparisons</a>
@@ -310,6 +376,12 @@
     var dropEl    = document.getElementById('ir-drop');
     var srcEl     = document.getElementById('ir-src');
     var optionsEl = document.getElementById('ir-options');
+    var ratiosEl  = document.getElementById('ir-ratios');
+    var fitEl     = document.getElementById('ir-fit');
+    var bgRow     = document.getElementById('ir-bg-row');
+    var bgColorEl = document.getElementById('ir-bg');
+    var bgTransEl = document.getElementById('ir-bg-transparent');
+    var resetCropEl = document.getElementById('ir-reset-crop');
     var wEl       = document.getElementById('ir-w');
     var hEl       = document.getElementById('ir-h');
     var lockEl    = document.getElementById('ir-lock');
@@ -328,8 +400,11 @@
     var goEl      = document.getElementById('ir-go');
     var statusEl  = document.getElementById('ir-status');
     var phEl      = document.getElementById('ir-ph');
+    var stageEl   = document.getElementById('ir-stage');
     var previewEl = document.getElementById('ir-preview');
+    var cropEl    = document.getElementById('ir-crop');
     var resultEl  = document.getElementById('ir-result');
+    var outImg    = document.getElementById('ir-out-img');
     var statsEl   = document.getElementById('ir-stats');
     var warnEl    = document.getElementById('ir-warn');
     var dlEl      = document.getElementById('ir-dl');
@@ -340,6 +415,9 @@
       srcW: 0, srcH: 0,
       isGif: false, bitmap: null,
       gif: null, frames: null, gifHasAlpha: false,
+      crop: { x: 0, y: 0, w: 1, h: 1 },   // fractions of the source
+      ratio: null,                         // null=free, 'orig', or {rw, rh}
+      fit: 'cover',
       outBlob: null, outName: 'resized'
     };
 
@@ -348,6 +426,7 @@
       if (n < 1024 * 1024) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB';
       return (n / 1048576).toFixed(2) + ' MB';
     }
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
     // ---------- file loading ----------
     fileInput.addEventListener('change', function (e) {
@@ -375,18 +454,19 @@
       state.isGif = file.type === 'image/gif';
 
       try {
-        if (state.isGif) {
-          await loadGif(file);
-        } else {
-          await loadStatic(file);
-        }
+        if (state.isGif) { await loadGif(file); } else { await loadStatic(file); }
       } catch (err) {
         console.error(err);
         alert('Could not read that file. It may be corrupt or an unsupported variant.');
         return;
       }
 
-      // default target = source dimensions
+      // reset crop / ratio / fit
+      state.crop = { x: 0, y: 0, w: 1, h: 1 };
+      state.ratio = null;
+      state.fit = 'cover';
+      setActiveChip(ratiosEl, 'free', 'ratio');
+      setActiveFit('cover');
       wEl.value = state.srcW;
       hEl.value = state.srcH;
 
@@ -404,10 +484,12 @@
 
       // show source preview
       phEl.hidden = true;
-      previewEl.hidden = false;
+      stageEl.hidden = false;
+      cropEl.hidden = false;
       if (previewEl.dataset.url) URL.revokeObjectURL(previewEl.dataset.url);
       var url = URL.createObjectURL(file);
       previewEl.dataset.url = url;
+      previewEl.onload = function () { layoutCrop(); };
       previewEl.src = url;
     }
 
@@ -416,8 +498,7 @@
       state.bitmap = bmp;
       state.srcW = bmp.width;
       state.srcH = bmp.height;
-      state.frames = null;
-      state.gif = null;
+      state.frames = null; state.gif = null;
     }
 
     async function loadGif(file) {
@@ -432,51 +513,190 @@
       state.bitmap = null;
     }
 
-    // ---------- dimension linking ----------
-    function ratio() { return state.srcH / state.srcW; }
-    wEl.addEventListener('input', function () {
-      if (lockEl.checked && state.srcW) {
-        var w = parseInt(wEl.value, 10);
-        if (w > 0) hEl.value = Math.max(1, Math.round(w * ratio()));
-      }
+    // ---------- aspect ratio + fit ----------
+    function parseRatio(id) {
+      if (id === 'free') return null;
+      if (id === 'orig') return { rw: state.srcW, rh: state.srcH };
+      var p = id.split(':');
+      return { rw: parseFloat(p[0]), rh: parseFloat(p[1]) };
+    }
+    function setActiveChip(container, value, attr) {
+      Array.prototype.forEach.call(container.querySelectorAll('.ir-chip'), function (b) {
+        b.classList.toggle('active', b.dataset[attr] === value);
+      });
+    }
+    function setActiveFit(fit) {
+      Array.prototype.forEach.call(fitEl.querySelectorAll('button'), function (b) {
+        b.classList.toggle('active', b.dataset.fit === fit);
+      });
+      bgRow.hidden = fit !== 'contain';
+    }
+
+    ratiosEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.ir-chip'); if (!btn || !state.srcW) return;
+      setActiveChip(ratiosEl, btn.dataset.ratio, 'ratio');
+      state.ratio = parseRatio(btn.dataset.ratio);
+      applyRatioLayout();
     });
-    hEl.addEventListener('input', function () {
-      if (lockEl.checked && state.srcH) {
-        var h = parseInt(hEl.value, 10);
-        if (h > 0) wEl.value = Math.max(1, Math.round(h / ratio()));
-      }
+    fitEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('button'); if (!btn) return;
+      state.fit = btn.dataset.fit;
+      setActiveFit(state.fit);
+      applyRatioLayout();
     });
-    lockEl.addEventListener('change', function () {
-      if (lockEl.checked && state.srcW) {
-        var w = parseInt(wEl.value, 10) || state.srcW;
-        hEl.value = Math.max(1, Math.round(w * ratio()));
-      }
+    resetCropEl.addEventListener('click', function () {
+      state.crop = { x: 0, y: 0, w: 1, h: 1 };
+      state.ratio = null;
+      setActiveChip(ratiosEl, 'free', 'ratio');
+      applyRatioLayout();
     });
-    presetsEl.addEventListener('click', function (e) {
-      var btn = e.target.closest('.ir-chip');
-      if (!btn || !state.srcW) return;
-      if (btn.dataset.scale) {
-        var s = parseFloat(btn.dataset.scale);
-        wEl.value = Math.max(1, Math.round(state.srcW * s));
-        hEl.value = Math.max(1, Math.round(state.srcH * s));
-      } else if (btn.dataset.width) {
-        var w = parseInt(btn.dataset.width, 10);
-        wEl.value = w;
-        hEl.value = Math.max(1, Math.round(w * ratio()));
+    bgTransEl.addEventListener('change', function () { bgColorEl.disabled = bgTransEl.checked; });
+
+    // largest centered crop of ratio rw:rh within the source (in fractions)
+    function centeredRatioCrop(rw, rh) {
+      var srcR = state.srcW / state.srcH, tR = rw / rh, w, h;
+      if (tR > srcR) { w = 1; h = (state.srcW / tR) / state.srcH; }
+      else { h = 1; w = (state.srcH * tR) / state.srcW; }
+      return { x: (1 - w) / 2, y: (1 - h) / 2, w: w, h: h };
+    }
+
+    function applyRatioLayout() {
+      if (state.ratio) {
+        if (state.fit === 'cover') {
+          state.crop = centeredRatioCrop(state.ratio.rw, state.ratio.rh);
+        } else {
+          // contain: use the whole image, output canvas takes the ratio
+          state.crop = { x: 0, y: 0, w: 1, h: 1 };
+        }
       }
+      syncOutputToLayout();
+      layoutCrop();
+    }
+
+    // set the output width/height inputs from the current crop + fit + ratio
+    function syncOutputToLayout() {
+      var cw = Math.round(state.crop.w * state.srcW);
+      var ch = Math.round(state.crop.h * state.srcH);
+      if (state.fit === 'contain' && state.ratio) {
+        var tR = state.ratio.rw / state.ratio.rh;
+        var ow, oh;
+        if (cw / ch >= tR) { ow = cw; oh = Math.round(cw / tR); }
+        else { oh = ch; ow = Math.round(ch * tR); }
+        wEl.value = Math.max(1, ow); hEl.value = Math.max(1, oh);
+      } else {
+        wEl.value = Math.max(1, cw); hEl.value = Math.max(1, ch);
+      }
+    }
+
+    // ---------- crop box interaction ----------
+    function layoutCrop() {
+      if (stageEl.hidden) return;
+      var iw = previewEl.clientWidth, ih = previewEl.clientHeight;
+      if (!iw || !ih) return;
+      cropEl.style.left = (state.crop.x * iw) + 'px';
+      cropEl.style.top = (state.crop.y * ih) + 'px';
+      cropEl.style.width = (state.crop.w * iw) + 'px';
+      cropEl.style.height = (state.crop.h * ih) + 'px';
+    }
+    window.addEventListener('resize', layoutCrop);
+
+    var drag = null;
+    function ratioHFromW(w) {
+      // fraction height that keeps the source-pixel ratio rw:rh, given fraction width w
+      if (!state.ratio) return null;
+      return w * (state.srcW * state.ratio.rh) / (state.ratio.rw * state.srcH);
+    }
+    function pointerFrac(e) {
+      var iw = previewEl.clientWidth, ih = previewEl.clientHeight;
+      var r = previewEl.getBoundingClientRect();
+      return { fx: (e.clientX - r.left) / iw, fy: (e.clientY - r.top) / ih };
+    }
+    function startDrag(e, mode, dir) {
+      e.preventDefault(); e.stopPropagation();
+      var p = pointerFrac(e);
+      drag = { mode: mode, dir: dir || '', startX: p.fx, startY: p.fy, orig: Object.assign({}, state.crop) };
+      window.addEventListener('pointermove', onDrag);
+      window.addEventListener('pointerup', endDrag);
+    }
+    cropEl.addEventListener('pointerdown', function (e) {
+      if (e.target.classList.contains('ir-hnd')) return;
+      startDrag(e, 'move');
     });
+    Array.prototype.forEach.call(cropEl.querySelectorAll('.ir-hnd'), function (hnd) {
+      hnd.addEventListener('pointerdown', function (e) { startDrag(e, 'resize', hnd.dataset.dir); });
+    });
+
+    function onDrag(e) {
+      if (!drag) return;
+      var p = pointerFrac(e);
+      var dx = p.fx - drag.startX, dy = p.fy - drag.startY;
+      var o = drag.orig, r;
+      if (drag.mode === 'move') {
+        r = { x: clamp(o.x + dx, 0, 1 - o.w), y: clamp(o.y + dy, 0, 1 - o.h), w: o.w, h: o.h };
+      } else {
+        r = { x: o.x, y: o.y, w: o.w, h: o.h };
+        var dir = drag.dir;
+        if (dir.indexOf('e') >= 0) r.w = o.w + dx;
+        if (dir.indexOf('s') >= 0) r.h = o.h + dy;
+        if (dir.indexOf('w') >= 0) { r.x = o.x + dx; r.w = o.w - dx; }
+        if (dir.indexOf('n') >= 0) { r.y = o.y + dy; r.h = o.h - dy; }
+        var minF = 0.03;
+        r.w = Math.max(minF, r.w); r.h = Math.max(minF, r.h);
+        if (state.ratio) {
+          var fh = ratioHFromW(r.w);
+          if (dir.indexOf('n') >= 0) { r.y = (o.y + o.h) - fh; r.h = fh; }
+          else { r.h = fh; }
+        }
+        // keep inside bounds
+        if (r.x < 0) { if (dir.indexOf('w') >= 0) r.w += r.x; r.x = 0; }
+        if (r.y < 0) { if (dir.indexOf('n') >= 0) r.h += r.y; r.y = 0; }
+        if (r.x + r.w > 1) r.w = 1 - r.x;
+        if (r.y + r.h > 1) r.h = 1 - r.y;
+        if (state.ratio) {
+          var fh2 = ratioHFromW(r.w);
+          if (r.y + fh2 > 1) { fh2 = 1 - r.y; r.w = fh2 * (state.ratio.rw * state.srcH) / (state.srcW * state.ratio.rh); }
+          r.h = fh2;
+        }
+      }
+      state.crop = r;
+      layoutCrop();
+      syncOutputToLayout();
+    }
+    function endDrag() {
+      drag = null;
+      window.removeEventListener('pointermove', onDrag);
+      window.removeEventListener('pointerup', endDrag);
+    }
 
     // ---------- misc control wiring ----------
     qEl.addEventListener('input', function () { qValEl.textContent = qEl.value; });
     fsOnEl.addEventListener('change', function () {
-      fsInline.hidden = !fsOnEl.checked;
-      fsHint.hidden = !fsOnEl.checked;
+      fsInline.hidden = !fsOnEl.checked; fsHint.hidden = !fsOnEl.checked;
+    });
+    wEl.addEventListener('input', function () {
+      if (lockEl.checked) { var w = parseInt(wEl.value, 10); if (w > 0) hEl.value = Math.max(1, Math.round(w * outRatioHW())); }
+    });
+    hEl.addEventListener('input', function () {
+      if (lockEl.checked) { var h = parseInt(hEl.value, 10); if (h > 0) wEl.value = Math.max(1, Math.round(h / outRatioHW())); }
+    });
+    function outRatioHW() {
+      var w = parseFloat(wEl.value) || 1, h = parseFloat(hEl.value) || 1;
+      return h / w;
+    }
+    presetsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.ir-chip'); if (!btn) return;
+      var w = parseFloat(wEl.value) || state.srcW, h = parseFloat(hEl.value) || state.srcH;
+      if (btn.dataset.scale) {
+        var s = parseFloat(btn.dataset.scale);
+        wEl.value = Math.max(1, Math.round(w * s)); hEl.value = Math.max(1, Math.round(h * s));
+      } else if (btn.dataset.width) {
+        var nw = parseInt(btn.dataset.width, 10);
+        wEl.value = nw; hEl.value = Math.max(1, Math.round(nw * (h / w)));
+      }
     });
 
-    function targetDims() {
-      var w = Math.max(1, Math.round(parseFloat(wEl.value) || state.srcW));
-      var h = Math.max(1, Math.round(parseFloat(hEl.value) || state.srcH));
-      return { w: w, h: h };
+    function outputDims() {
+      return { w: Math.max(1, Math.round(parseFloat(wEl.value) || state.srcW)), h: Math.max(1, Math.round(parseFloat(hEl.value) || state.srcH)) };
     }
     function targetBytes() {
       if (!fsOnEl.checked) return null;
@@ -491,23 +711,39 @@
       }
       return fmtEl.value;
     }
-    function extFor(mime) {
-      return { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[mime] || 'img';
+    function mimeSupportsAlpha(mime) { return mime === 'image/png' || mime === 'image/webp' || mime === 'image/gif'; }
+    function extFor(mime) { return { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[mime] || 'img'; }
+    function bgFillFor(mime) {
+      if (state.fit !== 'contain') return null;
+      if (bgTransEl.checked) return mimeSupportsAlpha(mime) ? null : '#ffffff';
+      return bgColorEl.value;
     }
 
     function toBlob(canvas, mime, q) {
-      return new Promise(function (resolve) {
-        canvas.toBlob(function (b) { resolve(b); }, mime, q);
-      });
+      return new Promise(function (resolve) { canvas.toBlob(function (b) { resolve(b); }, mime, q); });
     }
 
-    // ---------- resize action ----------
+    // ---------- shared draw: crop -> fit into output canvas ----------
+    function placement(cw, ch, outW, outH, mode) {
+      var s = mode === 'contain' ? Math.min(outW / cw, outH / ch) : Math.max(outW / cw, outH / ch);
+      var dw = cw * s, dh = ch * s;
+      return { dx: (outW - dw) / 2, dy: (outH - dh) / 2, dw: dw, dh: dh };
+    }
+    function drawFitted(ctx, source, srcW, srcH, crop, outW, outH, mode, bgFill) {
+      var sx = crop.x * srcW, sy = crop.y * srcH, sw = crop.w * srcW, sh = crop.h * srcH;
+      ctx.clearRect(0, 0, outW, outH);
+      if (bgFill) { ctx.fillStyle = bgFill; ctx.fillRect(0, 0, outW, outH); }
+      var p = placement(sw, sh, outW, outH, mode);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(source, sx, sy, sw, sh, p.dx, p.dy, p.dw, p.dh);
+    }
+
+    // ---------- export action ----------
     goEl.addEventListener('click', async function () {
       if (!state.file) return;
       goEl.disabled = true;
       statusEl.textContent = 'Working...';
       warnEl.hidden = true;
-      // let the UI paint the disabled state
       await new Promise(function (r) { setTimeout(r, 20); });
       try {
         var res = state.isGif ? await resizeGif() : await resizeStatic();
@@ -515,51 +751,39 @@
       } catch (err) {
         console.error(err);
         statusEl.textContent = '';
-        alert('Something went wrong while resizing. ' + (err && err.message ? err.message : ''));
+        alert('Something went wrong while exporting. ' + (err && err.message ? err.message : ''));
       } finally {
         goEl.disabled = false;
       }
     });
 
-    function drawScaled(source, sw, sh, w, h) {
-      var c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      var ctx = c.getContext('2d');
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(source, 0, 0, sw, sh, 0, 0, w, h);
+    function renderStaticCanvas(w, h, mime) {
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      drawFitted(c.getContext('2d'), state.bitmap, state.srcW, state.srcH, state.crop, w, h, state.fit, bgFillFor(mime));
       return c;
     }
 
     async function resizeStatic() {
-      var dims = targetDims();
+      var dims = outputDims();
       var mime = outMime();
       var target = targetBytes();
       var q = mime === 'image/png' ? undefined : (parseInt(qEl.value, 10) / 100);
 
       if (!target) {
-        var canvas = drawScaled(state.bitmap, state.srcW, state.srcH, dims.w, dims.h);
+        var canvas = renderStaticCanvas(dims.w, dims.h, mime);
         var blob = await toBlob(canvas, mime, q);
         return { blob: blob, w: dims.w, h: dims.h, mime: mime, met: true };
       }
 
-      // target file size: shrink dimensions in an outer loop, quality in an inner loop
       var scales = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3];
       var best = null;
       for (var i = 0; i < scales.length; i++) {
         var w = Math.max(1, Math.round(dims.w * scales[i]));
         var h = Math.max(1, Math.round(dims.h * scales[i]));
-        var canv = drawScaled(state.bitmap, state.srcW, state.srcH, w, h);
-        var got;
-        if (mime === 'image/png') {
-          got = await toBlob(canv, mime);
-        } else {
-          got = await encodeToTargetQuality(canv, mime, target);
-        }
+        var canv = renderStaticCanvas(w, h, mime);
+        var got = mime === 'image/png' ? await toBlob(canv, mime) : await encodeToTargetQuality(canv, mime, target);
         if (!best || got.size < best.blob.size) best = { blob: got, w: w, h: h };
-        if (got.size <= target) {
-          return { blob: got, w: w, h: h, mime: mime, met: true };
-        }
+        if (got.size <= target) return { blob: got, w: w, h: h, mime: mime, met: true };
       }
       return { blob: best.blob, w: best.w, h: best.h, mime: mime, met: false };
     }
@@ -568,7 +792,7 @@
       var hi = await toBlob(canvas, mime, 0.95);
       if (hi.size <= target) return hi;
       var lo = 0.05, hiQ = 0.95, best = await toBlob(canvas, mime, lo);
-      if (best.size > target) return best; // even lowest is too big at this scale
+      if (best.size > target) return best;
       for (var i = 0; i < 8; i++) {
         var mid = (lo + hiQ) / 2;
         var b = await toBlob(canvas, mime, mid);
@@ -577,9 +801,9 @@
       return best;
     }
 
-    // ---------- GIF resize ----------
+    // ---------- GIF export ----------
     async function resizeGif() {
-      var dims = targetDims();
+      var dims = outputDims();
       var target = targetBytes();
       var colorOpts = target ? [256, 128, 64, 32] : [256];
       var scaleOpts = target ? [1, 0.85, 0.7, 0.55, 0.4] : [1];
@@ -600,35 +824,30 @@
       return { blob: new Blob([last.bytes], { type: 'image/gif' }), w: last.w, h: last.h, mime: 'image/gif', met: !target };
     }
 
-    function renderGif(tw, th, maxColors) {
-      var W = state.srcW, H = state.srcH;
-      var frames = state.frames;
-      var useAlpha = state.gifHasAlpha;
+    function renderGif(outW, outH, maxColors) {
+      var W = state.srcW, H = state.srcH, frames = state.frames;
+      var bgFill = bgFillFor('image/gif');
+      var useAlpha = state.gifHasAlpha || (bgFill === null && state.fit === 'contain');
 
       var acc = document.createElement('canvas'); acc.width = W; acc.height = H;
       var actx = acc.getContext('2d');
       var patchCanvas = document.createElement('canvas');
-      var target = document.createElement('canvas'); target.width = tw; target.height = th;
+      var target = document.createElement('canvas'); target.width = outW; target.height = outH;
       var tctx = target.getContext('2d');
-      tctx.imageSmoothingEnabled = true; tctx.imageSmoothingQuality = 'high';
 
       var enc = window.gifenc.GIFEncoder();
       var saved = null;
 
       for (var i = 0; i < frames.length; i++) {
         var f = frames[i];
-        // draw this frame's patch onto the accumulator (source-over respects transparency)
         patchCanvas.width = f.dims.width; patchCanvas.height = f.dims.height;
-        var pctx = patchCanvas.getContext('2d');
-        pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), f.dims.width, f.dims.height), 0, 0);
+        patchCanvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(f.patch), f.dims.width, f.dims.height), 0, 0);
 
         if (f.disposalType === 3) saved = actx.getImageData(0, 0, W, H);
         actx.drawImage(patchCanvas, f.dims.left, f.dims.top);
 
-        // scale composited frame down/up to target size
-        tctx.clearRect(0, 0, tw, th);
-        tctx.drawImage(acc, 0, 0, W, H, 0, 0, tw, th);
-        var data = tctx.getImageData(0, 0, tw, th).data;
+        drawFitted(tctx, acc, W, H, state.crop, outW, outH, state.fit, bgFill);
+        var data = tctx.getImageData(0, 0, outW, outH).data;
 
         var delay = f.delay && f.delay >= 20 ? f.delay : 100;
         if (useAlpha) {
@@ -638,14 +857,13 @@
           for (var p = 0; p < palA.length; p++) { if (palA[p].length === 4 && palA[p][3] === 0) { ti = p; break; } }
           var optsA = { palette: palA, delay: delay };
           if (ti >= 0) { optsA.transparent = true; optsA.transparentIndex = ti; }
-          enc.writeFrame(idxA, tw, th, optsA);
+          enc.writeFrame(idxA, outW, outH, optsA);
         } else {
           var pal = window.gifenc.quantize(data, maxColors);
           var idx = window.gifenc.applyPalette(data, pal);
-          enc.writeFrame(idx, tw, th, { palette: pal, delay: delay });
+          enc.writeFrame(idx, outW, outH, { palette: pal, delay: delay });
         }
 
-        // apply disposal for next frame
         if (f.disposalType === 2) actx.clearRect(f.dims.left, f.dims.top, f.dims.width, f.dims.height);
         else if (f.disposalType === 3 && saved) actx.putImageData(saved, 0, 0);
       }
@@ -658,12 +876,10 @@
       state.outBlob = res.blob;
       state.outName = state.name + '-' + res.w + 'x' + res.h + '.' + extFor(res.mime);
 
-      if (previewEl.dataset.url) URL.revokeObjectURL(previewEl.dataset.url);
+      if (outImg.dataset.url) URL.revokeObjectURL(outImg.dataset.url);
       var url = URL.createObjectURL(res.blob);
-      previewEl.dataset.url = url;
-      previewEl.src = url;
-      phEl.hidden = true;
-      previewEl.hidden = false;
+      outImg.dataset.url = url;
+      outImg.src = url;
 
       var delta = state.srcBytes ? (res.blob.size - state.srcBytes) / state.srcBytes * 100 : 0;
       var deltaHtml = delta <= 0
