@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Image &amp; GIF resizer - free, in your browser, no sign-up - techtuate</title>
+  <meta name="description" content="Resize and compress images and animated GIFs in your browser. Set exact dimensions or a target file size. PNG, JPG, WebP, GIF. Free, no upload, no sign-up, no watermark." />
+  <meta name="keywords" content="free image resizer, resize gif, compress image online, resize image to kb, image resizer no upload, gif resizer, reduce image file size, resize png jpg webp" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/image-resize/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M18 22 L32 14 L46 22 L46 42 L32 50 L18 42 Z' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/image-resize/" />
+  <meta property="og:title" content="Image &amp; GIF resizer - free, in your browser, no sign-up" />
+  <meta property="og:description" content="Resize and compress images and animated GIFs in your browser. Exact dimensions or a target file size. Nothing is uploaded." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate Image & GIF resizer",
+    "url": "https://techtuate.com/image-resize/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Resize and compress images and animated GIFs entirely in your browser. Set exact pixel dimensions or a target file size. Nothing is uploaded.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+
+  <style>
+    .ir-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 820px) { .ir-layout { grid-template-columns: 1fr; } }
+
+    .ir-drop {
+      position: relative;
+      border: 2px dashed var(--ink);
+      border-radius: var(--r-md);
+      background: var(--yellow-wash);
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .ir-drop:hover, .ir-drop.drag { background: var(--yellow-soft); }
+    .ir-drop input[type=file] { display: none; }
+    .ir-drop-inner strong { display: block; font-family: var(--font-display); font-weight: 800; font-size: 17px; }
+    .ir-drop-inner span { display: block; margin-top: 6px; font-size: 13px; color: var(--ink-dim); }
+
+    .ir-src {
+      margin-top: 14px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--ink-mute);
+      border: 2px solid var(--line);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+      background: var(--bg-soft);
+    }
+    .ir-src b { color: var(--ink); }
+    .ir-tag { display: inline-block; background: var(--ink); color: var(--yellow); border-radius: 999px; padding: 1px 8px; font-size: 11px; margin-left: 6px; }
+
+    .ir-options { margin-top: 18px; }
+    .ir-row { margin-bottom: 18px; }
+    .ir-label { display: block; font-family: var(--font-display); font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+    .ir-hint { font-size: 12px; color: var(--ink-dim); margin-top: 6px; }
+
+    .ir-dim { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ir-num {
+      width: 92px; padding: 9px 10px;
+      border: 2px solid var(--ink); border-radius: var(--r-sm);
+      font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+      background: var(--bg); color: var(--ink);
+    }
+    .ir-x { font-weight: 700; color: var(--ink-dim); }
+    .ir-check { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
+    .ir-check input { width: 16px; height: 16px; accent-color: var(--ink); }
+
+    .ir-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .ir-chip {
+      border: 2px solid var(--ink); background: var(--bg); color: var(--ink);
+      border-radius: 999px; padding: 5px 11px; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: background .12s;
+    }
+    .ir-chip:hover { background: var(--yellow); }
+
+    .ir-select, .ir-range { width: 100%; }
+    .ir-select {
+      padding: 9px 10px; border: 2px solid var(--ink); border-radius: var(--r-sm);
+      font-family: inherit; font-size: 14px; font-weight: 600; background: var(--bg); color: var(--ink);
+    }
+    .ir-range { accent-color: var(--ink); }
+    .ir-range-val { font-family: var(--font-mono); font-size: 13px; font-weight: 700; margin-left: 8px; }
+
+    .ir-fs-inline { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .ir-fs-inline select { width: auto; padding: 8px 8px; }
+
+    .ir-privacy { margin-top: 18px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.55; }
+
+    .ir-canvas-wrap {
+      border: 2px solid var(--ink); border-radius: var(--r-md);
+      box-shadow: 4px 4px 0 var(--ink);
+      min-height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        linear-gradient(45deg, #efefef 25%, transparent 25%),
+        linear-gradient(-45deg, #efefef 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #efefef 75%),
+        linear-gradient(-45deg, transparent 75%, #efefef 75%);
+      background-size: 18px 18px;
+      background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+      overflow: hidden; padding: 14px;
+    }
+    .ir-canvas-wrap img { max-width: 100%; max-height: 420px; display: block; image-rendering: auto; }
+    .ir-placeholder { font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim); text-align: center; }
+
+    .ir-result {
+      margin-top: 16px; border: 2px solid var(--ink); border-radius: var(--r-md);
+      padding: 14px 16px; background: var(--bg);
+    }
+    .ir-stats { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-mono); font-size: 13px; margin-bottom: 14px; }
+    .ir-stats div span { color: var(--ink-dim); }
+    .ir-stats b { color: var(--ink); }
+    .ir-delta-down { color: #0a7d34; font-weight: 700; }
+    .ir-delta-up { color: #b04a00; font-weight: 700; }
+    .ir-warn { margin-top: 10px; font-size: 12.5px; color: #b04a00; }
+
+    .ir-go-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn[disabled] { opacity: .5; cursor: not-allowed; box-shadow: none; transform: none; }
+  </style>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads, ever.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">resize + compress, in your browser</div>
+      <h1>Image &amp; GIF resizer</h1>
+      <p class="lede">Drop an image or an animated GIF, set the size you want by pixels or by target file size, and download it. Nothing is uploaded - it all runs on your device.</p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The whole point is that everything runs in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <div class="ir-layout">
+
+        <!-- ---- controls ---- -->
+        <div class="ir-controls-col">
+          <label class="ir-drop" id="ir-drop" for="ir-file">
+            <input type="file" id="ir-file" accept="image/png,image/jpeg,image/webp,image/gif" />
+            <div class="ir-drop-inner">
+              <strong>Drop an image or GIF here</strong>
+              <span>or click to choose - PNG, JPG, WebP, or animated GIF</span>
+            </div>
+          </label>
+
+          <div class="ir-src" id="ir-src" hidden></div>
+
+          <div class="ir-options" id="ir-options" hidden>
+
+            <div class="ir-row">
+              <span class="ir-label">Target dimensions (px)</span>
+              <div class="ir-dim">
+                <input class="ir-num" id="ir-w" type="number" min="1" inputmode="numeric" aria-label="Target width" />
+                <span class="ir-x">x</span>
+                <input class="ir-num" id="ir-h" type="number" min="1" inputmode="numeric" aria-label="Target height" />
+                <label class="ir-check"><input type="checkbox" id="ir-lock" checked /> lock ratio</label>
+              </div>
+              <div class="ir-presets" id="ir-presets">
+                <button class="ir-chip" data-scale="0.25" type="button">25%</button>
+                <button class="ir-chip" data-scale="0.5" type="button">50%</button>
+                <button class="ir-chip" data-scale="0.75" type="button">75%</button>
+                <button class="ir-chip" data-scale="1" type="button">100%</button>
+                <button class="ir-chip" data-scale="2" type="button">200%</button>
+                <button class="ir-chip" data-width="1920" type="button">1920w</button>
+                <button class="ir-chip" data-width="1280" type="button">1280w</button>
+                <button class="ir-chip" data-width="800" type="button">800w</button>
+              </div>
+              <div class="ir-hint">Setting a size larger than the original upscales it (enhance). Quality is limited by the source.</div>
+            </div>
+
+            <div class="ir-row">
+              <label class="ir-check"><input type="checkbox" id="ir-fs-on" /> <span class="ir-label" style="margin:0;">Also aim for a file size</span></label>
+              <div class="ir-fs-inline" id="ir-fs-inline" hidden>
+                <span style="font-size:13px;">Under</span>
+                <input class="ir-num" id="ir-fs" type="number" min="1" value="500" inputmode="numeric" aria-label="Target file size" />
+                <select class="ir-select" id="ir-fs-unit"><option value="1024">KB</option><option value="1048576">MB</option></select>
+              </div>
+              <div class="ir-hint" id="ir-fs-hint" hidden>The tool lowers quality (and, if needed, shrinks dimensions or colors) to get under this size.</div>
+            </div>
+
+            <div class="ir-row" id="ir-fmt-row">
+              <span class="ir-label">Output format</span>
+              <select class="ir-select" id="ir-fmt">
+                <option value="keep">Keep original</option>
+                <option value="image/jpeg">JPEG (.jpg)</option>
+                <option value="image/png">PNG (.png)</option>
+                <option value="image/webp">WebP (.webp)</option>
+              </select>
+            </div>
+
+            <div class="ir-row" id="ir-q-row">
+              <span class="ir-label">Quality <span class="ir-range-val" id="ir-q-val">80</span></span>
+              <input class="ir-range" id="ir-q" type="range" min="5" max="100" value="80" aria-label="Quality" />
+              <div class="ir-hint">Applies to JPEG and WebP. PNG is lossless (quality slider is ignored).</div>
+            </div>
+
+            <div class="ir-row" id="ir-gif-note" hidden>
+              <div class="callout wash" style="margin:0;">
+                <h4>Animated GIF</h4>
+                <p>This stays an animated GIF, all frames kept. Colors are optimized automatically. Big GIFs can take a few seconds.</p>
+              </div>
+            </div>
+
+            <div class="ir-go-row">
+              <button class="btn" id="ir-go" type="button">Resize</button>
+              <span id="ir-status" style="font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim);"></span>
+            </div>
+          </div>
+
+          <p class="ir-privacy">
+            Other resizers upload your photo to their server first. This one never does. Your file goes from your browser straight to your downloads folder - no account, no watermark, no size cap beyond what your device can hold in memory.
+          </p>
+        </div>
+
+        <!-- ---- preview + result ---- -->
+        <div class="ir-preview-col">
+          <div class="ir-canvas-wrap" id="ir-canvas-wrap">
+            <div class="ir-placeholder" id="ir-ph">your image will<br>preview here</div>
+            <img id="ir-preview" alt="Preview" hidden />
+          </div>
+
+          <div class="ir-result" id="ir-result" hidden>
+            <div class="ir-stats" id="ir-stats"></div>
+            <button class="btn alt" id="ir-dl" type="button">Download</button>
+            <div class="ir-warn" id="ir-warn" hidden></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <section style="margin-top: 52px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, forever, no sign-up. Runs entirely in your browser - nothing is uploaded.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+      <p style="max-width:680px; color:var(--ink-mute); margin-top:12px;">
+        Resize by exact pixels, by a percentage, or by a target file size (say, get a photo under 500 KB for an upload limit). Animated GIFs keep every frame - the tool decodes them, scales each frame, and re-encodes a fresh optimized GIF, all locally.
+      </p>
+      <h3 style="margin-top: 28px; font-size: 18px;">Why "no upload" matters here</h3>
+      <p style="max-width:680px; color:var(--ink-mute); margin-top:8px;">
+        Most online resizers (and every "compress to X KB" site) send your image to a server. For screenshots, ID scans, or anything private, that is a real leak. Your browser already has everything needed to decode, scale, and re-encode an image, so there is nothing to send anywhere.
+      </p>
+      <p style="max-width:680px; margin-top:20px; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
+        Comparison: <a href="/vs/ezgif/">vs. EZGIF</a> &middot; <a href="/vs/">all comparisons</a>
+      </p>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/pdf-editor/">pdf editor</a> &middot;
+        <a href="/qr-code/">qr code</a> &middot;
+        <a href="/vs/">comparisons</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="lib/gifuct.min.js"></script>
+  <script src="lib/gifenc.min.js"></script>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // ---------- element refs ----------
+    var fileInput = document.getElementById('ir-file');
+    var dropEl    = document.getElementById('ir-drop');
+    var srcEl     = document.getElementById('ir-src');
+    var optionsEl = document.getElementById('ir-options');
+    var wEl       = document.getElementById('ir-w');
+    var hEl       = document.getElementById('ir-h');
+    var lockEl    = document.getElementById('ir-lock');
+    var presetsEl = document.getElementById('ir-presets');
+    var fsOnEl    = document.getElementById('ir-fs-on');
+    var fsInline  = document.getElementById('ir-fs-inline');
+    var fsHint    = document.getElementById('ir-fs-hint');
+    var fsEl      = document.getElementById('ir-fs');
+    var fsUnitEl  = document.getElementById('ir-fs-unit');
+    var fmtRow    = document.getElementById('ir-fmt-row');
+    var fmtEl     = document.getElementById('ir-fmt');
+    var qRow      = document.getElementById('ir-q-row');
+    var qEl       = document.getElementById('ir-q');
+    var qValEl    = document.getElementById('ir-q-val');
+    var gifNote   = document.getElementById('ir-gif-note');
+    var goEl      = document.getElementById('ir-go');
+    var statusEl  = document.getElementById('ir-status');
+    var phEl      = document.getElementById('ir-ph');
+    var previewEl = document.getElementById('ir-preview');
+    var resultEl  = document.getElementById('ir-result');
+    var statsEl   = document.getElementById('ir-stats');
+    var warnEl    = document.getElementById('ir-warn');
+    var dlEl      = document.getElementById('ir-dl');
+
+    // ---------- state ----------
+    var state = {
+      file: null, name: 'image', srcType: '', srcBytes: 0,
+      srcW: 0, srcH: 0,
+      isGif: false, bitmap: null,
+      gif: null, frames: null, gifHasAlpha: false,
+      outBlob: null, outName: 'resized'
+    };
+
+    function fmtBytes(n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1024 * 1024) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB';
+      return (n / 1048576).toFixed(2) + ' MB';
+    }
+
+    // ---------- file loading ----------
+    fileInput.addEventListener('change', function (e) {
+      if (e.target.files && e.target.files[0]) loadFile(e.target.files[0]);
+    });
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      dropEl.addEventListener(ev, function (e) { e.preventDefault(); dropEl.classList.add('drag'); });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      dropEl.addEventListener(ev, function (e) { e.preventDefault(); dropEl.classList.remove('drag'); });
+    });
+    dropEl.addEventListener('drop', function (e) {
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) loadFile(f);
+    });
+
+    async function loadFile(file) {
+      var ok = /^image\/(png|jpeg|webp|gif)$/.test(file.type);
+      if (!ok) { alert('Please choose a PNG, JPG, WebP, or GIF image.'); return; }
+      resetResult();
+      state.file = file;
+      state.srcType = file.type;
+      state.srcBytes = file.size;
+      state.name = (file.name || 'image').replace(/\.[^.]+$/, '') || 'image';
+      state.isGif = file.type === 'image/gif';
+
+      try {
+        if (state.isGif) {
+          await loadGif(file);
+        } else {
+          await loadStatic(file);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Could not read that file. It may be corrupt or an unsupported variant.');
+        return;
+      }
+
+      // default target = source dimensions
+      wEl.value = state.srcW;
+      hEl.value = state.srcH;
+
+      // GIF vs static UI
+      var animated = state.isGif && state.frames && state.frames.length > 1;
+      fmtRow.hidden = state.isGif;
+      qRow.hidden = state.isGif;
+      gifNote.hidden = !state.isGif;
+
+      var tag = state.isGif ? (animated ? '<span class="ir-tag">' + state.frames.length + ' frames</span>' : '<span class="ir-tag">gif</span>') : '';
+      srcEl.hidden = false;
+      srcEl.innerHTML = 'Original: <b>' + state.srcW + ' x ' + state.srcH + '</b> px &middot; <b>' +
+        fmtBytes(state.srcBytes) + '</b> &middot; ' + state.srcType.replace('image/', '').toUpperCase() + tag;
+      optionsEl.hidden = false;
+
+      // show source preview
+      phEl.hidden = true;
+      previewEl.hidden = false;
+      if (previewEl.dataset.url) URL.revokeObjectURL(previewEl.dataset.url);
+      var url = URL.createObjectURL(file);
+      previewEl.dataset.url = url;
+      previewEl.src = url;
+    }
+
+    async function loadStatic(file) {
+      var bmp = await createImageBitmap(file);
+      state.bitmap = bmp;
+      state.srcW = bmp.width;
+      state.srcH = bmp.height;
+      state.frames = null;
+      state.gif = null;
+    }
+
+    async function loadGif(file) {
+      var buf = await file.arrayBuffer();
+      var gif = window.gifuct.parseGIF(buf);
+      var frames = window.gifuct.decompressFrames(gif, true);
+      state.gif = gif;
+      state.frames = frames;
+      state.srcW = gif.lsd.width;
+      state.srcH = gif.lsd.height;
+      state.gifHasAlpha = frames.some(function (f) { return typeof f.transparentIndex === 'number'; });
+      state.bitmap = null;
+    }
+
+    // ---------- dimension linking ----------
+    function ratio() { return state.srcH / state.srcW; }
+    wEl.addEventListener('input', function () {
+      if (lockEl.checked && state.srcW) {
+        var w = parseInt(wEl.value, 10);
+        if (w > 0) hEl.value = Math.max(1, Math.round(w * ratio()));
+      }
+    });
+    hEl.addEventListener('input', function () {
+      if (lockEl.checked && state.srcH) {
+        var h = parseInt(hEl.value, 10);
+        if (h > 0) wEl.value = Math.max(1, Math.round(h / ratio()));
+      }
+    });
+    lockEl.addEventListener('change', function () {
+      if (lockEl.checked && state.srcW) {
+        var w = parseInt(wEl.value, 10) || state.srcW;
+        hEl.value = Math.max(1, Math.round(w * ratio()));
+      }
+    });
+    presetsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.ir-chip');
+      if (!btn || !state.srcW) return;
+      if (btn.dataset.scale) {
+        var s = parseFloat(btn.dataset.scale);
+        wEl.value = Math.max(1, Math.round(state.srcW * s));
+        hEl.value = Math.max(1, Math.round(state.srcH * s));
+      } else if (btn.dataset.width) {
+        var w = parseInt(btn.dataset.width, 10);
+        wEl.value = w;
+        hEl.value = Math.max(1, Math.round(w * ratio()));
+      }
+    });
+
+    // ---------- misc control wiring ----------
+    qEl.addEventListener('input', function () { qValEl.textContent = qEl.value; });
+    fsOnEl.addEventListener('change', function () {
+      fsInline.hidden = !fsOnEl.checked;
+      fsHint.hidden = !fsOnEl.checked;
+    });
+
+    function targetDims() {
+      var w = Math.max(1, Math.round(parseFloat(wEl.value) || state.srcW));
+      var h = Math.max(1, Math.round(parseFloat(hEl.value) || state.srcH));
+      return { w: w, h: h };
+    }
+    function targetBytes() {
+      if (!fsOnEl.checked) return null;
+      var n = parseFloat(fsEl.value);
+      if (!(n > 0)) return null;
+      return Math.round(n * parseInt(fsUnitEl.value, 10));
+    }
+    function outMime() {
+      if (fmtEl.value === 'keep') {
+        if (/^image\/(jpeg|png|webp)$/.test(state.srcType)) return state.srcType;
+        return 'image/png';
+      }
+      return fmtEl.value;
+    }
+    function extFor(mime) {
+      return { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[mime] || 'img';
+    }
+
+    function toBlob(canvas, mime, q) {
+      return new Promise(function (resolve) {
+        canvas.toBlob(function (b) { resolve(b); }, mime, q);
+      });
+    }
+
+    // ---------- resize action ----------
+    goEl.addEventListener('click', async function () {
+      if (!state.file) return;
+      goEl.disabled = true;
+      statusEl.textContent = 'Working...';
+      warnEl.hidden = true;
+      // let the UI paint the disabled state
+      await new Promise(function (r) { setTimeout(r, 20); });
+      try {
+        var res = state.isGif ? await resizeGif() : await resizeStatic();
+        showResult(res);
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = '';
+        alert('Something went wrong while resizing. ' + (err && err.message ? err.message : ''));
+      } finally {
+        goEl.disabled = false;
+      }
+    });
+
+    function drawScaled(source, sw, sh, w, h) {
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      var ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(source, 0, 0, sw, sh, 0, 0, w, h);
+      return c;
+    }
+
+    async function resizeStatic() {
+      var dims = targetDims();
+      var mime = outMime();
+      var target = targetBytes();
+      var q = mime === 'image/png' ? undefined : (parseInt(qEl.value, 10) / 100);
+
+      if (!target) {
+        var canvas = drawScaled(state.bitmap, state.srcW, state.srcH, dims.w, dims.h);
+        var blob = await toBlob(canvas, mime, q);
+        return { blob: blob, w: dims.w, h: dims.h, mime: mime, met: true };
+      }
+
+      // target file size: shrink dimensions in an outer loop, quality in an inner loop
+      var scales = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3];
+      var best = null;
+      for (var i = 0; i < scales.length; i++) {
+        var w = Math.max(1, Math.round(dims.w * scales[i]));
+        var h = Math.max(1, Math.round(dims.h * scales[i]));
+        var canv = drawScaled(state.bitmap, state.srcW, state.srcH, w, h);
+        var got;
+        if (mime === 'image/png') {
+          got = await toBlob(canv, mime);
+        } else {
+          got = await encodeToTargetQuality(canv, mime, target);
+        }
+        if (!best || got.size < best.blob.size) best = { blob: got, w: w, h: h };
+        if (got.size <= target) {
+          return { blob: got, w: w, h: h, mime: mime, met: true };
+        }
+      }
+      return { blob: best.blob, w: best.w, h: best.h, mime: mime, met: false };
+    }
+
+    async function encodeToTargetQuality(canvas, mime, target) {
+      var hi = await toBlob(canvas, mime, 0.95);
+      if (hi.size <= target) return hi;
+      var lo = 0.05, hiQ = 0.95, best = await toBlob(canvas, mime, lo);
+      if (best.size > target) return best; // even lowest is too big at this scale
+      for (var i = 0; i < 8; i++) {
+        var mid = (lo + hiQ) / 2;
+        var b = await toBlob(canvas, mime, mid);
+        if (b.size <= target) { best = b; lo = mid; } else { hiQ = mid; }
+      }
+      return best;
+    }
+
+    // ---------- GIF resize ----------
+    async function resizeGif() {
+      var dims = targetDims();
+      var target = targetBytes();
+      var colorOpts = target ? [256, 128, 64, 32] : [256];
+      var scaleOpts = target ? [1, 0.85, 0.7, 0.55, 0.4] : [1];
+      var last = null;
+      for (var s = 0; s < scaleOpts.length; s++) {
+        var tw = Math.max(1, Math.round(dims.w * scaleOpts[s]));
+        var th = Math.max(1, Math.round(dims.h * scaleOpts[s]));
+        for (var c = 0; c < colorOpts.length; c++) {
+          statusEl.textContent = 'Encoding GIF (' + tw + 'x' + th + ', ' + colorOpts[c] + ' colors)...';
+          await new Promise(function (r) { setTimeout(r, 0); });
+          var bytes = renderGif(tw, th, colorOpts[c]);
+          last = { bytes: bytes, w: tw, h: th };
+          if (!target || bytes.length <= target) {
+            return { blob: new Blob([bytes], { type: 'image/gif' }), w: tw, h: th, mime: 'image/gif', met: true };
+          }
+        }
+      }
+      return { blob: new Blob([last.bytes], { type: 'image/gif' }), w: last.w, h: last.h, mime: 'image/gif', met: !target };
+    }
+
+    function renderGif(tw, th, maxColors) {
+      var W = state.srcW, H = state.srcH;
+      var frames = state.frames;
+      var useAlpha = state.gifHasAlpha;
+
+      var acc = document.createElement('canvas'); acc.width = W; acc.height = H;
+      var actx = acc.getContext('2d');
+      var patchCanvas = document.createElement('canvas');
+      var target = document.createElement('canvas'); target.width = tw; target.height = th;
+      var tctx = target.getContext('2d');
+      tctx.imageSmoothingEnabled = true; tctx.imageSmoothingQuality = 'high';
+
+      var enc = window.gifenc.GIFEncoder();
+      var saved = null;
+
+      for (var i = 0; i < frames.length; i++) {
+        var f = frames[i];
+        // draw this frame's patch onto the accumulator (source-over respects transparency)
+        patchCanvas.width = f.dims.width; patchCanvas.height = f.dims.height;
+        var pctx = patchCanvas.getContext('2d');
+        pctx.putImageData(new ImageData(new Uint8ClampedArray(f.patch), f.dims.width, f.dims.height), 0, 0);
+
+        if (f.disposalType === 3) saved = actx.getImageData(0, 0, W, H);
+        actx.drawImage(patchCanvas, f.dims.left, f.dims.top);
+
+        // scale composited frame down/up to target size
+        tctx.clearRect(0, 0, tw, th);
+        tctx.drawImage(acc, 0, 0, W, H, 0, 0, tw, th);
+        var data = tctx.getImageData(0, 0, tw, th).data;
+
+        var delay = f.delay && f.delay >= 20 ? f.delay : 100;
+        if (useAlpha) {
+          var palA = window.gifenc.quantize(data, maxColors, { format: 'rgba4444', oneBitAlpha: true });
+          var idxA = window.gifenc.applyPalette(data, palA, 'rgba4444');
+          var ti = -1;
+          for (var p = 0; p < palA.length; p++) { if (palA[p].length === 4 && palA[p][3] === 0) { ti = p; break; } }
+          var optsA = { palette: palA, delay: delay };
+          if (ti >= 0) { optsA.transparent = true; optsA.transparentIndex = ti; }
+          enc.writeFrame(idxA, tw, th, optsA);
+        } else {
+          var pal = window.gifenc.quantize(data, maxColors);
+          var idx = window.gifenc.applyPalette(data, pal);
+          enc.writeFrame(idx, tw, th, { palette: pal, delay: delay });
+        }
+
+        // apply disposal for next frame
+        if (f.disposalType === 2) actx.clearRect(f.dims.left, f.dims.top, f.dims.width, f.dims.height);
+        else if (f.disposalType === 3 && saved) actx.putImageData(saved, 0, 0);
+      }
+      enc.finish();
+      return enc.bytes();
+    }
+
+    // ---------- result ----------
+    function showResult(res) {
+      state.outBlob = res.blob;
+      state.outName = state.name + '-' + res.w + 'x' + res.h + '.' + extFor(res.mime);
+
+      if (previewEl.dataset.url) URL.revokeObjectURL(previewEl.dataset.url);
+      var url = URL.createObjectURL(res.blob);
+      previewEl.dataset.url = url;
+      previewEl.src = url;
+      phEl.hidden = true;
+      previewEl.hidden = false;
+
+      var delta = state.srcBytes ? (res.blob.size - state.srcBytes) / state.srcBytes * 100 : 0;
+      var deltaHtml = delta <= 0
+        ? '<span class="ir-delta-down">' + Math.abs(delta).toFixed(0) + '% smaller</span>'
+        : '<span class="ir-delta-up">' + delta.toFixed(0) + '% larger</span>';
+
+      statsEl.innerHTML =
+        '<div><span>size</span> <b>' + res.w + ' x ' + res.h + '</b> px</div>' +
+        '<div><span>file</span> <b>' + fmtBytes(res.blob.size) + '</b> (' + deltaHtml + ')</div>' +
+        '<div><span>was</span> ' + fmtBytes(state.srcBytes) + '</div>';
+
+      warnEl.hidden = res.met !== false;
+      if (res.met === false) {
+        warnEl.textContent = 'Could not get all the way under your target size without destroying the image. This is the smallest sensible result.';
+      }
+      resultEl.hidden = false;
+      statusEl.textContent = 'Done.';
+    }
+
+    dlEl.addEventListener('click', function () {
+      if (!state.outBlob) return;
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(state.outBlob);
+      a.download = state.outName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    });
+
+    function resetResult() {
+      resultEl.hidden = true;
+      warnEl.hidden = true;
+      statusEl.textContent = '';
+      state.outBlob = null;
+    }
+  </script>
+</body>
+</html>

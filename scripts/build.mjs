@@ -38,6 +38,7 @@ const STATIC_DIRS = [
   'password-generator',
   'svg-converter',
   'sql-to-excel',
+  'image-resize',
 ];
 
 function log(...args) { console.log('[build]', ...args); }
