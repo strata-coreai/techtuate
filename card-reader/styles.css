@@ -90,6 +90,13 @@
 .cr-scan { margin: 8px 0 28px; }
 .cr-scan-btn { font-size: 16px; padding: 12px 22px; }
 .cr-scan-btn[disabled] { opacity: .55; cursor: progress; }
+/* brief attention pulse when a captured image makes the scan action appear */
+.cr-scan.cr-pop .cr-scan-btn { animation: cr-pop 0.9s ease; }
+@keyframes cr-pop {
+  0% { transform: scale(1); box-shadow: 3px 3px 0 var(--yellow-deep); }
+  30% { transform: scale(1.06); box-shadow: 5px 5px 0 var(--yellow-deep); }
+  100% { transform: scale(1); box-shadow: 3px 3px 0 var(--yellow-deep); }
+}
 .cr-disclosure {
   margin: 12px 0 0; max-width: 640px;
   font-size: 12.5px; line-height: 1.5; color: var(--ink-mute);

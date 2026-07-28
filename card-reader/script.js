@@ -82,6 +82,15 @@
     images[slot] = dataUrl;
     if (slot === 'back') wantBack = true;
     renderThumbs();
+    // Bring the next action to the user (esp. on mobile, where the "Read card"
+    // button would otherwise be below the fold after a capture).
+    if (images.front) {
+      requestAnimationFrame(function () {
+        try { scanBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+        scanSection.classList.add('cr-pop');
+        setTimeout(function () { scanSection.classList.remove('cr-pop'); }, 900);
+      });
+    }
   }
 
   function removeImage(slot) {
@@ -226,6 +235,7 @@
       scanBtn.disabled = false;
       if (!r.ok || !r.body || r.body.ok === false) {
         var m = (r.body && r.body.error) || 'The reader could not process this card.';
+        if (r.body && r.body.detail) m += ' [' + String(r.body.detail).slice(0, 200) + ']';
         setStatus(m + ' You can still type the details in below.', 'error');
         populateReview({});   // open an empty, editable form so the tool never dead-ends
         return;

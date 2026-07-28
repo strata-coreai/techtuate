@@ -11,7 +11,11 @@
 // Model is isolated to the small config below so the provider can be swapped
 // (GLM-4.6V, Qwen-VL, Workers AI, etc.) without touching the client.
 
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+// gemini-flash-latest is an alias that tracks the newest Flash model, so this
+// will not break when Google retires a specific version (as happened with
+// gemini-2.5-flash). Override with the GEMINI_MODEL env var to pin a version
+// (e.g. gemini-3.5-flash-lite for the cheapest option).
+const DEFAULT_MODEL = 'gemini-flash-latest';
 const MAX_IMAGES = 2;
 const MAX_BYTES = 6 * 1024 * 1024; // ~6MB of base64 per image, generous for a downscaled JPEG
 
@@ -123,12 +127,23 @@ export async function onRequestPost(context) {
   }
 
   if (!res.ok) {
-    // Surface a friendly message; do not leak the upstream error body.
-    const status = res.status === 429 ? 429 : 502;
-    const msg = res.status === 429
-      ? 'The free reading quota for today has been used up. Please try again later or type the details in manually.'
-      : 'The reading service returned an error. Please try again.';
-    return json({ ok: false, error: msg }, status);
+    // Read the upstream body so we can log it (visible in Cloudflare real-time
+    // function logs) and surface the HTTP status to help debugging.
+    let detail = '';
+    try { detail = await res.text(); } catch (e) { detail = ''; }
+    console.log('scan: gemini error', res.status, detail.slice(0, 800));
+
+    if (res.status === 429) {
+      return json({ ok: false, error: 'The free reading quota has been used up for now. Please try again later or type the details in manually.', status: 429 }, 429);
+    }
+    // Include the status code (and a short detail snippet) so the cause is
+    // visible in the browser Network tab without digging into server logs.
+    return json({
+      ok: false,
+      error: 'The reading service returned an error (HTTP ' + res.status + '). If this is a 404, the model name is wrong - set GEMINI_MODEL to one from your key\'s model list.',
+      status: res.status,
+      detail: detail.slice(0, 400)
+    }, 502);
   }
 
   let data;
