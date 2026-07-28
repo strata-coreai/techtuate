@@ -11,6 +11,14 @@ A static site of free, client-side, browser-based utilities. One repo, one Cloud
 - **Same palette + voice across every page.** White, vibrant yellow (`#ffd60a`), black, dark grays only. Inter Tight display, neo-brutalist hard borders + offset shadows. Mobile-friendly down to ~360px.
 - **NEVER use em-dashes (—) or en-dashes (–). Use plain hyphens (-) instead.** Forever rule. Founder said em-dashes "scream AI". Applies to every file: HTML, CSS, JS, MD, comments, prompts.
 
+### Approved exception: /card-reader/ (business card reader)
+This one tool is a **deliberate, founder-approved exception** to "no backend / no functions" and "no data leaves the device". It uses a single Cloudflare Pages Function (`/functions/api/scan.js`) that forwards the card image to Google Gemini (Google AI Studio key) for high-quality reading. Rules for it:
+- The image is sent **once for reading only** - the function does not store or log it, there is no account, and the user's saved phonebook stays in their browser (IndexedDB).
+- The third-party call **must be labelled** on the tool UI (the visible `*` disclosure) and in its About section. Do not quietly remove that label.
+- The Gemini key lives ONLY as the encrypted Cloudflare env var `GEMINI_API_KEY` (optional `GEMINI_MODEL`). Never commit it, never ship it to the client.
+- The provider is isolated in the function so it can be swapped (GLM-4.6V, Qwen-VL, Workers AI) without touching the client.
+- This exception applies to `/card-reader/` ONLY. Every other tool stays 100% client-side. Do not use it as precedent for new tools without asking the founder.
+
 ## Repo layout
 
 ```

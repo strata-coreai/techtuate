@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>techtuate vs. CamCard - free business card scanner, no account (2026)</title>
+  <meta name="description" content="CamCard needs an account and stores your scanned contacts on its servers. techtuate reads a card in your browser, keeps no account and no server copy, and exports a vCard or CSV. Free, no app." />
+  <link rel="canonical" href="https://techtuate.com/vs/camcard/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="techtuate vs. CamCard (2026)" />
+  <meta property="og:description" content="CamCard stores your contacts on its cloud behind an account and a subscription. techtuate reads a card and hands you a vCard - no account, no stored server copy, free." />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"techtuate vs. CamCard","url":"https://techtuate.com/vs/camcard/","datePublished":"2026-07-28","author":{"@type":"Organization","name":"techtuate"}}</script>
+</head>
+<body>
+  <div class="topbanner">tools that should be free, are. no sign-up, no ads, ever. <a href="/why-free/">read why</a></div>
+  <div class="wrap">
+    <header class="site">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">tech<span>tuate</span></span></a>
+      <nav class="top"><a href="/#tools">tools</a><a href="/vs/" class="active">vs.</a><a href="/why-free/">why</a></nav>
+    </header>
+
+    <article class="prose">
+      <h1>techtuate vs. CamCard</h1>
+      <p class="byline">Pricing and behavior checked July 2026.</p>
+
+      <p class="lede">
+        CamCard is one of the best-known business card scanners. It is also a contact database that lives on someone else's servers: to use it you make an account, and every card you scan is uploaded and kept in CamCard's cloud so it can sync across devices and sell you a subscription. techtuate's card reader takes a different shape - it reads the card, hands you the contact, and keeps nothing.
+      </p>
+
+      <div class="callout yellow">
+        <h4>TL;DR</h4>
+        <p>CamCard = account required, your scanned contacts stored on their cloud, business plans $21-$25/user/mo. techtuate = no account, no stored server copy, your phonebook stays in your browser, export a vCard or CSV, free.</p>
+      </div>
+
+      <h2>One honest thing up front</h2>
+      <p>
+        Unlike the rest of techtuate, the card reader does make a single call to a third party (Google Gemini) to read the image, because good card reading needs a strong vision model and we will not pretend a weaker in-browser engine is as accurate. We are upfront about that on the tool. The difference from CamCard is what happens next: we do not keep an account, we do not store the image, and your saved contacts live only in your browser. CamCard's whole model is to hold your contact database on its servers indefinitely.
+      </p>
+
+      <h2>What you are actually signing up for with CamCard</h2>
+      <ul>
+        <li><strong>An account, always.</strong> Even the free tier requires you to register before you can scan.</li>
+        <li><strong>Your contacts on their cloud.</strong> Scanned cards sync to CamCard's servers. That is the feature and the lock-in: your address book now lives with them.</li>
+        <li><strong>A subscription for real use.</strong> Business plans run about $21-$25 per user per month, with monthly scan caps on lower tiers.</li>
+        <li><strong>An app install.</strong> It is a mobile app first, not a "open a link and go" tool.</li>
+      </ul>
+
+      <h2>What techtuate does instead</h2>
+      <ul>
+        <li><strong>No account.</strong> Open the page and scan. Nothing to register.</li>
+        <li><strong>No stored server copy.</strong> The image is sent once to be read and is not saved by us. There is no cloud database of your contacts.</li>
+        <li><strong>Your phonebook is yours.</strong> Saved contacts live in this browser (IndexedDB). Export them any time as a vCard (.vcf) that imports into any phone, or as a CSV.</li>
+        <li><strong>No app.</strong> Works in the browser on your phone or laptop.</li>
+        <li><strong>Free.</strong> No tier, no per-seat pricing.</li>
+      </ul>
+
+      <h2>The honest trade-off</h2>
+      <p>
+        CamCard's cloud sync is genuinely useful if you want a team-wide, always-synced contact database with CRM integrations, and you are comfortable with that data living on their servers and paying per seat for it. If that is you, CamCard is built for it.
+      </p>
+      <p>
+        techtuate is for the far more common case: you were handed a card, you want it in your phone in ten seconds without an account or an app, and you do not want a subscription or a permanent cloud copy of your contacts. For that, a read-and-export tool is exactly right, and it costs nothing.
+      </p>
+
+      <div class="compare">
+        <table>
+          <thead>
+            <tr><th></th><th>CamCard</th><th>techtuate</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Price</td><td>Free (limited) / $21-$25 per user/mo</td><td class="yes">Free, forever</td></tr>
+            <tr><td>Account required</td><td class="no">Yes, even to scan</td><td class="yes">No</td></tr>
+            <tr><td>App install</td><td class="no">Yes (mobile app)</td><td class="yes">No, runs in the browser</td></tr>
+            <tr><td>Your contacts stored on their server</td><td class="no">Yes, that is the model</td><td class="yes">No, phonebook stays in your browser</td></tr>
+            <tr><td>Card image uploaded to read it</td><td class="no">Yes, to their cloud</td><td>Once, to Google Gemini, not stored</td></tr>
+            <tr><td>Monthly scan cap</td><td class="no">Yes on lower tiers</td><td class="yes">None</td></tr>
+            <tr><td>Front and back of card</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+            <tr><td>Export vCard (.vcf)</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+            <tr><td>Export CSV</td><td class="no">Paid / higher tiers</td><td class="yes">Yes, free</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta">
+        <h3>Scan a card right now.</h3>
+        <p>No account. No app. No subscription.</p>
+        <a class="btn" href="/card-reader/">Open the business card reader</a>
+      </div>
+
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
+        See also: <a href="/vs/">all comparisons</a> &middot; <a href="/qr-code/">QR code generator</a> &middot; <a href="/card-reader/">business card reader</a>
+      </p>
+    </article>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div><a href="/card-reader/">card reader</a> &middot; <a href="/vs/">comparisons</a></div>
+    </footer>
+  </div>
+  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>

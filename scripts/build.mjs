@@ -39,7 +39,14 @@ const STATIC_DIRS = [
   'svg-converter',
   'sql-to-excel',
   'image-resize',
+  'card-reader',
 ];
+
+// NOTE: the /card-reader/ tool also relies on a Cloudflare Pages Function at
+// /functions/api/scan.js. That functions/ directory lives at the REPO ROOT and
+// is auto-detected and compiled by Cloudflare Pages at deploy time. It is NOT
+// copied into ./dist (Cloudflare requires functions to sit outside the static
+// output dir), so this build script deliberately does nothing with it.
 
 function log(...args) { console.log('[build]', ...args); }
 
