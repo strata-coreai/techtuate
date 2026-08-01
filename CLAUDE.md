@@ -2,22 +2,28 @@
 
 A static site of free, client-side, browser-based utilities. One repo, one Cloudflare Pages project, landing page at the root, each tool in its own `/<tool-name>/` subfolder, plus SEO/marketing pages.
 
+## Positioning (as of 2026-07-28)
+
+techtuate is now **"free & powerful little tools that just work"**, not "purist local-only". Local processing is still the default and the SEO moat, but AI features are welcome as **clearly-labeled add-ons**. AI is NOT the headline - lead with free + useful. See `docs/positioning.md` for the full messaging + rewrite map. Practical copy rules: scope the "your files stay on your device" claim to the local tools (do not state it as a whole-site absolute); say "no ads" (true today) but never "no ads, ever" (ads are a possible future path past the free-tier ceiling); AI tools always carry the `*` disclosure.
+
 ## Hard constraints - do not violate
 
-- **100% client-side / static.** No backend, no server, no APIs we own, no functions, no edge workers. Every tool runs entirely in the user's browser.
-- **No accounts, no credit cards, no ads.** The site's whole promise to users.
-- **Free hosting on Cloudflare Pages.** Whatever you ship must build to `./dist/` and serve as static files. No per-request cost.
-- **No data leaves the device.** No third-party analytics SDKs, no CDN fetches at runtime (CDN'd build deps at build time are fine).
+- **Local-first is the default.** Every non-AI tool runs 100% client-side: files are processed in the browser and never uploaded. This is the moat - keep it for any tool that does not genuinely need a server.
+- **AI / enhanced tools MAY use a backend**, specifically a Cloudflare Pages Function proxy to a third-party AI service, but ONLY when: (a) it materially improves quality, (b) it carries the visible `*` "uses a third-party AI service" disclosure, (c) there is no user account, (d) the user's input is not stored server-side, (e) the API key stays server-side as an encrypted env var. **Ask the founder before adding a new AI dependency.**
+- **Lightweight third-party embeds** (Trustpilot, StartupBar, privacy-friendly analytics) are allowed, but must be disclosed on pages where they load.
+- **No accounts, no credit cards.** Still hard. **No ads today** (but do not promise "ever").
+- **Free static hosting on Cloudflare Pages.** The static site builds to `./dist/`. AI functions live in `/functions/` at the repo root and run on Cloudflare's free tier; keep per-request cost near zero.
+- **Files stay on the device for local tools.** AI tools send only the specific input needed (e.g. a card image) to a named, labeled service. No third-party analytics SDKs beyond disclosed embeds; no runtime CDN fetches for the static tools (build-time deps are fine).
 - **Same palette + voice across every page.** White, vibrant yellow (`#ffd60a`), black, dark grays only. Inter Tight display, neo-brutalist hard borders + offset shadows. Mobile-friendly down to ~360px.
 - **NEVER use em-dashes (—) or en-dashes (–). Use plain hyphens (-) instead.** Forever rule. Founder said em-dashes "scream AI". Applies to every file: HTML, CSS, JS, MD, comments, prompts.
 
-### Approved exception: /card-reader/ (business card reader)
-This one tool is a **deliberate, founder-approved exception** to "no backend / no functions" and "no data leaves the device". It uses a single Cloudflare Pages Function (`/functions/api/scan.js`) that forwards the card image to Google Gemini (Google AI Studio key) for high-quality reading. Rules for it:
+### First AI tool: /card-reader/ (business card reader) - the pattern to copy
+Reference implementation of the AI-tool rules above. It uses a single Cloudflare Pages Function (`/functions/api/scan.js`) that forwards the card image to Google Gemini (Google AI Studio key) for reading:
 - The image is sent **once for reading only** - the function does not store or log it, there is no account, and the user's saved phonebook stays in their browser (IndexedDB).
-- The third-party call **must be labelled** on the tool UI (the visible `*` disclosure) and in its About section. Do not quietly remove that label.
-- The Gemini key lives ONLY as the encrypted Cloudflare env var `GEMINI_API_KEY` (optional `GEMINI_MODEL`). Never commit it, never ship it to the client.
+- The third-party call **is labelled** on the tool UI (the visible `*` disclosure) and in its About section. Do not quietly remove that label.
+- The Gemini key lives ONLY as the encrypted Cloudflare env var `GEMINI_API_KEY` (optional `GEMINI_MODEL`, default `gemini-flash-latest` - do NOT pin a dated model, Google retires them for new keys). Never commit it, never ship it to the client.
 - The provider is isolated in the function so it can be swapped (GLM-4.6V, Qwen-VL, Workers AI) without touching the client.
-- This exception applies to `/card-reader/` ONLY. Every other tool stays 100% client-side. Do not use it as precedent for new tools without asking the founder.
+- New AI tools follow this same shape (labeled, keyless client, no stored input). Ask the founder before adding one.
 
 ## Repo layout
 
