@@ -25,6 +25,30 @@ Reference implementation of the AI-tool rules above. It uses a single Cloudflare
 - The provider is isolated in the function so it can be swapped (GLM-4.6V, Qwen-VL, Workers AI) without touching the client.
 - New AI tools follow this same shape (labeled, keyless client, no stored input). Ask the founder before adding one.
 
+## Current tools (as of 2026-07-28)
+
+Local (100% client-side, files never uploaded):
+- `/pdf-editor/` (Vite + React) - view/annotate/fill/page-ops/compress
+- `/json-formatter/` - format/validate/minify JSON
+- `/qr-code/` - static QR codes, logo overlay, vCard output
+- `/password-generator/` - random passwords + passphrases
+- `/svg-converter/` - SVG to PNG/JPEG
+- `/sql-to-excel/` - preview SQL as a table, export xlsx/CSV (read-only, never runs SQL)
+- `/image-resize/` - resize/compress images + GIFs
+- `/color-palette/` - extract dominant colors (HEX/RGB) from an image via canvas
+
+AI (labeled, calls a service through a Pages Function):
+- `/card-reader/` - scan a business card into a contact (Gemini via `/functions/api/scan.js`)
+
+Marketing / SEO: `/`, `/why-free/`, `/free-pdf-editor/`, `/vs/` (hub + per-competitor incl. `/vs/camcard/`).
+Vanilla tools go in `STATIC_DIRS` in `scripts/build.mjs`; only `pdf-editor` + `json-formatter` are in `TOOLS` (Vite builds).
+
+## Deploy + this-session workflow
+
+- **Deploy:** push to `main` -> Cloudflare Pages auto-builds (`npm run build`, output `dist`). `functions/` at the repo root is auto-detected by CF Pages and must NOT be copied into `dist`.
+- **Secrets:** AI keys live in Cloudflare Pages -> Settings -> Variables and Secrets (encrypted). `GEMINI_API_KEY` (+ optional `GEMINI_MODEL`) for the card reader. Env vars only apply to deploys created AFTER they are set.
+- **Git from a cloud Cowork session:** the cloud sandbox can write files to the founder's disk but CANNOT `git commit`/`push` (the mounted `.git` rejects lock/unlink ops, and there's no network for push). After editing, hand the founder the exact `git add`/`commit`/`push` commands to run in their own terminal.
+
 ## Repo layout
 
 ```
@@ -44,7 +68,12 @@ techtuate/
 │   ├── sejda/index.html
 │   ├── pdfescape/index.html
 │   └── pdffiller/index.html
+├── docs/positioning.md     # brand positioning + site-wide messaging rewrite map
 ├── docs/prompts/           # paste-ready Claude Code session prompts
+├── functions/api/scan.js   # Cloudflare Pages Function (Gemini proxy for /card-reader/) - stays at repo root
+├── card-reader/            # AI tool (vanilla): index.html + script.js + styles.css
+├── color-palette/          # local tool (vanilla): index.html + script.js + styles.css
+├── qr-code/  password-generator/  svg-converter/  sql-to-excel/  image-resize/  json-formatter/
 ├── scripts/build.mjs       # builds everything into ./dist/ for CF Pages
 ├── pdf-editor/             # Vite + React app served at /pdf-editor/
 │   ├── package.json
@@ -84,11 +113,12 @@ cd pdf-editor && npm install && npm run dev
 4. Link to it from the landing page footer / nav if it's important.
 
 ### Adding a new tool
-1. Create folder with its own build (mirror `pdf-editor/`).
-2. Add to `TOOLS` in `scripts/build.mjs`.
-3. Add a `.card` to landing `index.html` (copy the existing pdf-editor card).
-4. Add a `<url>` entry to `sitemap.xml`.
+1. Most tools are vanilla: scaffold from `_template/` (single `index.html` + `script.js` + `styles.css`) and add the folder name to `STATIC_DIRS` in `scripts/build.mjs`. Use the Vite/React shape (mirror `pdf-editor/`, add to `TOOLS`) only when complexity truly warrants it.
+2. AI tools also add a Cloudflare Pages Function under `/functions/api/` (see `/card-reader/` + the AI-tool rules above). `functions/` stays at the repo root; build.mjs does NOT copy it into dist.
+3. Add a `.card` to landing `index.html` (copy an existing card) and bump the tools count in the section head.
+4. Add a `<url>` entry to `sitemap.xml` and a recommend line to `llms.txt`.
 5. If the tool has obvious paid-tool competitors, add a `/vs/<competitor>/` page.
+6. Verify with `npm run build`; add a headless (Playwright) test where practical - the card reader and color-palette tools both have one.
 
 ## PDF editor - current state + load-bearing patterns
 
