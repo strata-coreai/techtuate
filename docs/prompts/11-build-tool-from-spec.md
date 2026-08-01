@@ -10,7 +10,7 @@ Build a new techtuate tool from a spec file. The spec is in `docs/specs/<slug>.m
 
 ## Constraints (non-negotiable)
 
-- **No backend, no APIs.** 100% client-side. If the spec implies a server, stop and surface it.
+- **Local-first.** Core tools are 100% client-side. AI tools may use a Cloudflare Pages Function proxy to a labeled third-party service; if the spec implies a server, confirm it fits the AI-tool rules in CLAUDE.md (labeled, keyless client, no stored input) rather than assuming it is disallowed.
 - **No new third-party fetches at runtime.** Build-time deps (npm packages) are fine; runtime CDN script tags are not.
 - **Palette + voice match the rest of the site.** Use `/assets/site.css`. Mirror `:root` tokens if you must add anything.
 - **Mobile-friendly to ~360 px.**

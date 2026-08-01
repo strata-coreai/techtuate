@@ -123,5 +123,6 @@ Rewrite the constraints block from "100% client-side / no functions / no data le
 
 ### Pass status
 - Pass 1 (DONE): homepage `index.html` (title, meta, OG/Twitter, topbanner, eyebrow, lede, pills, JSON-LD desc, third-party line), `CLAUDE.md` constraints rewrite, `llms.txt` top description.
-- Pass 2 (next): `why-free/index.html` rewrite, `vs/index.html` one-line softening, site-wide topbanner "ever" removal on all remaining pages, `_template/index.html`.
-- Pass 3 (follow-up): `docs/` launch scripts + ops-model copy.
+- Pass 2 (DONE): `why-free/index.html` rewrite, `vs/index.html` two-line softening, site-wide topbanner "ever" removal on all 25 remaining pages (+ ezgif/pdfescape content "no ads ever"), `_template/index.html` local/AI variant.
+- Pass 3 (DONE): `README.md` (scoped client-side claim, AI note, em-dashes cleaned), build prompts `docs/prompts/10-add-new-tool.md` + `11-build-tool-from-spec.md` (AI tools now allowed, not "stop if server implied"), `docs/tools-roadmap.md` AI-image note, `docs/launch/producthunt.md` "no paywall ever" -> "no paywall". `ops-model.md` had no absolute pitch lines. PDF-editor-specific launch drafts (hn, reddit) left as-is since those claims are true for that local tool.
+- Repositioning complete. Note left for future: some `docs/specs/*.md` and PDF launch drafts still say "100% client-side" in a tool-specific (accurate) context; only revisit if a specific tool changes.

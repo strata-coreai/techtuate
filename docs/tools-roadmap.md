@@ -52,7 +52,7 @@ These six alone would 5-10x the surface area of the site. Each ships in under a 
 - **Background remover** - very high volume but needs an ML model (~5-50 MB download), changes the architecture story.
 - **Video tools** (compressor, trim, to-gif) - browser video processing is slow and memory-hungry; results are mediocre vs. desktop tools.
 - **OCR** - same problem: needs a large model.
-- **AI image generator** - requires inference, can't be 100% client-side.
+- **AI image generator** - needs inference, so it would use the labeled AI-proxy pattern (like /card-reader/) rather than pure client-side.
 - **Cloud sync / accounts** - violates the hard constraint.
 
 ## What "ship" means for each tool

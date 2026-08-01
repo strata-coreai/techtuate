@@ -31,7 +31,7 @@ What it doesn't do:
 • OCR on scanned PDFs (yet)
 
 How it stays free forever:
-The whole site is static, hosted on Cloudflare Pages for $0/mo regardless of traffic. There's no server processing your file, so there's no per-user cost. Which means no paywall ever.
+The whole site is static, hosted on Cloudflare Pages for $0/mo regardless of traffic. There's no server processing your file, so there's no per-user cost. Which means no paywall.
 
 Six more tools planned over the next 90 days (image compressor, QR code generator, password generator, JSON formatter, word counter, image-to-PDF). One per week.
 
