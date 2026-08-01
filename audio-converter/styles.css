@@ -1,0 +1,142 @@
+/* ============================================================
+   audio converter - layers on /assets/site.css tokens
+   ============================================================ */
+
+.ac-panel { margin-bottom: 20px; }
+
+/* ---------- drop zone ---------- */
+.ac-drop {
+  border: 2px dashed var(--ink);
+  border-radius: var(--r-lg);
+  background: var(--bg-soft);
+  padding: 40px 20px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.ac-drop:hover, .ac-drop:focus-visible { background: var(--yellow-wash); outline: none; }
+.ac-drop.dragover { background: var(--yellow-soft); border-style: solid; }
+.ac-drop-title { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 18px; }
+.ac-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.ac-hint { margin: 0; font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); }
+
+/* ---------- output controls bar ---------- */
+.ac-controls {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px;
+  padding: 16px 18px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  background: var(--yellow-wash);
+  box-shadow: 4px 4px 0 var(--ink);
+  margin-bottom: 24px;
+}
+.ac-ctl { display: flex; flex-direction: column; gap: 6px; }
+.ac-ctl.hidden { display: none; }
+.ac-ctl label {
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-mute);
+}
+.ac-controls select {
+  font-family: inherit; font-size: 15px; padding: 7px 10px;
+  border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--bg); color: var(--ink);
+}
+.ac-controls select:focus { outline: none; box-shadow: 3px 3px 0 var(--yellow-deep); }
+.ac-ctl-actions { display: flex; gap: 10px; margin-left: auto; align-items: flex-end; }
+
+/* ---------- file cards ---------- */
+.ac-files { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+.ac-file {
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 16px 16px 14px;
+}
+.ac-file-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 12px;
+}
+.ac-file-name {
+  font-family: var(--font-display); font-weight: 800; font-size: 16px;
+  word-break: break-all; margin: 0;
+}
+.ac-file-meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
+.ac-file-remove {
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim);
+  background: none; border: none; cursor: pointer; padding: 2px 4px;
+}
+.ac-file-remove:hover { color: var(--ink); background: var(--yellow); border-radius: 4px; }
+
+/* ---------- waveform + trim ---------- */
+.ac-wave-wrap {
+  position: relative;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-sm);
+  background: var(--bg-soft);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+.ac-wave { display: block; width: 100%; height: 84px; }
+.ac-sel {
+  position: absolute; top: 0; bottom: 0;
+  background: rgba(255, 214, 10, 0.28);
+  border-left: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
+  pointer-events: none;
+}
+.ac-handle {
+  position: absolute; top: 0; bottom: 0; width: 16px;
+  cursor: ew-resize; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+}
+.ac-handle::after {
+  content: ""; width: 4px; height: 34px;
+  background: var(--ink); border-radius: 2px;
+}
+.ac-dim { position: absolute; top: 0; bottom: 0; background: rgba(10,10,10,0.06); pointer-events: none; }
+
+/* ---------- trim controls ---------- */
+.ac-trim {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-top: 12px;
+}
+.ac-time { display: flex; align-items: center; gap: 6px; }
+.ac-time label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: var(--ink-mute); }
+.ac-time input {
+  font-family: var(--font-mono); font-size: 14px; width: 92px; padding: 6px 8px;
+  border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--bg); color: var(--ink);
+}
+.ac-time input:focus { outline: none; box-shadow: 3px 3px 0 var(--yellow-deep); }
+.ac-play {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 12px; font-family: inherit; font-weight: 700; font-size: 13px;
+  border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--bg); color: var(--ink);
+  cursor: pointer; box-shadow: 2px 2px 0 var(--ink);
+}
+.ac-play:hover { background: var(--yellow); }
+.ac-seldur { font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); margin-left: auto; }
+
+/* ---------- per-file footer ---------- */
+.ac-file-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.ac-progress {
+  flex: 1 1 120px; height: 10px; min-width: 100px;
+  border: 2px solid var(--ink); border-radius: 999px; background: var(--bg); overflow: hidden;
+}
+.ac-progress > span { display: block; height: 100%; width: 0; background: var(--yellow); transition: width .15s; }
+.ac-status { font-family: var(--font-mono); font-size: 12px; color: var(--ink-mute); white-space: nowrap; }
+.ac-status.err { color: #a12; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 720px) {
+  .ac-controls { gap: 12px; }
+  .ac-ctl-actions { margin-left: 0; width: 100%; }
+  .ac-ctl-actions .btn { flex: 1; justify-content: center; }
+  .ac-seldur { margin-left: 0; width: 100%; }
+}
+@media (max-width: 420px) {
+  .ac-ctl { flex: 1 1 44%; }
+  .ac-controls select { width: 100%; }
+  .ac-time input { width: 84px; }
+}
