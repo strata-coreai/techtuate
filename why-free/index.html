@@ -14,7 +14,7 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Why is techtuate free?","url":"https://techtuate.com/why-free/","datePublished":"2026-05-21","author":{"@type":"Person","name":"GJ"},"publisher":{"@type":"Organization","name":"techtuate"}}</script>
 </head>
 <body>
-  <div class="topbanner">tools that should be free, are. no sign-up, no ads, ever. <a href="/why-free/" style="border-bottom-color:var(--bg);">read why</a></div>
+  <div class="topbanner">tools that should be free, are. no sign-up, no ads. <a href="/why-free/" style="border-bottom-color:var(--bg);">read why</a></div>
   <div class="wrap narrow">
     <header class="site">
       <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">tech<span>tuate</span></span></a>
@@ -39,7 +39,7 @@
 
       <h2>How it costs me $0/mo. to host</h2>
       <p>
-        techtuate is 100% client-side. There's no backend, no database, no API I'm running. Every tool is a self-contained web page that does the work in your browser, on your computer. Nothing uploads.
+        Most of techtuate is 100% client-side. For the core tools there's no backend, no database, no API - each is a self-contained web page that does the work in your browser, on your computer, so nothing uploads. A couple of newer AI tools (like the card reader) call a small serverless function to do the heavy lifting; those are clearly labeled, and everything else still runs entirely on your machine.
       </p>
       <p>
         That means I can host the entire site on <a href="https://pages.cloudflare.com" target="_blank" rel="noreferrer">Cloudflare Pages</a> for free. Unlimited bandwidth. No per-request cost. If a million people use the PDF editor tomorrow, my bill is still $0, because their browser does the work and Cloudflare's CDN serves a static file.
@@ -50,7 +50,7 @@
 
       <h2>What "client-side" buys you, the user</h2>
       <ul>
-        <li><strong>Privacy.</strong> Your file never leaves your browser. There's no server log of "user X uploaded confidential.pdf at 3:14am."</li>
+        <li><strong>Privacy.</strong> For the in-browser tools, your file never leaves your browser. There's no server log of "user X uploaded confidential.pdf at 3:14am." The AI tools are the exception, and they say so before you use them.</li>
         <li><strong>Speed.</strong> No round-trip to a server. The editor runs at the speed of your laptop.</li>
         <li><strong>Offline.</strong> Once a page is loaded, you can disconnect from the internet and keep working.</li>
         <li><strong>No size limit (almost).</strong> The only ceiling is your browser's memory. Modern browsers happily handle hundreds of megabytes.</li>
@@ -58,7 +58,7 @@
 
       <h2>The deal</h2>
       <p>
-        Free forever. No sign-up. No credit card. No ads. No third-party trackers. No data collection beyond the privacy-friendly Cloudflare visit counts.
+        Free forever. No sign-up. No credit card. No ads. No ad networks, and no data collection beyond privacy-friendly Cloudflare visit counts and the two home-page widgets noted below.
       </p>
       <p>
         In exchange, I ask one thing: <strong>if a tool here saves you a minute or a dollar, tell someone.</strong> Send the link to a friend. Drop it in your team chat. Tweet it. Bookmark and come back. That's it. That's the whole arrangement. The tools stay free for everyone if more people know they exist.
@@ -71,12 +71,12 @@
 
       <h2>What about ads?</h2>
       <p>
-        No. The whole point is "no ad-bloat, no friction." The day this site has a banner ad is the day it stopped being techtuate. If you ever see one, you've been phished.
+        None. No ad-bloat, no auto-play, no tracking junk - that friction is exactly what made me build this. The tools stay clean and fast, and that's the whole point.
       </p>
 
       <h2>What about your data?</h2>
       <p>
-        I can't see it. Cloudflare Web Analytics counts page visits anonymously (no cookies, no fingerprinting). The tools themselves run in your tab and never call my server (because there isn't one) and never call a third-party. The one exception is the Trustpilot review widget on the home page: it loads from Trustpilot and can set a cookie, because Trustpilot requires their official widget to display reviews. Open the Network tab in DevTools next time you're here. On a tool page you'll see static asset loads from <code>techtuate.com</code> and nothing else; on the home page you'll also see that one Trustpilot widget.
+        For the local tools, I can't see your data - they run in your tab and never call my server. Cloudflare Web Analytics counts page visits anonymously (no cookies, no fingerprinting). The AI tools are the honest exception: they send only the specific thing you're working on (for example, the card reader sends the card image to Google Gemini to read it) to a named service, labeled with a <code>*</code> on the tool. Nothing is stored on my side and there's no account. The home page also loads two embeds - the Trustpilot review widget and a StartupBar badge - which can set a cookie. Open the Network tab in DevTools next time you're here: on a local tool page you'll see static asset loads from <code>techtuate.com</code> and nothing else; on an AI tool you'll see the one labeled call; on the home page you'll also see those two widgets.
       </p>
 
       <h2>What's the long-term plan?</h2>

@@ -34,7 +34,7 @@
 <body>
 
   <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads, ever.
+    tools that should be free, are. no sign-up, no ads.
     <a href="/why-free/">read why</a>
   </div>
 
@@ -77,10 +77,22 @@
 
     <section style="margin-top: 48px;">
       <div class="section-head"><h2>About this tool</h2></div>
+      <!-- LOCAL tool (default): the file is processed in the browser, nothing uploaded. Keep this blurb. -->
       <p style="max-width:680px; color:var(--ink-mute);">
-        Free, forever, no sign-up. Runs entirely in your browser - nothing is uploaded.
+        Free, no sign-up. Runs entirely in your browser - nothing is uploaded.
         Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
       </p>
+      <!-- AI tool variant: if this tool calls a third-party AI service via a Cloudflare Pages Function, DELETE the
+           paragraph above and use the labeled version below (and add a visible "*" disclosure near the action button;
+           see /card-reader/ for the pattern):
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, no sign-up. This tool sends your input once to a third-party AI service (name it) to do the processing -
+        it is not stored and there is no account. Everything else stays in your browser.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+      -->
+      <!-- Founder note (index.html) uses "no ads" but never "no ads, ever" - ads are a possible future path. Do not re-add "ever". -->
+
     </section>
 
     <footer class="site">
