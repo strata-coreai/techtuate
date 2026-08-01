@@ -40,6 +40,7 @@ const STATIC_DIRS = [
   'sql-to-excel',
   'image-resize',
   'card-reader',
+  'color-palette',
 ];
 
 // NOTE: the /card-reader/ tool also relies on a Cloudflare Pages Function at
