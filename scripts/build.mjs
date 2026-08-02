@@ -41,7 +41,7 @@ const STATIC_DIRS = [
   'image-resize',
   'card-reader',
   'color-palette',
-  'audio-converter',
+  'font-finder',
 ];
 
 // NOTE: the /card-reader/ tool also relies on a Cloudflare Pages Function at

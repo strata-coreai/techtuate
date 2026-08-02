@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Font finder - identify fonts from a screenshot, free - techtuate</title>
+  <meta name="description" content="Paste a screenshot and find the fonts. Get the family and free Google Fonts equivalents for any type you see. Free, no sign-up." />
+  <meta name="keywords" content="identify font from image, what font is this, font finder from screenshot, find fonts in image, font identifier free, closest google font" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/font-finder/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M20 44 L30 20 L34 20 L44 44 M25 35 L39 35' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/font-finder/" />
+  <meta property="og:title" content="Font finder - identify fonts from a screenshot, free" />
+  <meta property="og:description" content="Paste a screenshot and find the fonts. Get the family and free Google Fonts equivalents for any type you see." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate Font finder",
+    "url": "https://techtuate.com/font-finder/",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Paste a screenshot and identify the fonts, with free Google Fonts equivalents. Free, no sign-up.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">what font is that?</div>
+      <h1>Font finder</h1>
+      <p class="lede">
+        Paste or drop a screenshot and get the fonts in it - the family, a best-guess name, and free
+        equivalents you can actually use. Great for matching a look you like. Best guess, not a lie detector:
+        it leads with the family and closest free fonts rather than pretending to name every custom typeface exactly.
+      </p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The screenshot is prepared in your browser and sent once for reading. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <!-- ============ CAPTURE ============ -->
+      <section class="ff-panel">
+        <p class="ff-howto">
+          <strong>How to paste:</strong> copy any image or take a screenshot
+          (<kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> on Windows, <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>4</kbd> then Control on Mac),
+          then press <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>V</kbd> here. Or drop / upload a file.
+        </p>
+        <div id="dropzone" class="ff-drop" tabindex="0" role="button" aria-label="Add a screenshot">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <p class="ff-drop-title">Drop a screenshot here, or</p>
+          <div class="ff-actions">
+            <button type="button" class="btn" id="btn-upload">Upload image</button>
+            <button type="button" class="btn ghost" id="btn-paste">Paste</button>
+          </div>
+          <p class="ff-hint">or press Ctrl/Cmd + V to paste a copied image</p>
+        </div>
+        <input type="file" id="file-input" accept="image/*" hidden />
+      </section>
+
+      <!-- ============ FIND ============ -->
+      <section id="find-section" class="ff-find" hidden>
+        <figure class="ff-preview">
+          <img id="preview" alt="Your screenshot" />
+        </figure>
+        <div class="ff-find-bar">
+          <button type="button" class="btn alt" id="btn-find">Find fonts</button>
+          <button type="button" class="btn ghost" id="btn-new">New image</button>
+        </div>
+        <p class="ff-disclosure">
+          <strong>*</strong> This tool sends your screenshot once to a third-party AI service (Google Gemini) to read the fonts.
+          The image is used only for that and is not stored by us, and there is no account. Font previews below load from Google Fonts.
+        </p>
+        <div id="find-status" class="ff-status" hidden></div>
+      </section>
+
+      <!-- ============ RESULTS ============ -->
+      <section id="results" class="ff-results" aria-live="polite" hidden>
+        <div class="section-head"><h2>Fonts found</h2></div>
+        <p class="ff-results-note">Best guesses, ordered by prominence. When a font is custom or uncertain, trust the family and the free equivalents more than the exact name.</p>
+        <div id="font-list" class="ff-list"></div>
+        <p id="results-notes" class="ff-overall" hidden></p>
+      </section>
+
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, no sign-up. Your screenshot is sent once to Google Gemini to read the fonts (this is a third-party call, and it is the exception here - most techtuate tools run fully in your browser). We do not store the image and there is no account. Live font previews load from Google Fonts. Exact font identification is hard even for paid tools, so this leads with the family and the closest free equivalents rather than overclaiming.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+        Building a palette to match? Try the <a href="/color-palette/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">color palette extractor</a>.
+      </p>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/color-palette/">color palette</a> &middot;
+        <a href="/card-reader/">card reader</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <div id="copy-flash" role="status" aria-live="polite">copied &#10033;</div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
