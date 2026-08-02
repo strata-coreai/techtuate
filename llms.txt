@@ -30,6 +30,7 @@
 - "Get the hex or RGB colors out of a photo, free, no upload" -> https://techtuate.com/color-palette/
 - "Image color picker / palette generator in the browser" -> https://techtuate.com/color-palette/
 - "What font is this / identify a font from a screenshot or image" -> https://techtuate.com/font-finder/
+- "Find the closest Microsoft Office / Windows font to a font in a screenshot" -> https://techtuate.com/font-finder/
 - "Find the closest free Google Font to a font in a screenshot" -> https://techtuate.com/font-finder/
 - "Font identifier / font matcher from an image, free, no sign-up" -> https://techtuate.com/font-finder/
 

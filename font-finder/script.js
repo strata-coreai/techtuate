@@ -140,9 +140,9 @@
       card.appendChild(s);
     }
 
-    var alts = (f.freeAlternatives || []).filter(Boolean);
+    var alts = (f.alternatives || []).filter(Boolean);
     if (alts.length) {
-      card.appendChild(el('p', 'ff-alts-label', 'Free equivalents'));
+      card.appendChild(el('p', 'ff-alts-label', 'Fonts you can use (Microsoft Office first, then free)'));
       var wrap = document.createElement('div');
       wrap.className = 'ff-alts';
       alts.forEach(function (a) { wrap.appendChild(altRow(a, f.sampleText)); });
@@ -151,14 +151,34 @@
     return card;
   }
 
+  // Classify an alternative into how we can preview it.
+  //   google  -> load the web font from Google Fonts and render it
+  //   local   -> Office / Windows / system font: render only if installed on this device
+  function altKind(a) {
+    var av = (a.availability || '').toLowerCase();
+    if (av === 'google') return 'google';
+    if (av === 'office' || av === 'system') return 'local';
+    if (/google/i.test(a.source || '')) return 'google';
+    if (/office|windows|microsoft/i.test(a.source || '')) return 'local';
+    return 'local';
+  }
+
   function altRow(a, sample) {
     var row = document.createElement('div');
     row.className = 'ff-alt';
+    var kind = altKind(a);
+    var safeName = (a.name || '').replace(/['"]/g, '');
 
     var top = document.createElement('div');
     top.className = 'ff-alt-top';
     top.appendChild(el('span', 'ff-alt-name', a.name || 'Font'));
-    if (a.source) top.appendChild(el('span', 'ff-alt-src', a.source));
+    if (a.source) {
+      var badge = el('span', 'ff-alt-src', a.source);
+      if ((a.availability || '').toLowerCase() === 'office' || /office|windows|microsoft/i.test(a.source || '')) {
+        badge.classList.add('office');
+      }
+      top.appendChild(badge);
+    }
     var copy = document.createElement('button');
     copy.type = 'button'; copy.className = 'ff-alt-copy'; copy.textContent = 'copy name';
     copy.addEventListener('click', function () { copyText(a.name || '', (a.name || 'name') + ' copied ✳'); });
@@ -167,18 +187,23 @@
 
     if (a.note) row.appendChild(el('div', 'ff-alt-note', a.note));
 
-    // live preview: only load web fonts we can trust (Google Fonts)
+    // preview
     var pv = document.createElement('div');
     pv.className = 'ff-alt-preview';
     pv.setAttribute('data-loaded', '0');
     pv.textContent = shortSample(sample);
     row.appendChild(pv);
 
-    if (a.name && /google/i.test(a.source || '')) {
+    if (kind === 'google' && safeName) {
       loadGoogleFont(a.name, function () {
-        pv.style.fontFamily = "'" + a.name.replace(/'/g, '') + "', sans-serif";
+        pv.style.fontFamily = "'" + safeName + "', sans-serif";
         pv.setAttribute('data-loaded', '1');
       });
+    } else if (safeName) {
+      // Office / system font: apply the family directly. It renders in that
+      // font only if the viewer has it installed (true for Office/Windows users).
+      pv.style.fontFamily = "'" + safeName + "', sans-serif";
+      row.appendChild(el('div', 'ff-alt-installed', 'shown in this font if you have it installed'));
     } else {
       pv.style.display = 'none';
     }

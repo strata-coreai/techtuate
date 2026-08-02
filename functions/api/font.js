@@ -26,8 +26,12 @@ const PROMPT = [
   '- family: a plain-language classification, e.g. "Geometric sans-serif", "Humanist sans-serif", "Transitional serif", "Slab serif", "Monospace", "Script", "Display".',
   '- isLikelyCustom: true if this looks like a proprietary/custom or brand-exclusive typeface unlikely to be freely available.',
   '- confidence: 0..1, how sure you are of identifiedName specifically. Use low values when guessing.',
-  '- freeAlternatives: 1 to 3 free, downloadable fonts that closely match. STRONGLY prefer Google Fonts (they can be previewed live). For each: name, source (e.g. "Google Fonts"), and a short note on why it matches. Use the exact Google Fonts family name so it can be loaded.',
-  'Be honest: it is better to give the family and good free equivalents than a confidently wrong exact name. Do not invent names you are unsure of.',
+  '- alternatives: 3 to 5 real fonts a person could actually get and use to reproduce this look, ordered best match first. They must span more than one source. Specifically:',
+  '  * ALWAYS include the closest Microsoft Office / Windows-bundled font. This is a priority - MS Office availability matters most. Draw from fonts that ship with current Microsoft Office / Windows, e.g. Aptos (the current Office default), Calibri, Cambria, Segoe UI, Arial, Times New Roman, Georgia, Verdana, Tahoma, Corbel, Constantia, Candara, Consolas.',
+  '  * ALSO include at least one freely downloadable font (Google Fonts, or another free / open-source foundry).',
+  '  * Do NOT return only Google Fonts.',
+  '  Each alternative has: name (the exact font family name); availability, one of "office" (ships with Microsoft Office or Windows), "google" (available on Google Fonts), "free" (free download from another source), "system" (other OS system font), "paid" (commercial); source (a short human label like "Microsoft Office" or "Google Fonts"); note (why it matches, and where to get it if not obvious).',
+  'Be honest: it is better to give the family and good real-world equivalents than a confidently wrong exact name. Do not invent font names you are unsure of.',
   'notes: one short overall remark (optional, may be empty).'
 ].join('\n');
 
@@ -45,12 +49,13 @@ const RESPONSE_SCHEMA = {
           family: { type: 'STRING' },
           isLikelyCustom: { type: 'BOOLEAN' },
           confidence: { type: 'NUMBER' },
-          freeAlternatives: {
+          alternatives: {
             type: 'ARRAY',
             items: {
               type: 'OBJECT',
               properties: {
                 name: { type: 'STRING' },
+                availability: { type: 'STRING' },
                 source: { type: 'STRING' },
                 note: { type: 'STRING' }
               }

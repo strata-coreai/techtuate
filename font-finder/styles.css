@@ -117,7 +117,9 @@
 }
 .ff-alt-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .ff-alt-name { font-weight: 700; font-size: 14px; }
-.ff-alt-src { font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); }
+.ff-alt-src { font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 7px; }
+.ff-alt-src.office { color: var(--ink); border-color: var(--ink); background: var(--yellow); font-weight: 700; }
+.ff-alt-installed { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-dim); margin-top: 1px; }
 .ff-alt-copy {
   margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim);
   background: none; border: none; cursor: pointer; padding: 2px 4px;
