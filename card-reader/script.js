@@ -336,6 +336,34 @@
     (navigator.platform && /Mac|iPhone|iPad|iPod/.test(navigator.platform));
   var IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
 
+  // Ship the reach-out layout CSS from JS so it can never drift/cache apart from this script.
+  // (Injected into <head> after site.css, so it wins on equal specificity.)
+  (function injectReachStyles() {
+    if (document.getElementById('cr-reach-style')) return;
+    var css = [
+      '.cr-multi-row.cr-has-acts{flex-direction:column;align-items:stretch;gap:8px}',
+      '.cr-row-top{display:flex;gap:8px;align-items:center}',
+      '.cr-row-top select{max-width:120px}',
+      '.cr-row-top input{flex:1;min-width:0}',
+      '.cr-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px}',
+      '.cr-acts-lead{flex-basis:100%;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-bottom:-3px}',
+      '.cr-connect{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 16px}',
+      '.cr-connect[hidden]{display:none}',
+      '.cr-connect-label{font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-mute)}',
+      '.cr-act{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border:2px solid var(--ink);border-radius:999px;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:13.5px;font-weight:700;line-height:1;text-decoration:none;cursor:pointer;box-shadow:2px 2px 0 var(--ink);transition:transform .12s ease,box-shadow .12s ease,background .12s ease}',
+      '.cr-act.primary{background:var(--yellow)}',
+      '.cr-act:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);background:var(--yellow-wash)}',
+      '.cr-act.primary:hover{background:var(--yellow-soft)}',
+      '.cr-act:active{transform:translate(0,0);box-shadow:1px 1px 0 var(--ink)}',
+      '.cr-act svg{display:block;flex:0 0 auto}',
+      '.cr-act span{white-space:nowrap}'
+    ].join('');
+    var s = document.createElement('style');
+    s.id = 'cr-reach-style';
+    s.textContent = css;
+    document.head.appendChild(s);
+  })();
+
   function fieldVal(key) { var el = form.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
   function firstName() { var f = fieldVal('fullName'); return f ? f.split(/\s+/)[0] : ''; }
   function enc(s) { return encodeURIComponent(s || ''); }
