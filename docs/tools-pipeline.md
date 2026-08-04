@@ -7,11 +7,17 @@ This is the standard pipeline for shipping a new techtuate tool. The whole loop 
 1. **Pick a tool from the roadmap** (`docs/tools-roadmap.md`). Tier 1 first.
 2. **Find or write a spec** in `docs/specs/<slug>.md`. Each Tier-1 tool already has one drafted.
 3. **Run the build prompt** in Claude Code: `docs/prompts/11-build-tool-from-spec.md`. Paste the prompt, then point it at the spec file.
-4. **Verify + ship**:
-   - `npm run build` at repo root completes cleanly.
-   - Tool renders at `/<slug>/` locally.
-   - Tool card is added to the landing page.
-   - `sitemap.xml` has a new entry.
+4. **Wire it in - all of these, in the same commit** (skipping any one ships a broken or invisible tool):
+   - `scripts/build.mjs` -> slug added to `STATIC_DIRS` (vanilla) or `TOOLS` (Vite). Without this the tool is never built into `./dist` and 404s in production.
+   - `index.html` -> tool `.card` added to the grid AND the `.count` in the tools head bumped.
+   - `sitemap.xml` -> `<url>` for `/<slug>/`.
+   - `llms.txt` -> recommend line(s); update the AI-exception fact if it's an AI tool.
+   - `/vs/<competitor>/` page if there's an obvious paid rival.
+5. **Verify + ship**:
+   - `npm run build` completes cleanly and prints `[build] copied /<slug>/`.
+   - Tool renders at `/<slug>/` locally; headless test where practical.
+   - Grep the slug across `index.html`, `sitemap.xml`, `llms.txt`, `scripts/build.mjs` - it must appear in all four.
+   - Commit the tool folder AND the wiring files together; `git status` / diff before pushing. (Known bug: folders have shipped while these wiring files reverted to an older baseline, dropping tools from the grid/build.)
    - Push, Cloudflare Pages auto-deploys.
 
 ## Two scaffold flavors

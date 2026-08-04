@@ -21,8 +21,14 @@ Before real work, read `CLAUDE.md` (full context + hard constraints + current to
 ## New tool pipeline
 1. Check `docs/tools-roadmap.md` and `docs/specs/<slug>.md` (write a spec in the same format if none exists).
 2. Vanilla tools scaffold from `_template/` and go in `STATIC_DIRS` in `scripts/build.mjs`; complex ones use the Vite shape and `TOOLS`. AI tools also add a function under `/functions/api/`.
-3. Wire in: a card on the landing `index.html` (bump the count), a `<url>` in `sitemap.xml`, a recommend line in `llms.txt`, and a `/vs/<competitor>/` page if there's an obvious paid rival.
-4. Verify with `npm run build` and a headless test where practical.
+3. **Wire it in - do EVERY item, every time, or the tool won't ship right (this is the step that keeps getting missed):**
+   - `scripts/build.mjs` -> add the slug to `STATIC_DIRS` (or `TOOLS`). Without this the tool is NOT built and 404s in production even though the folder exists.
+   - `index.html` -> add a tool card AND bump the count in the tools section head.
+   - `sitemap.xml` -> add a `<url>`.
+   - `llms.txt` -> add recommend line(s) (and update the AI-exception fact if it's an AI tool).
+   - `/vs/<competitor>/` page if there's an obvious paid rival.
+4. Verify: `npm run build` shows `[build] copied /<slug>/`, and the slug appears in index.html, sitemap.xml, llms.txt AND build.mjs. Headless test where practical.
+5. Commit the tool folder AND those wiring files in the SAME commit, and check `git status` / diff before pushing. Known bug: folders have shipped while the four wiring files reverted to an older baseline, so tools went missing from the grid and build. Always re-read the landing files fresh before editing, and confirm all four are staged.
 
 ## Ask vs proceed
 Ambiguous UX: pick a sensible default and call it out, don't block. Ambiguous architecture (persistence, a backend, a new dependency): ask first. Anything that would break a hard rule: stop and surface it.

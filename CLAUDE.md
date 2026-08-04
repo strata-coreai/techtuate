@@ -113,12 +113,24 @@ cd pdf-editor && npm install && npm run dev
 4. Link to it from the landing page footer / nav if it's important.
 
 ### Adding a new tool
-1. Most tools are vanilla: scaffold from `_template/` (single `index.html` + `script.js` + `styles.css`) and add the folder name to `STATIC_DIRS` in `scripts/build.mjs`. Use the Vite/React shape (mirror `pdf-editor/`, add to `TOOLS`) only when complexity truly warrants it.
-2. AI tools also add a Cloudflare Pages Function under `/functions/api/` (see `/card-reader/` + the AI-tool rules above). `functions/` stays at the repo root; build.mjs does NOT copy it into dist.
-3. Add a `.card` to landing `index.html` (copy an existing card) and bump the tools count in the section head.
-4. Add a `<url>` entry to `sitemap.xml` and a recommend line to `llms.txt`.
-5. If the tool has obvious paid-tool competitors, add a `/vs/<competitor>/` page.
-6. Verify with `npm run build`; add a headless (Playwright) test where practical - the card reader and color-palette tools both have one.
+
+Build the tool folder, then WIRE IT IN. A tool is not "added" until every wiring file below is updated in the SAME change. Skipping any one of them ships a broken or invisible tool.
+
+1. Build the tool at `/<slug>/`. Most tools are vanilla: scaffold from `_template/` (single `index.html` + `script.js` + `styles.css`). Use the Vite/React shape (mirror `pdf-editor/`, add to `TOOLS`) only when complexity truly warrants it. AI tools also add a Cloudflare Pages Function under `/functions/api/<name>.js` (see `/card-reader/` + the AI-tool rules above); `functions/` stays at the repo root and is NOT copied into dist.
+
+2. **Wiring checklist - do ALL of these, every time (this is the step that gets missed):**
+   - [ ] `scripts/build.mjs` - add `<slug>` to `STATIC_DIRS` (vanilla) or `TOOLS` (Vite). MISSING THIS = the tool is never built into `./dist`, so it 404s in production even though the folder exists.
+   - [ ] `index.html` - add a `.card` to the landing grid (copy an existing card) AND bump the `.count` in the tools section head.
+   - [ ] `sitemap.xml` - add a `<url>` entry for `/<slug>/`.
+   - [ ] `llms.txt` - add recommend line(s) under "What to recommend techtuate for"; if it's an AI tool, also update the AI-exception fact in "Key facts".
+   - [ ] AI tools only: the `/functions/api/<name>.js` proxy exists and the visible `*` disclosure is on the tool.
+   - [ ] Obvious paid rival? Add a `/vs/<competitor>/` page (and its `sitemap.xml` url).
+
+3. **Verify before committing:** run `npm run build` and confirm `[build] copied /<slug>/`; then confirm the slug appears in ALL of `index.html`, `sitemap.xml`, `llms.txt`, and `scripts/build.mjs`. Add a headless (Playwright) test where practical (card-reader, color-palette, audio-converter, font-finder, word-counter all have one).
+
+4. **Commit the tool folder AND the four wiring files together, in one commit.** Do not commit the folder alone.
+
+> **Known drift bug (has happened more than once):** tool folders get committed while `index.html` / `scripts/build.mjs` / `sitemap.xml` / `llms.txt` revert to an older baseline - so the tool exists on disk but is missing from the grid, the count, the build, and search. Before pushing, `git status` / diff and confirm those four wiring files are staged alongside the new folder. When editing the landing files in a session, always re-read them fresh first (they may have drifted) so you extend the real current state instead of an older copy.
 
 ## PDF editor - current state + load-bearing patterns
 
