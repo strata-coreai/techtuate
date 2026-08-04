@@ -269,7 +269,8 @@
 
   function emailRow(value) {
     var row = document.createElement('div');
-    row.className = 'cr-multi-row';
+    row.className = 'cr-multi-row cr-has-acts';
+    var top = document.createElement('div'); top.className = 'cr-row-top';
     var inp = document.createElement('input');
     inp.type = 'email'; inp.placeholder = 'name@company.com'; inp.value = value || '';
     inp.className = 'cr-email';
@@ -277,18 +278,26 @@
     del.type = 'button'; del.className = 'cr-del'; del.textContent = '\u00d7';
     del.setAttribute('aria-label', 'Remove email');
     del.addEventListener('click', function () { row.remove(); });
-    row.appendChild(inp); row.appendChild(del);
+    top.appendChild(inp); top.appendChild(del);
+    var acts = document.createElement('div'); acts.className = 'cr-acts';
+    row.appendChild(top); row.appendChild(acts);
+    row._upd = function () { updateEmailActions(inp, acts); };
+    inp.addEventListener('input', row._upd);
+    row._upd();
     return row;
   }
 
-  function phoneRow(value, type) {
+  function phoneRow(value, type, e164, isMobile) {
     var row = document.createElement('div');
-    row.className = 'cr-multi-row';
+    row.className = 'cr-multi-row cr-has-acts';
+    if (e164) row.setAttribute('data-e164', e164);
+    var top = document.createElement('div'); top.className = 'cr-row-top';
     var sel = document.createElement('select');
     sel.className = 'cr-ptype';
+    var wantType = type || (isMobile ? 'mobile' : 'other');
     PHONE_TYPES.forEach(function (t) {
       var o = document.createElement('option'); o.value = t; o.textContent = t;
-      if (t === (type || 'mobile')) o.selected = true;
+      if (t === wantType) o.selected = true;
       sel.appendChild(o);
     });
     var inp = document.createElement('input');
@@ -298,9 +307,118 @@
     del.type = 'button'; del.className = 'cr-del'; del.textContent = '\u00d7';
     del.setAttribute('aria-label', 'Remove phone');
     del.addEventListener('click', function () { row.remove(); });
-    row.appendChild(sel); row.appendChild(inp); row.appendChild(del);
+    top.appendChild(sel); top.appendChild(inp); top.appendChild(del);
+    var acts = document.createElement('div'); acts.className = 'cr-acts';
+    row.appendChild(top); row.appendChild(acts);
+    row._upd = function () { updatePhoneActions(row, sel, inp, acts); };
+    inp.addEventListener('input', row._upd);
+    sel.addEventListener('change', row._upd);
+    row._upd();
     return row;
   }
+
+  // ---------- reach-out: build deep links from the recognized contact ----------
+  // All client-side. Nothing is sent anywhere; these just open the user's own apps.
+  var ICON = {
+    call: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#0a0a0a" d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#25D366"/><g transform="translate(3 3) scale(0.72)"><path fill="#fff" d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z"/></g></svg>',
+    sms: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#34C759" d="M12 3C6.5 3 2 6.6 2 11c0 2.4 1.3 4.5 3.4 5.9-.1 1-.6 2.2-1.4 3.1 1.6-.2 3.2-.8 4.4-1.7 1.1.3 2.3.5 3.6.5 5.5 0 10-3.6 10-8s-4.5-8-10-8z"/></svg>',
+    email: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="none" stroke="#0a0a0a" stroke-width="1.8"/><path d="M3.5 6.5l8.5 6 8.5-6" fill="none" stroke="#0a0a0a" stroke-width="1.6"/></svg>',
+    gmail: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="#fff" stroke="#EA4335" stroke-width="1.5"/><path d="M3.2 6.5l8.8 6 8.8-6" fill="none" stroke="#EA4335" stroke-width="1.8"/></svg>',
+    outlook: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="#0078D4"/><path d="M4 7.5l8 5 8-5" fill="none" stroke="#fff" stroke-width="1.6"/></svg>',
+    linkedin: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0A66C2"/><circle cx="7" cy="8" r="1.5" fill="#fff"/><rect x="5.7" y="10.4" width="2.6" height="7.6" fill="#fff"/><path fill="#fff" d="M10.6 10.4h2.5v1.05a2.9 2.9 0 0 1 2.5-1.25c2 0 3.2 1.25 3.2 3.7V18h-2.6v-3.85c0-1-.4-1.7-1.35-1.7-.8 0-1.45.6-1.45 1.7V18h-2.6z"/></svg>',
+    web: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#0a0a0a" stroke-width="1.7"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18" fill="none" stroke="#0a0a0a" stroke-width="1.2"/></svg>',
+    facetime: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="2.5" fill="#34C759"/><path d="M16 10l5-3v10l-5-3z" fill="#34C759"/></svg>'
+  };
+
+  // FaceTime is only useful on Apple devices (iPhone/iPad/Mac). Show it there (desktop Macs included).
+  var IS_APPLE = /iPhone|iPad|iPod|Macintosh|Mac OS X/.test(navigator.userAgent || '') ||
+    (navigator.platform && /Mac|iPhone|iPad|iPod/.test(navigator.platform));
+
+  function fieldVal(key) { var el = form.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
+  function firstName() { var f = fieldVal('fullName'); return f ? f.split(/\s+/)[0] : ''; }
+  function enc(s) { return encodeURIComponent(s || ''); }
+
+  function usableE164(raw, stored) {
+    if (/\+/.test(raw)) return '+' + raw.replace(/[^\d]/g, '');
+    if (stored) return stored;
+    return ''; // national-only, no country code -> can't build a WhatsApp link
+  }
+  function telHref(n) { return 'tel:' + (n || '').replace(/[^\d+]/g, ''); }
+  function smsHref(n) { return 'sms:' + (n || '').replace(/[^\d+]/g, ''); }
+  function ftHref(n) { return 'facetime:' + (n || '').replace(/[^\d+]/g, ''); }
+  function waHref(e164, text) {
+    var d = (e164 || '').replace(/[^\d]/g, '');
+    return 'https://wa.me/' + d + (text ? '?text=' + enc(text) : '');
+  }
+  function mailtoHref(email, subj, body) { return 'mailto:' + email + '?subject=' + enc(subj) + '&body=' + enc(body); }
+  function gmailHref(email, subj, body) { return 'https://mail.google.com/mail/?view=cm&fs=1&to=' + enc(email) + '&su=' + enc(subj) + '&body=' + enc(body); }
+  function outlookHref(email, subj, body) { return 'https://outlook.office.com/mail/deeplink/compose?to=' + enc(email) + '&subject=' + enc(subj) + '&body=' + enc(body); }
+  function linkedinHref(q) { return 'https://www.linkedin.com/search/results/people/?keywords=' + enc(q); }
+  function webHref(q) { return 'https://www.google.com/search?q=' + enc(q + ' linkedin'); }
+
+  function actionBtn(href, label, icon, external) {
+    var a = document.createElement('a');
+    a.className = 'cr-act';
+    a.href = href;
+    if (external) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.innerHTML = icon + '<span>' + label + '</span>';
+    a.setAttribute('aria-label', label);
+    return a;
+  }
+
+  function updatePhoneActions(row, sel, inp, acts) {
+    acts.innerHTML = '';
+    var raw = inp.value.trim();
+    if (!raw) return;
+    var e164 = usableE164(raw, row.getAttribute('data-e164'));
+    var mobile = sel.value === 'mobile';
+    acts.appendChild(actionBtn(telHref(e164 || raw), 'Call', ICON.call, false));
+    if (mobile) {
+      var name = firstName();
+      var waText = name ? 'Hi ' + name + ', great connecting.' : '';
+      if (e164) acts.appendChild(actionBtn(waHref(e164, waText), 'WhatsApp', ICON.whatsapp, true));
+      acts.appendChild(actionBtn(smsHref(e164 || raw), 'Text', ICON.sms, false));
+      if (IS_APPLE) acts.appendChild(actionBtn(ftHref(e164 || raw), 'FaceTime', ICON.facetime, false));
+    }
+  }
+
+  function updateEmailActions(inp, acts) {
+    acts.innerHTML = '';
+    var e = inp.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return;
+    var name = firstName();
+    var subj = 'Great connecting';
+    var body = (name ? 'Hi ' + name : 'Hi there') +
+      ',\n\nIt was great connecting today. I\'d love to stay in touch - happy to continue the conversation whenever suits you.\n\nBest regards,';
+    acts.appendChild(actionBtn(mailtoHref(e, subj, body), 'Email', ICON.email, false));
+    acts.appendChild(actionBtn(gmailHref(e, subj, body), 'Gmail', ICON.gmail, true));
+    acts.appendChild(actionBtn(outlookHref(e, subj, body), 'Outlook', ICON.outlook, true));
+  }
+
+  function buildConnect() {
+    var box = $('cr-connect'); var acts = $('cr-connect-actions');
+    if (!box || !acts) return;
+    var name = fieldVal('fullName'); var company = fieldVal('company');
+    acts.innerHTML = '';
+    if (!name && !company) { show(box, false); return; }
+    var q = (name + ' ' + company).trim();
+    acts.appendChild(actionBtn(linkedinHref(q), 'LinkedIn', ICON.linkedin, true));
+    acts.appendChild(actionBtn(webHref(q), 'Web search', ICON.web, true));
+    show(box, true);
+  }
+
+  function refreshActions() {
+    [].slice.call(phonesBox.children).forEach(function (r) { if (r._upd) r._upd(); });
+    [].slice.call(emailsBox.children).forEach(function (r) { if (r._upd) r._upd(); });
+    buildConnect();
+  }
+
+  // name / company edits refresh LinkedIn search + message prefills
+  ['fullName', 'company'].forEach(function (k) {
+    var el = form.querySelector('[data-key="' + k + '"]');
+    if (el) el.addEventListener('input', refreshActions);
+  });
 
   document.querySelector('[data-add="email"]').addEventListener('click', function () {
     emailsBox.appendChild(emailRow(''));
@@ -344,9 +462,10 @@
     if (!phones.length) phonesBox.appendChild(phoneRow('', 'mobile'));
     else phones.forEach(function (p) {
       if (typeof p === 'string') phonesBox.appendChild(phoneRow(p, 'mobile'));
-      else phonesBox.appendChild(phoneRow(p.value, normType(p.type)));
+      else phonesBox.appendChild(phoneRow(p.value, p.isMobile ? 'mobile' : normType(p.type), p.e164 || '', !!p.isMobile));
     });
 
+    buildConnect();
     show(review, true);
     review.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
