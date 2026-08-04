@@ -334,6 +334,7 @@
   // FaceTime is only useful on Apple devices (iPhone/iPad/Mac). Show it there (desktop Macs included).
   var IS_APPLE = /iPhone|iPad|iPod|Macintosh|Mac OS X/.test(navigator.userAgent || '') ||
     (navigator.platform && /Mac|iPhone|iPad|iPod/.test(navigator.platform));
+  var IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
 
   function fieldVal(key) { var el = form.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
   function firstName() { var f = fieldVal('fullName'); return f ? f.split(/\s+/)[0] : ''; }
@@ -352,19 +353,33 @@
     return 'https://wa.me/' + d + (text ? '?text=' + enc(text) : '');
   }
   function mailtoHref(email, subj, body) { return 'mailto:' + email + '?subject=' + enc(subj) + '&body=' + enc(body); }
-  function gmailHref(email, subj, body) { return 'https://mail.google.com/mail/?view=cm&fs=1&to=' + enc(email) + '&su=' + enc(subj) + '&body=' + enc(body); }
-  function outlookHref(email, subj, body) { return 'https://outlook.office.com/mail/deeplink/compose?to=' + enc(email) + '&subject=' + enc(subj) + '&body=' + enc(body); }
+  // On mobile, open the actual app (its scheme) so the message prefills; on desktop, web compose.
+  function gmailHref(email, subj, body) {
+    if (IS_MOBILE) return 'googlegmail://co?to=' + enc(email) + '&subject=' + enc(subj) + '&body=' + enc(body);
+    return 'https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=' + enc(email) + '&su=' + enc(subj) + '&body=' + enc(body);
+  }
+  function outlookHref(email, subj, body) {
+    if (IS_MOBILE) return 'ms-outlook://compose?to=' + enc(email) + '&subject=' + enc(subj) + '&body=' + enc(body);
+    return 'https://outlook.office.com/mail/deeplink/compose?to=' + enc(email) + '&subject=' + enc(subj) + '&body=' + enc(body);
+  }
   function linkedinHref(q) { return 'https://www.linkedin.com/search/results/people/?keywords=' + enc(q); }
   function webHref(q) { return 'https://www.google.com/search?q=' + enc(q + ' linkedin'); }
 
-  function actionBtn(href, label, icon, external) {
+  function actionBtn(href, label, icon, external, primary) {
     var a = document.createElement('a');
-    a.className = 'cr-act';
+    a.className = 'cr-act' + (primary ? ' primary' : '');
     a.href = href;
     if (external) { a.target = '_blank'; a.rel = 'noopener'; }
     a.innerHTML = icon + '<span>' + label + '</span>';
     a.setAttribute('aria-label', label);
     return a;
+  }
+
+  function leadLabel() {
+    var s = document.createElement('span');
+    s.className = 'cr-acts-lead';
+    s.textContent = 'Reach out';
+    return s;
   }
 
   function updatePhoneActions(row, sel, inp, acts) {
@@ -373,13 +388,17 @@
     if (!raw) return;
     var e164 = usableE164(raw, row.getAttribute('data-e164'));
     var mobile = sel.value === 'mobile';
-    acts.appendChild(actionBtn(telHref(e164 || raw), 'Call', ICON.call, false));
+    acts.appendChild(leadLabel());
     if (mobile) {
       var name = firstName();
       var waText = name ? 'Hi ' + name + ', great connecting.' : '';
-      if (e164) acts.appendChild(actionBtn(waHref(e164, waText), 'WhatsApp', ICON.whatsapp, true));
+      // WhatsApp is the primary action for a mobile; if we can't build it, Call is primary.
+      if (e164) acts.appendChild(actionBtn(waHref(e164, waText), 'WhatsApp', ICON.whatsapp, true, true));
+      acts.appendChild(actionBtn(telHref(e164 || raw), 'Call', ICON.call, false, !e164));
       acts.appendChild(actionBtn(smsHref(e164 || raw), 'Text', ICON.sms, false));
       if (IS_APPLE) acts.appendChild(actionBtn(ftHref(e164 || raw), 'FaceTime', ICON.facetime, false));
+    } else {
+      acts.appendChild(actionBtn(telHref(e164 || raw), 'Call', ICON.call, false, true));
     }
   }
 
@@ -391,14 +410,33 @@
     var subj = 'Great connecting';
     var body = (name ? 'Hi ' + name : 'Hi there') +
       ',\n\nIt was great connecting today. I\'d love to stay in touch - happy to continue the conversation whenever suits you.\n\nBest regards,';
-    acts.appendChild(actionBtn(mailtoHref(e, subj, body), 'Email', ICON.email, false));
-    acts.appendChild(actionBtn(gmailHref(e, subj, body), 'Gmail', ICON.gmail, true));
-    acts.appendChild(actionBtn(outlookHref(e, subj, body), 'Outlook', ICON.outlook, true));
+    // Email = mailto: opens the user's default mail app (Gmail/Outlook/Apple Mail) with the message.
+    // Gmail/Outlook = the app scheme on mobile (opens the app), web compose in a new tab on desktop.
+    var webCompose = !IS_MOBILE;
+    acts.appendChild(leadLabel());
+    acts.appendChild(actionBtn(mailtoHref(e, subj, body), 'Email', ICON.email, false, true));
+    acts.appendChild(actionBtn(gmailHref(e, subj, body), 'Gmail', ICON.gmail, webCompose));
+    acts.appendChild(actionBtn(outlookHref(e, subj, body), 'Outlook', ICON.outlook, webCompose));
+  }
+
+  // Create the Connect block if it isn't in the markup (so it works even if index.html drifted).
+  function ensureConnectBox() {
+    var box = $('cr-connect');
+    if (box) return box;
+    box = document.createElement('div');
+    box.id = 'cr-connect'; box.className = 'cr-connect'; box.hidden = true;
+    var label = document.createElement('span'); label.className = 'cr-connect-label'; label.textContent = 'Connect';
+    var acts = document.createElement('div'); acts.id = 'cr-connect-actions'; acts.className = 'cr-acts';
+    box.appendChild(label); box.appendChild(acts);
+    var anchor = form.querySelector('.cr-multi'); // the Email fieldset
+    if (anchor) form.insertBefore(box, anchor); else form.appendChild(box);
+    return box;
   }
 
   function buildConnect() {
-    var box = $('cr-connect'); var acts = $('cr-connect-actions');
-    if (!box || !acts) return;
+    var box = ensureConnectBox();
+    var acts = box.querySelector('#cr-connect-actions') || box.querySelector('.cr-acts');
+    if (!acts) return;
     var name = fieldVal('fullName'); var company = fieldVal('company');
     acts.innerHTML = '';
     if (!name && !company) { show(box, false); return; }
