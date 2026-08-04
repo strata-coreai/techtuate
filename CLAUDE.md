@@ -14,7 +14,7 @@ techtuate is now **"free & powerful little tools that just work"**, not "purist 
 - **No accounts, no credit cards.** Still hard. **No ads today** (but do not promise "ever").
 - **Free static hosting on Cloudflare Pages.** The static site builds to `./dist/`. AI functions live in `/functions/` at the repo root and run on Cloudflare's free tier; keep per-request cost near zero.
 - **Files stay on the device for local tools.** AI tools send only the specific input needed (e.g. a card image) to a named, labeled service. No third-party analytics SDKs beyond disclosed embeds; no runtime CDN fetches for the static tools (build-time deps are fine).
-- **Same palette + voice across every page.** White, vibrant yellow (`#ffd60a`), black, dark grays only. Inter Tight display, neo-brutalist hard borders + offset shadows. Mobile-friendly down to ~360px.
+- **Same palette + voice across every page.** White, vibrant yellow (`#ffd60a`), black, dark grays only. Inter Tight display, neo-brutalist hard borders + offset shadows. Mobile-friendly down to ~360px. **Approved exception (2026-08-04):** the `/card-reader/` reach-out buttons use real brand logos in their brand colors (WhatsApp green, Gmail red, Outlook/LinkedIn blue) for instant recognizability. This is a deliberate, scoped exception - do not "correct" those to monochrome. No other page introduces off-palette color without founder sign-off.
 - **NEVER use em-dashes (—) or en-dashes (–). Use plain hyphens (-) instead.** Forever rule. Founder said em-dashes "scream AI". Applies to every file: HTML, CSS, JS, MD, comments, prompts.
 
 ### First AI tool: /card-reader/ (business card reader) - the pattern to copy

@@ -27,6 +27,8 @@ const PROMPT = [
   '- Leave a field empty (empty string or empty array) if it is not clearly present. Do NOT guess or invent values.',
   '- Separate multiple emails and multiple phone numbers into individual array entries.',
   '- For each phone, set type to one of: mobile, work, home, other (best guess from labels/icons).',
+  '- For each phone, also provide e164: the number in full international E.164 format (a leading +, the country calling code, then digits only, no spaces or punctuation). Infer the country from the card - the printed country code, the address, or the country of the company. If the country genuinely cannot be determined, leave e164 empty.',
+  '- For each phone, set isMobile to true if it is a mobile/cell number and false otherwise (landline/office/fax). Decide using the country\'s own mobile numbering rules (mobile prefixes) plus any "mobile"/"cell"/"M:" label or phone icon on the card. Most countries clearly separate mobile from fixed-line ranges.',
   '- website is the plain domain or URL. address is a single human-readable line.',
   '- confidence: a 0..1 estimate for how sure you are of fullName, jobTitle, and company.'
 ].join('\n');
@@ -42,7 +44,12 @@ const RESPONSE_SCHEMA = {
       type: 'ARRAY',
       items: {
         type: 'OBJECT',
-        properties: { value: { type: 'STRING' }, type: { type: 'STRING' } }
+        properties: {
+          value: { type: 'STRING' },
+          type: { type: 'STRING' },
+          e164: { type: 'STRING' },
+          isMobile: { type: 'BOOLEAN' }
+        }
       }
     },
     website: { type: 'STRING' },
