@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Free word &amp; character counter - words, characters, reading time - techtuate</title>
+  <meta name="description" content="Paste text for live word and character counts (with and without spaces), plus sentences, paragraphs and reading time. Nothing is uploaded. Free, no sign-up." />
+  <meta name="keywords" content="free word counter, character counter, word count tool, characters with and without spaces, online word counter no signup, reading time calculator" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/word-counter/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M16 22 L48 22 M16 32 L48 32 M16 42 L36 42' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/word-counter/" />
+  <meta property="og:title" content="Free word &amp; character counter - words, characters, reading time" />
+  <meta property="og:description" content="Paste text for live word and character counts (with and without spaces), plus sentences, paragraphs and reading time. Nothing uploaded, no sign-up." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate Word and character counter",
+    "url": "https://techtuate.com/word-counter/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Live word and character counts (with and without spaces), sentences, paragraphs and reading time. Runs in your browser, nothing uploaded. Free, no sign-up.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">word &amp; character counter</div>
+      <h1>Word &amp; character counter</h1>
+      <p class="lede">
+        Paste or type, and get a live word count and character count - both with and without spaces -
+        plus sentences, paragraphs and reading time. It all runs in your browser; your text is never uploaded.
+      </p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The counting happens in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <!-- ============ STATS ============ -->
+      <section class="wc-stats" aria-live="polite">
+        <div class="wc-stat wc-primary">
+          <span class="wc-num" id="s-words">0</span>
+          <span class="wc-label">Words</span>
+        </div>
+        <div class="wc-stat wc-primary" id="tile-chars">
+          <span class="wc-num" id="s-chars">0</span>
+          <span class="wc-label">Characters</span>
+        </div>
+        <div class="wc-stat wc-primary">
+          <span class="wc-num" id="s-chars-ns">0</span>
+          <span class="wc-label">Characters (no spaces)</span>
+        </div>
+        <div class="wc-stat">
+          <span class="wc-num" id="s-sentences">0</span>
+          <span class="wc-label">Sentences</span>
+        </div>
+        <div class="wc-stat">
+          <span class="wc-num" id="s-paragraphs">0</span>
+          <span class="wc-label">Paragraphs</span>
+        </div>
+        <div class="wc-stat">
+          <span class="wc-num" id="s-reading">0 sec</span>
+          <span class="wc-label">Reading time</span>
+        </div>
+      </section>
+
+      <!-- ============ TOOLBAR ============ -->
+      <div class="wc-bar">
+        <label class="wc-limit">
+          <span>Character limit</span>
+          <input type="number" id="limit" min="0" step="1" placeholder="e.g. 280" inputmode="numeric" />
+        </label>
+        <span id="limit-msg" class="wc-limit-msg" hidden></span>
+        <div class="wc-bar-actions">
+          <button type="button" class="btn ghost" id="btn-copy">Copy text</button>
+          <button type="button" class="btn ghost" id="btn-clear">Clear</button>
+        </div>
+      </div>
+
+      <!-- ============ INPUT ============ -->
+      <textarea id="input" class="wc-input" placeholder="Paste or type your text here..." autofocus spellcheck="false"></textarea>
+
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, no sign-up. Everything is counted right here in your browser - your text is never uploaded, which
+        matters if you're pasting a draft you'd rather not send to some random site. Words are whitespace-separated;
+        characters are counted both with and without spaces; reading time assumes about 200 words per minute.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/json-formatter/">json formatter</a> &middot;
+        <a href="/font-finder/">font finder</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <div id="copy-flash" role="status" aria-live="polite">copied &#10033;</div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

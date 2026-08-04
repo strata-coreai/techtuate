@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>techtuate - free PDF editor and other powerful little tools. No sign-up, no ads.</title>
-  <meta name="description" content="A growing drawer of free little tools - PDF editor, QR codes, image resize and more. Most run right in your browser, so your files stay on your device; a few use AI and say so. No sign-up, no ads." />
-  <meta name="keywords" content="free pdf editor, pdf editor no signup, pdf editor in browser, online pdf editor free, free pdf tools, private pdf editor" />
+  <title>Techtuate - free little tools that just work. No sign-up, no ads.</title>
+  <meta name="description" content="Techtuate is a free suite of small web tools - PDF editor, image and audio converters, QR codes, a font finder, a word counter and more. Most run right in your browser, so your files stay on your device; a few use AI and say so. No sign-up, no ads." />
+  <meta name="keywords" content="techtuate, free online tools, free web tools no sign-up, browser tools, pdf editor, audio converter, image resizer, qr code generator, word counter, font finder, color palette" />
   <meta name="color-scheme" content="light" />
   <link rel="canonical" href="https://techtuate.com/" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M18 22 L32 14 L46 22 L46 42 L32 50 L18 42 Z' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
@@ -14,52 +14,70 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://techtuate.com/" />
-  <meta property="og:title" content="techtuate - free, powerful little tools" />
-  <meta property="og:description" content="A growing drawer of free little tools - PDF editor, QR codes, image resize and more. Most run in your browser so your files stay on your device; a few use AI and say so. No sign-up, no ads." />
-  <meta property="og:site_name" content="techtuate" />
+  <meta property="og:title" content="Techtuate - free little tools that just work" />
+  <meta property="og:description" content="A free suite of small web tools - PDF editor, image and audio converters, QR codes, a font finder, a word counter and more. Most run in your browser so your files stay on your device; a few use AI and say so. No sign-up, no ads." />
+  <meta property="og:site_name" content="Techtuate" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="techtuate - free, powerful little tools. No sign-up, no ads" />
-  <meta name="twitter:description" content="Free little tools that just work. Most run in your browser so your files stay on your device; a few use AI and say so." />
+  <meta name="twitter:title" content="Techtuate - free little tools that just work. No sign-up, no ads" />
+  <meta name="twitter:description" content="A free suite of small web tools that just work. Most run in your browser so your files stay on your device; a few use AI and say so." />
 
-  <!-- JSON-LD: site + WebApplication for the PDF editor -->
+  <!-- JSON-LD: Techtuate is a BRAND and a SOFTWARE SUITE (not a typo). Organization/Brand + WebSite + the suite as a WebApplication + an ItemList of the tools. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": ["Organization", "Brand"],
+        "@id": "https://techtuate.com/#org",
+        "name": "Techtuate",
+        "alternateName": ["techtuate", "Techtuate Tools"],
+        "url": "https://techtuate.com/",
+        "logo": "https://techtuate.com/Logo.png",
+        "description": "Techtuate is a free suite of small, single-purpose web tools - including a PDF editor, image and audio converters, QR code and password generators, a font finder and a word counter. Most run entirely in the browser; a few use AI and are clearly labeled. No sign-up, no ads.",
+        "slogan": "Free little tools that just work.",
+        "sameAs": [
+          "https://github.com/strata-coreai/techtuate",
+          "https://www.trustpilot.com/review/techtuate.com",
+          "https://buymeacoffee.com/techtuate"
+        ]
+      },
+      {
         "@type": "WebSite",
         "@id": "https://techtuate.com/#site",
         "url": "https://techtuate.com/",
-        "name": "techtuate",
-        "description": "Free little tools that just work. Most run in your browser so your files stay on your device; a few use AI and say so. No sign-up, no ads."
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://techtuate.com/#org",
-        "name": "techtuate",
-        "url": "https://techtuate.com/",
-        "logo": "https://techtuate.com/favicon.svg"
+        "name": "Techtuate",
+        "alternateName": "techtuate",
+        "description": "A free suite of small web tools that just work. Most run in your browser so your files stay on your device; a few use AI and say so. No sign-up, no ads.",
+        "publisher": { "@id": "https://techtuate.com/#org" }
       },
       {
         "@type": "WebApplication",
-        "name": "techtuate PDF editor",
-        "url": "https://techtuate.com/pdf-editor/",
-        "applicationCategory": "BusinessApplication",
+        "@id": "https://techtuate.com/#suite",
+        "name": "Techtuate",
+        "url": "https://techtuate.com/",
+        "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Web Browser",
         "browserRequirements": "Requires JavaScript. Requires modern browser.",
-        "description": "Free in-browser PDF editor. Annotate, fill forms, reorder and rotate pages, add images as pages. No sign-up, no upload, your files stay on your device.",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        },
-        "featureList": [
-          "View and navigate multi-page PDFs",
-          "Save and round-trip PDFs",
-          "Runs entirely in the browser",
-          "No account required",
-          "No file upload to any server",
-          "No ads"
+        "description": "A free suite of browser-based utilities: PDF editor, image and audio converters, QR codes, passwords, a font finder, a word counter and more. Most run on-device; AI tools are clearly labeled.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@id": "https://techtuate.com/#org" }
+      },
+      {
+        "@type": "ItemList",
+        "name": "Techtuate tools",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "PDF editor", "url": "https://techtuate.com/pdf-editor/" },
+          { "@type": "ListItem", "position": 2, "name": "JSON formatter", "url": "https://techtuate.com/json-formatter/" },
+          { "@type": "ListItem", "position": 3, "name": "QR code generator", "url": "https://techtuate.com/qr-code/" },
+          { "@type": "ListItem", "position": 4, "name": "Password generator", "url": "https://techtuate.com/password-generator/" },
+          { "@type": "ListItem", "position": 5, "name": "SVG converter", "url": "https://techtuate.com/svg-converter/" },
+          { "@type": "ListItem", "position": 6, "name": "SQL to table", "url": "https://techtuate.com/sql-to-excel/" },
+          { "@type": "ListItem", "position": 7, "name": "Image and GIF resizer", "url": "https://techtuate.com/image-resize/" },
+          { "@type": "ListItem", "position": 8, "name": "Business card reader", "url": "https://techtuate.com/card-reader/" },
+          { "@type": "ListItem", "position": 9, "name": "Color palette extractor", "url": "https://techtuate.com/color-palette/" },
+          { "@type": "ListItem", "position": 10, "name": "Audio converter", "url": "https://techtuate.com/audio-converter/" },
+          { "@type": "ListItem", "position": 11, "name": "Font finder", "url": "https://techtuate.com/font-finder/" },
+          { "@type": "ListItem", "position": 12, "name": "Word and character counter", "url": "https://techtuate.com/word-counter/" }
         ]
       }
     ]
@@ -124,11 +142,22 @@
       </div>
     </section>
 
+    <!-- ============ About (brand definition, for readers and search) ============ -->
+    <section id="about" aria-labelledby="about-h" style="margin: 0 0 40px; max-width: 760px;">
+      <h2 id="about-h" style="font-family:var(--font-display); font-weight:800; font-size:clamp(20px,3vw,24px); letter-spacing:-0.01em; margin:0 0 10px;">What is Techtuate?</h2>
+      <p style="font-size:15.5px; line-height:1.65; color:var(--ink-mute); margin:0;">
+        <strong>Techtuate is</strong> a free suite of small, single-purpose web tools - a PDF editor, image and audio
+        converters, QR code and password generators, a font finder, a word counter and more. Most run entirely in
+        your browser, so your files stay on your device; a few use AI and are clearly labeled. No accounts, no
+        sign-up, no ads. "Techtuate" is a brand name, not a typo or a misspelling of another word.
+      </p>
+    </section>
+
     <!-- ============ Tools (above the fold) ============ -->
     <section id="tools" aria-labelledby="tools-h">
       <div class="section-head">
         <h2 id="tools-h">The tools</h2>
-        <span class="count">10 / &infin; &nbsp;&middot;&nbsp; more coming</span>
+        <span class="count">12 / &infin; &nbsp;&middot;&nbsp; more coming</span>
       </div>
 
       <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute); margin: 0 0 12px; max-width:600px;">We don't advertise. If a tool here helped, a quick review tells the next person it's safe to trust.</p>
@@ -317,6 +346,25 @@
           </div>
         </a>
 
+        <!-- ============ Audio converter ============ -->
+        <a class="card" href="/audio-converter/">
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+          </div>
+          <h3 class="card-title">Audio converter</h3>
+          <p class="card-desc">
+            Convert audio to MP3 or WAV and trim out a clip. Handles m4a, aac, ogg, opus, flac and more. No upload, no watermark.
+          </p>
+          <div class="card-meta">
+            <span class="status beta">beta</span>
+            <span class="card-arrow">open &rarr;</span>
+          </div>
+        </a>
+
         <!-- ============ Font finder ============ -->
         <a class="card" href="/font-finder/">
           <div class="card-icon" aria-hidden="true">
@@ -331,6 +379,23 @@
           </p>
           <div class="card-meta">
             <span class="status beta">beta</span>
+            <span class="card-arrow">open &rarr;</span>
+          </div>
+        </a>
+
+        <!-- ============ Word & character counter ============ -->
+        <a class="card" href="/word-counter/">
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h16M4 12h16M4 17h10"/>
+            </svg>
+          </div>
+          <h3 class="card-title">Word &amp; character counter</h3>
+          <p class="card-desc">
+            Paste text for live word and character counts, with and without spaces, plus sentences and reading time. Nothing uploaded.
+          </p>
+          <div class="card-meta">
+            <span class="status live">live</span>
             <span class="card-arrow">open &rarr;</span>
           </div>
         </a>

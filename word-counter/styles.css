@@ -1,0 +1,86 @@
+/* ============================================================
+   word & character counter - layers on /assets/site.css tokens
+   ============================================================ */
+
+.wc-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.wc-stat {
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.wc-stat.wc-primary { background: var(--yellow-wash); }
+.wc-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.wc-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+}
+.wc-stat.over {
+  background: #fdecec;
+  border-color: #a12;
+}
+.wc-stat.over .wc-num { color: #a12; }
+
+/* ---------- toolbar ---------- */
+.wc-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.wc-limit { display: flex; align-items: center; gap: 8px; }
+.wc-limit span {
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ink-mute);
+}
+.wc-limit input {
+  font-family: var(--font-mono); font-size: 14px; width: 96px; padding: 6px 8px;
+  border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--bg); color: var(--ink);
+}
+.wc-limit input:focus { outline: none; box-shadow: 3px 3px 0 var(--yellow-deep); }
+.wc-limit-msg { font-family: var(--font-mono); font-size: 12px; color: #a12; font-weight: 700; }
+.wc-limit-msg.ok { color: var(--ink-dim); font-weight: 400; }
+.wc-bar-actions { display: flex; gap: 10px; margin-left: auto; }
+
+/* ---------- input ---------- */
+.wc-input {
+  width: 100%;
+  min-height: 320px;
+  resize: vertical;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 16px 18px;
+  box-sizing: border-box;
+}
+.wc-input:focus { outline: none; box-shadow: 5px 5px 0 var(--yellow-deep); }
+
+@media (max-width: 720px) {
+  .wc-bar-actions { margin-left: 0; width: 100%; }
+  .wc-bar-actions .btn { flex: 1; justify-content: center; }
+}

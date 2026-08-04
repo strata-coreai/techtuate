@@ -177,6 +177,7 @@
         stream = s;
         video.srcObject = s;
         show(cameraWrap, true);
+        document.body.classList.add('cr-modal-open');   // lock scroll behind the focused camera
       })
       .catch(function () {
         setStatus('Could not open the camera. You can upload a photo instead.', 'error');
@@ -187,7 +188,13 @@
     if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
     video.srcObject = null;
     show(cameraWrap, false);
+    document.body.classList.remove('cr-modal-open');
   }
+
+  // close the camera modal with Escape
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && cameraWrap && !cameraWrap.hidden) stopCamera();
+  });
 
   function snapCamera() {
     if (!video.videoWidth) return;

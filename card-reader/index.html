@@ -90,12 +90,13 @@
         <input type="file" id="file-input" accept="image/*" hidden />
 
         <!-- live camera -->
-        <div id="camera-wrap" class="cr-camera" hidden>
+        <div id="camera-wrap" class="cr-camera" role="dialog" aria-modal="true" aria-label="Camera" hidden>
+          <div class="cr-camera-title">Fit the card in the frame, then Capture</div>
           <video id="camera-video" playsinline autoplay muted></video>
           <div class="cr-camera-guide" aria-hidden="true"></div>
           <div class="cr-camera-bar">
             <button type="button" class="btn" id="btn-snap">Capture</button>
-            <button type="button" class="btn ghost" id="btn-camera-cancel">Cancel</button>
+            <button type="button" class="btn ghost" id="btn-camera-cancel">Close</button>
           </div>
         </div>
 
