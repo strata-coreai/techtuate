@@ -366,6 +366,20 @@
 
   function fieldVal(key) { var el = form.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
   function firstName() { var f = fieldVal('fullName'); return f ? f.split(/\s+/)[0] : ''; }
+
+  // Short brand name for the LinkedIn/web people search. The scan supplies a
+  // best 1-2 word searchName; if it's missing (or the user retyped company)
+  // we fall back to the first significant word of the company field, since the
+  // full legal name ("... Technologies Pvt Ltd") makes the search useless.
+  var aiCompanySearch = '';
+  function companyShort(c) {
+    c = (c || '').trim();
+    if (!c) return '';
+    var words = c.replace(/[.,&]/g, ' ').split(/\s+/).filter(Boolean);
+    if (words.length > 1 && /^(the|a|an)$/i.test(words[0])) words.shift();
+    return words[0] || '';
+  }
+  function companySearch(company) { return aiCompanySearch || companyShort(company); }
   function enc(s) { return encodeURIComponent(s || ''); }
 
   function usableE164(raw, stored) {
@@ -468,7 +482,7 @@
     var name = fieldVal('fullName'); var company = fieldVal('company');
     acts.innerHTML = '';
     if (!name && !company) { show(box, false); return; }
-    var q = (name + ' ' + company).trim();
+    var q = (name + ' ' + companySearch(company)).trim();
     acts.appendChild(actionBtn(linkedinHref(q), 'LinkedIn', ICON.linkedin, true));
     acts.appendChild(actionBtn(webHref(q), 'Web search', ICON.web, true));
     show(box, true);
@@ -483,7 +497,12 @@
   // name / company edits refresh LinkedIn search + message prefills
   ['fullName', 'company'].forEach(function (k) {
     var el = form.querySelector('[data-key="' + k + '"]');
-    if (el) el.addEventListener('input', refreshActions);
+    if (el) el.addEventListener('input', function () {
+      // Once the user retypes the company, drop the scanned brand name and
+      // derive the search term from what they actually typed.
+      if (k === 'company') aiCompanySearch = '';
+      refreshActions();
+    });
   });
 
   document.querySelector('[data-add="email"]').addEventListener('click', function () {
@@ -509,6 +528,7 @@
 
   function populateReview(d) {
     var conf = d.confidence || {};
+    aiCompanySearch = (d.searchName || '').trim();
     setField('fullName', d.fullName || d.name || '', conf);
     setField('jobTitle', d.jobTitle || d.title || '', conf);
     setField('company', d.company || d.organization || '', conf);
