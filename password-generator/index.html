@@ -196,6 +196,39 @@
       line-height: 1.6;
     }
   </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://techtuate.com/password-generator/",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are online password generators safe to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This one generates every password locally in your browser using the browser's cryptographic random source, so the password is never transmitted or stored on a server."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is an XKCD-style passphrase?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is a password made of several random common words, which is easy to remember but hard to guess; this tool can produce them alongside standard random-character passwords."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is a passphrase stronger than a password?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A long random-word passphrase can be both easier to remember and harder to crack than a short complex password, because length adds more resistance than symbol variety."
+      }
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -309,6 +342,24 @@
       <p style="max-width:680px; margin-top:20px; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
         Comparisons: <a href="/vs/bitwarden-password-generator/">vs. Bitwarden generator</a> &middot; <a href="/vs/1password-password-generator/">vs. 1Password generator</a>
       </p>
+    </section>
+
+    <section class="faq" style="margin-top:44px;">
+      <div class="section-head"><h2>Questions people ask</h2></div>
+      <div style="max-width:720px;">
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Are online password generators safe to use?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">This one generates every password locally in your browser using the browser's cryptographic random source, so the password is never transmitted or stored on a server.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">What is an XKCD-style passphrase?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">It is a password made of several random common words, which is easy to remember but hard to guess; this tool can produce them alongside standard random-character passwords.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Is a passphrase stronger than a password?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">A long random-word passphrase can be both easier to remember and harder to crack than a short complex password, because length adds more resistance than symbol variety.</p>
+        </details>
+      </div>
     </section>
 
     <footer class="site">

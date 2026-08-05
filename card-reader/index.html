@@ -31,6 +31,39 @@
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://techtuate.com/card-reader/",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is there a business card scanner that works without an app?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. It runs in your web browser on phone or desktop, so there is nothing to install and no account to create. Scan or upload a card and it becomes an editable contact."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does my saved contact data leave my device?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The card image is sent once to a labeled AI service to read it and is not stored there. Your saved phonebook is kept locally in your browser, not on our servers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I export scanned cards to my phone or CRM?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. You can export contacts as a vCard or CSV file and import them into your phone contacts, Google Contacts, or a spreadsheet."
+      }
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -57,8 +90,7 @@
       <div class="eyebrow">scan a card, get a contact</div>
       <h1>Business card reader</h1>
       <p class="lede">
-        Snap or upload a business card and it reads the details into an editable contact you can save to your phone -
-        then reach out on the spot: WhatsApp, call or text the mobile, email them, or find them on LinkedIn, one tap.
+        Snap or upload a business card and it reads the details into an editable contact you can save to your phone.
         No app, no sign-up. Front and back supported. Your saved phonebook stays in this browser.
       </p>
     </section>
@@ -91,13 +123,12 @@
         <input type="file" id="file-input" accept="image/*" hidden />
 
         <!-- live camera -->
-        <div id="camera-wrap" class="cr-camera" role="dialog" aria-modal="true" aria-label="Camera" hidden>
-          <div class="cr-camera-title">Fit the card in the frame, then Capture</div>
+        <div id="camera-wrap" class="cr-camera" hidden>
           <video id="camera-video" playsinline autoplay muted></video>
           <div class="cr-camera-guide" aria-hidden="true"></div>
           <div class="cr-camera-bar">
             <button type="button" class="btn" id="btn-snap">Capture</button>
-            <button type="button" class="btn ghost" id="btn-camera-cancel">Close</button>
+            <button type="button" class="btn ghost" id="btn-camera-cancel">Cancel</button>
           </div>
         </div>
 
@@ -137,11 +168,6 @@
           <div class="cr-row2">
             <label class="cr-field"><span>Job title</span><input type="text" name="jobTitle" data-key="jobTitle" /></label>
             <label class="cr-field"><span>Company</span><input type="text" name="company" data-key="company" /></label>
-          </div>
-
-          <div id="cr-connect" class="cr-connect" hidden>
-            <span class="cr-connect-label">Connect</span>
-            <div id="cr-connect-actions" class="cr-acts"></div>
           </div>
 
           <fieldset class="cr-multi">
@@ -200,6 +226,24 @@
         Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
         Made a card to hand out? Design one with the <a href="/qr-code/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">QR code generator</a>.
       </p>
+    </section>
+
+    <section class="faq" style="margin-top:44px;">
+      <div class="section-head"><h2>Questions people ask</h2></div>
+      <div style="max-width:720px;">
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Is there a business card scanner that works without an app?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. It runs in your web browser on phone or desktop, so there is nothing to install and no account to create. Scan or upload a card and it becomes an editable contact.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Does my saved contact data leave my device?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">The card image is sent once to a labeled AI service to read it and is not stored there. Your saved phonebook is kept locally in your browser, not on our servers.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I export scanned cards to my phone or CRM?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. You can export contacts as a vCard or CSV file and import them into your phone contacts, Google Contacts, or a spreadsheet.</p>
+        </details>
+      </div>
     </section>
 
     <footer class="site">

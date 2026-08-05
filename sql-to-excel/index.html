@@ -121,6 +121,39 @@
     .csv-link { font-family: var(--font-mono); font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid var(--ink); background: var(--bg); border-radius: 999px; padding: 5px 11px; }
     .csv-link:hover { background: var(--yellow); }
   </style>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://techtuate.com/sql-to-excel/",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I convert SQL INSERT statements to Excel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paste your INSERT statements and the tool renders the values as a table you can export to xlsx or CSV, all in your browser with no upload."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I see what a SQL script will delete before running it?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. It reads the script and gives plain-English warnings about DELETE and UPDATE statements, without ever executing the SQL against a database."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this tool run or connect to my database?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It only parses the pasted text to preview and warn; it is read-only, runs in your browser, and never connects to or runs against any database."
+      }
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -203,6 +236,24 @@
         Handy for reviewing a migration or a generated script before you run it. Part of
         <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>.
       </p>
+    </section>
+
+    <section class="faq" style="margin-top:44px;">
+      <div class="section-head"><h2>Questions people ask</h2></div>
+      <div style="max-width:720px;">
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How do I convert SQL INSERT statements to Excel?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Paste your INSERT statements and the tool renders the values as a table you can export to xlsx or CSV, all in your browser with no upload.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I see what a SQL script will delete before running it?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. It reads the script and gives plain-English warnings about DELETE and UPDATE statements, without ever executing the SQL against a database.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Does this tool run or connect to my database?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">No. It only parses the pasted text to preview and warn; it is read-only, runs in your browser, and never connects to or runs against any database.</p>
+        </details>
+      </div>
     </section>
 
     <footer class="site">

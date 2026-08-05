@@ -23,7 +23,7 @@
     "author": { "@type": "Organization", "name": "techtuate" },
     "publisher": { "@type": "Organization", "name": "techtuate" },
     "datePublished": "2026-05-21",
-    "dateModified": "2026-05-21"
+    "dateModified": "2026-08-05"
   }
   </script>
 </head>
@@ -51,10 +51,10 @@
 
     <article class="prose">
       <h1>How techtuate's tools stack up vs. the paid alternatives</h1>
-      <p class="byline">Updated May 2026. Pricing and limits checked against vendor sites.</p>
+      <p class="byline">Updated August 2026. Pricing and limits checked against vendor sites.</p>
 
       <p class="lede">
-        Most "free" online tools have a sign-up wall, a task-per-hour ceiling, a watermark, a file limit, or a subscription. techtuate has none of those, because these tools run in your browser with no server involved.
+        Most "free" online tools have a sign-up wall, a task-per-hour ceiling, a watermark, a file limit, or a subscription. techtuate has none of those. Most of its tools run in your browser with no server involved; the two that use AI (the card reader and font finder) send only their input, once, to a labeled service and keep everything else on your device.
       </p>
 
       <div class="callout yellow">
@@ -277,13 +277,89 @@
         </a>
       </div>
 
+      <h2>Business card reader vs. the scanner apps</h2>
+      <p>
+        Most business card scanners are app installs or funnel you into a CRM account. techtuate reads a card in the browser and, more importantly, turns it into instant reach-out - WhatsApp, call, text, email, or a LinkedIn search - with no app and no sign-up.
+      </p>
+
+      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+        <a class="card" href="/vs/camcard/">
+          <div class="card-icon" aria-hidden="true">Cc</div>
+          <h3 class="card-title">vs. CamCard</h3>
+          <p class="card-desc">A well-known card scanner, but app-based with accounts and paid tiers. techtuate runs in the browser and adds one-tap reach-out. When to use each.</p>
+          <div class="card-meta"><span class="status live">free, no app</span><span class="card-arrow">&rarr;</span></div>
+        </a>
+      </div>
+
+      <h2>Font finder vs. the font matchers</h2>
+      <p>
+        Font matchers are good at naming a typeface and then pointing you at a paid foundry font. techtuate identifies the family and hands you the closest Microsoft Office font and a free Google Fonts match you can actually use.
+      </p>
+
+      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+        <a class="card" href="/vs/whatthefont/">
+          <div class="card-icon" aria-hidden="true">Wtf</div>
+          <h3 class="card-title">vs. WhatTheFont</h3>
+          <p class="card-desc">MyFonts' matcher points to paid foundry fonts. techtuate leads with the closest free Google Fonts and Microsoft Office match. When to use each.</p>
+          <div class="card-meta"><span class="status live">free match</span><span class="card-arrow">&rarr;</span></div>
+        </a>
+      </div>
+
+      <h2>JSON formatter vs. the online formatters</h2>
+      <p>
+        The popular online JSON formatters process on their servers and lean on ads. techtuate formats, validates, and minifies in your browser, so sensitive JSON is not uploaded.
+      </p>
+
+      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+        <a class="card" href="/vs/jsonformatter-org/">
+          <div class="card-icon" aria-hidden="true">Jf</div>
+          <h3 class="card-title">vs. JSONFormatter.org</h3>
+          <p class="card-desc">A deep, ad-supported toolbox that processes server-side. techtuate keeps format/validate/minify local and ad-free. When to use each.</p>
+          <div class="card-meta"><span class="status live">nothing uploaded</span><span class="card-arrow">&rarr;</span></div>
+        </a>
+      </div>
+
+      <h2>Audio &amp; SVG converters vs. the server converters</h2>
+      <p>
+        General converters upload your file and meter free use by conversion minutes. techtuate converts audio to MP3/WAV (and trims) and SVG to PNG/JPEG in your browser, with no upload and no cap.
+      </p>
+
+      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+        <a class="card" href="/vs/cloudconvert/">
+          <div class="card-icon" aria-hidden="true">Cc</div>
+          <h3 class="card-title">vs. CloudConvert</h3>
+          <p class="card-desc">Hundreds of formats, server-side, with free-tier minute caps. techtuate does the common audio and SVG jobs locally with no cap. When to use each.</p>
+          <div class="card-meta"><span class="status live">both free</span><span class="card-arrow">&rarr;</span></div>
+        </a>
+      </div>
+
+      <h2>Color palette &amp; word counter vs. the popular defaults</h2>
+      <p>
+        Coolors is a full palette-building app with accounts; techtuate just extracts colors from an image. WordCounter.net leans on ad and writing-tool upsells; techtuate keeps the counts clean and local.
+      </p>
+
+      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+        <a class="card" href="/vs/coolors/">
+          <div class="card-icon" aria-hidden="true">Co</div>
+          <h3 class="card-title">vs. Coolors</h3>
+          <p class="card-desc">A scheme-generation app that nudges toward accounts. techtuate extracts an image's colors as HEX/RGB with no sign-up. When to use each.</p>
+          <div class="card-meta"><span class="status live">no sign-up</span><span class="card-arrow">&rarr;</span></div>
+        </a>
+        <a class="card" href="/vs/wordcounter-net/">
+          <div class="card-icon" aria-hidden="true">Wc</div>
+          <h3 class="card-title">vs. WordCounter.net</h3>
+          <p class="card-desc">The default counter, with ads and writing-tool upsells. techtuate gives the same core counts, no upsell, text stays local. When to use each.</p>
+          <div class="card-meta"><span class="status live">no upsell</span><span class="card-arrow">&rarr;</span></div>
+        </a>
+      </div>
+
       <h2>How techtuate can be forever free</h2>
       <p>
         The big tools above run server-side. Every action you take (merge, split, fill, annotate) costs them CPU, memory, and bandwidth.
         They charge a subscription because every user costs them money.
       </p>
       <p>
-        techtuate runs entirely in your browser. Your laptop does the work, your laptop has the file. There's no server to scale, no bandwidth bill, no per-user cost. So we can host it on a static CDN (Cloudflare Pages) for $0/mo and never put a paywall on it. The full <a href="/why-free/">why</a> goes deeper.
+        Most techtuate tools run entirely in your browser. Your laptop does the work and keeps the file. There's no server to scale, no bandwidth bill, no per-user cost. So we can host it on a static CDN (Cloudflare Pages) for $0/mo and never put a paywall on it. (The two AI tools, the card reader and font finder, send only their input once to a labeled service and store nothing; everything else stays local.) The full <a href="/why-free/">why</a> goes deeper.
       </p>
 
       <div class="cta">
