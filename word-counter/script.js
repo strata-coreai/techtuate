@@ -19,12 +19,17 @@
   var elSentences = $('s-sentences');
   var elParagraphs = $('s-paragraphs');
   var elReading = $('s-reading');
+  var elLevel = $('s-level');
+  var elEase = $('s-ease');
+  var elEaseCap = $('cap-ease');
   var tileChars = $('tile-chars');
   var limit = $('limit');
   var limitMsg = $('limit-msg');
   var flash = $('copy-flash');
 
   var READING_WPM = 200;
+  // Readability needs a little text before the estimate means anything.
+  var READ_MIN_WORDS = 5;
 
   function countWords(t) {
     var m = t.trim();
@@ -55,18 +60,79 @@
   }
   function fmt(n) { return n.toLocaleString('en-US'); }
 
+  /* ---------- readability ----------
+     Estimates via Flesch Reading Ease + Flesch-Kincaid grade. Both need a
+     syllable count, which is heuristic in English, so these are estimates. */
+  function syllables(word) {
+    word = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (!word) return 0;
+    if (word.length <= 3) return 1;
+    word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+    word = word.replace(/^y/, '');
+    var m = word.match(/[aeiouy]{1,2}/g);
+    return m ? m.length : 1;
+  }
+
+  // Flesch Reading Ease band -> short plain-English label
+  function easeBand(score) {
+    if (score >= 90) return 'Very easy';
+    if (score >= 80) return 'Easy';
+    if (score >= 70) return 'Fairly easy';
+    if (score >= 60) return 'Standard';
+    if (score >= 50) return 'Fairly hard';
+    if (score >= 30) return 'Hard';
+    return 'Very hard';
+  }
+
+  // Flesch-Kincaid grade -> tile label
+  function gradeLabel(grade) {
+    var g = Math.round(grade);
+    if (g < 1) return 'Grade 1';
+    if (g <= 12) return 'Grade ' + g;
+    if (g <= 15) return 'College';
+    return 'Postgrad';
+  }
+
+  // returns null when there is not enough text, else { ease, band, grade, gradeLabel }
+  function readability(text, words, sentences) {
+    if (words < READ_MIN_WORDS) return null;
+    var sent = Math.max(sentences, 1);
+    var toks = text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || [];
+    if (!toks.length) return null;
+    var syl = 0;
+    for (var i = 0; i < toks.length; i++) syl += syllables(toks[i]);
+    var wps = words / sent;             // words per sentence
+    var spw = syl / toks.length;        // syllables per word
+    var ease = 206.835 - 1.015 * wps - 84.6 * spw;
+    var grade = 0.39 * wps + 11.8 * spw - 15.59;
+    ease = Math.max(0, Math.min(100, ease));
+    return { ease: Math.round(ease), band: easeBand(ease), grade: grade, gradeLabel: gradeLabel(grade) };
+  }
+
   function update() {
     var t = input.value;
     var chars = t.length;
     var charsNs = t.replace(/\s/g, '').length;
     var words = countWords(t);
+    var sentences = countSentences(t);
 
     elWords.textContent = fmt(words);
     elChars.textContent = fmt(chars);
     elCharsNs.textContent = fmt(charsNs);
-    elSentences.textContent = fmt(countSentences(t));
+    elSentences.textContent = fmt(sentences);
     elParagraphs.textContent = fmt(countParagraphs(t));
     elReading.textContent = readingTime(words);
+
+    var r = readability(t, words, sentences);
+    if (r) {
+      elLevel.textContent = r.gradeLabel;
+      elEase.textContent = r.band;
+      elEaseCap.textContent = 'Reading ease · ' + r.ease;
+    } else {
+      elLevel.textContent = '-';
+      elEase.textContent = '-';
+      elEaseCap.textContent = 'Reading ease';
+    }
 
     applyLimit(chars);
   }

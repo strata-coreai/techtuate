@@ -27,6 +27,8 @@
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
+/* word-band readouts (e.g. "Fairly easy") need a smaller size than the numbers */
+.wc-num.sm { font-size: clamp(19px, 3vw, 25px); }
 .wc-label {
   font-family: var(--font-mono);
   font-size: 11.5px;
