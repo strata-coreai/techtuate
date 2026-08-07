@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Diff checker - compare text &amp; code in your browser, nothing uploaded - techtuate</title>
+  <meta name="description" content="Compare two texts or code files in your browser and see the differences. Ignore whitespace or case, share by link, export a .diff. Nothing uploaded, no sign-up." />
+  <meta name="keywords" content="diff checker, compare text online, text compare, code diff, compare two files, json diff, online diff tool no upload, diff checker no sign up, share diff by url" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/diff-checker/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M14 22 H30 M14 32 H30 M14 42 H26' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M38 24 h12 M44 18 v12' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M38 42 h12' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/diff-checker/" />
+  <meta property="og:title" content="Diff checker - compare text &amp; code in your browser, nothing uploaded" />
+  <meta property="og:description" content="Compare two texts or code files in your browser. Ignore whitespace or case, share the result by a link no server sees, export a .diff. No sign-up." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate Diff checker",
+    "url": "https://techtuate.com/diff-checker/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Compare two blocks of text, code, or config in the browser with side-by-side and unified views, ignore-whitespace and ignore-case, share-by-link, and .diff export. Nothing is uploaded.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "url": "https://techtuate.com/diff-checker/",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I compare two blocks of text or code?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Paste the original on the left and the changed version on the right. The differences are highlighted line by line, with word-level changes marked inside each changed line. It all runs in your browser."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a diff tool that does not upload my code?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This diff checker compares both sides locally in your browser, so your code or text is never uploaded to a server."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I share a diff with someone without a server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The share link encodes both text blocks into the link itself, compressed, so the other person opens the exact comparison instantly and nothing is stored on any server. The link carries your text, so share it only with people you would share the text with."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between side-by-side and unified diff view?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Side-by-side shows the original and changed text in two columns so you can read them in parallel. Unified view stacks the changes into one column with minus lines for removals and plus lines for additions, which is the format of a .diff or .patch file."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">diff checker</div>
+      <h1>Diff checker, runs in your browser</h1>
+      <p class="lede">
+        Compare two blocks of text, code, or config - side by side or as a unified diff. Toggle
+        ignore-whitespace and ignore-case, highlight the exact word that changed, and share a result
+        by a link that carries the data itself, so no server ever sees it. Nothing is uploaded.
+      </p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The comparison happens in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <!-- extractable one-liner (GEO) -->
+      <div class="callout wash">
+        <p>Compare two blocks of text, code, or config side by side or as a unified diff, entirely in your browser - nothing is uploaded, you can share a result by a link that carries the data itself, and you can export the differences as a <code>.diff</code> patch file.</p>
+      </div>
+
+      <!-- ============ TOOLBAR ============ -->
+      <div class="dc-toolbar">
+        <div class="dc-seg" role="group" aria-label="View mode">
+          <button type="button" id="view-sbs" class="on" aria-pressed="true">Side-by-side</button>
+          <button type="button" id="view-uni" aria-pressed="false">Unified</button>
+        </div>
+
+        <div class="dc-checks">
+          <label class="dc-chip">
+            <input type="checkbox" id="opt-ws" />
+            <span class="box" aria-hidden="true"></span>
+            Ignore whitespace
+          </label>
+          <label class="dc-chip">
+            <input type="checkbox" id="opt-case" />
+            <span class="box" aria-hidden="true"></span>
+            Ignore case
+          </label>
+          <label class="dc-chip">
+            <input type="checkbox" id="opt-json" />
+            <span class="box" aria-hidden="true"></span>
+            Format JSON
+          </label>
+        </div>
+
+        <div class="dc-actions">
+          <button type="button" class="btn ghost" id="btn-swap">Swap</button>
+          <button type="button" class="btn ghost" id="btn-share">Copy share link</button>
+          <button type="button" class="btn ghost" id="btn-export">Export .diff</button>
+          <button type="button" class="btn ghost" id="btn-clear">Clear</button>
+        </div>
+      </div>
+
+      <!-- ============ INPUT PANES ============ -->
+      <div class="dc-panes">
+        <div class="dc-pane">
+          <span class="dc-pane-label" id="lab-a">Original</span>
+          <textarea id="input-a" class="dc-input" spellcheck="false" placeholder="Paste the original text or code here..." aria-labelledby="lab-a"></textarea>
+        </div>
+        <div class="dc-pane">
+          <span class="dc-pane-label" id="lab-b">Changed</span>
+          <textarea id="input-b" class="dc-input" spellcheck="false" placeholder="Paste the changed version here..." aria-labelledby="lab-b"></textarea>
+        </div>
+      </div>
+
+      <!-- ============ RESULT ============ -->
+      <div class="dc-resulthead">
+        <span class="dc-stats" id="stats" aria-live="polite"></span>
+        <span class="dc-note" id="json-note" hidden></span>
+      </div>
+
+      <div class="dc-output" id="output" aria-live="polite">
+        <div class="dc-empty">Paste text on both sides to see the difference.</div>
+      </div>
+
+      <p class="dc-note" id="share-note"></p>
+
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, no sign-up. Both sides are compared right here in your browser - nothing is uploaded, which
+        matters when you are diffing proprietary code, a config file, or a draft you would rather not paste
+        into some random site. "Copy share link" packs both text blocks into the link itself (compressed),
+        so a coworker opens the exact same comparison without any server storing it - just remember the link
+        carries your text, so share it like you would share the text. "Ignore whitespace" skips indentation
+        and trailing-space differences; "Format JSON" pretty-prints and sorts keys on both sides first, so
+        you diff meaning instead of formatting noise. "Export .diff" gives you a standard unified patch.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+    </section>
+
+    <p class="cross-compare" style="max-width:680px; margin:18px 0 0; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">Compare: <a href="/vs/diffchecker/" style="color:inherit;">techtuate vs Diffchecker.com</a> &middot; <a href="/vs/" style="color:inherit;">all comparisons</a> &middot; <a href="/" style="color:inherit;">more tools</a></p>
+
+    <section class="faq" style="margin-top:44px;">
+      <div class="section-head"><h2>Questions people ask</h2></div>
+      <div style="max-width:720px;">
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How do I compare two blocks of text or code?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Paste the original on the left and the changed version on the right. The differences are highlighted line by line, with word-level changes marked inside each changed line. It all runs in your browser.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Is there a diff tool that does not upload my code?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. This diff checker compares both sides locally in your browser, so your code or text is never uploaded to a server.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I share a diff with someone without a server?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. The share link encodes both text blocks into the link itself, compressed, so the other person opens the exact comparison instantly and nothing is stored on any server. The link carries your text, so share it only with people you would share the text with.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">What is the difference between side-by-side and unified diff view?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Side-by-side shows the original and changed text in two columns so you can read them in parallel. Unified view stacks the changes into one column with minus lines for removals and plus lines for additions, which is the format of a .diff or .patch file.</p>
+        </details>
+      </div>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/json-formatter/">json formatter</a> &middot;
+        <a href="/word-counter/">word counter</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <div id="copy-flash" role="status" aria-live="polite">copied &#10033;</div>
+
+  <script src="./lib/diff.min.js"></script>
+  <script src="./lib/lz-string.min.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

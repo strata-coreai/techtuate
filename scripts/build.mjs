@@ -44,6 +44,7 @@ const STATIC_DIRS = [
   'audio-converter',
   'word-counter',
   'font-finder',
+  'diff-checker',
 ];
 
 // NOTE: the /card-reader/ tool also relies on a Cloudflare Pages Function at
