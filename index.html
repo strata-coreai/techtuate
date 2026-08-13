@@ -21,7 +21,7 @@
   <meta name="twitter:title" content="techtuate - free, powerful little tools. No sign-up, no ads" />
   <meta name="twitter:description" content="Free little tools that just work. Most run in your browser so your files stay on your device; a few use AI and say so." />
 
-  <!-- JSON-LD: site + WebApplication for the PDF editor -->
+  <!-- JSON-LD: site + Organization + PDF editor WebApplication + ItemList of all tools -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -60,6 +60,26 @@
           "No account required",
           "No file upload to any server",
           "No ads"
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "name": "techtuate tools",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "PDF editor", "url": "https://techtuate.com/pdf-editor/" },
+          { "@type": "ListItem", "position": 2, "name": "JSON formatter", "url": "https://techtuate.com/json-formatter/" },
+          { "@type": "ListItem", "position": 3, "name": "Diff checker", "url": "https://techtuate.com/diff-checker/" },
+          { "@type": "ListItem", "position": 4, "name": "QR code generator", "url": "https://techtuate.com/qr-code/" },
+          { "@type": "ListItem", "position": 5, "name": "Password generator", "url": "https://techtuate.com/password-generator/" },
+          { "@type": "ListItem", "position": 6, "name": "SVG converter", "url": "https://techtuate.com/svg-converter/" },
+          { "@type": "ListItem", "position": 7, "name": "SQL to table", "url": "https://techtuate.com/sql-to-excel/" },
+          { "@type": "ListItem", "position": 8, "name": "Image and GIF resizer", "url": "https://techtuate.com/image-resize/" },
+          { "@type": "ListItem", "position": 9, "name": "Business card reader", "url": "https://techtuate.com/card-reader/" },
+          { "@type": "ListItem", "position": 10, "name": "Color palette extractor", "url": "https://techtuate.com/color-palette/" },
+          { "@type": "ListItem", "position": 11, "name": "Font finder", "url": "https://techtuate.com/font-finder/" },
+          { "@type": "ListItem", "position": 12, "name": "Audio converter", "url": "https://techtuate.com/audio-converter/" },
+          { "@type": "ListItem", "position": 13, "name": "Word and character counter", "url": "https://techtuate.com/word-counter/" },
+          { "@type": "ListItem", "position": 14, "name": "PDF password remover", "url": "https://techtuate.com/pdf-password-remover/" }
         ]
       }
     ]
@@ -128,7 +148,7 @@
     <section id="tools" aria-labelledby="tools-h">
       <div class="section-head">
         <h2 id="tools-h">The tools</h2>
-        <span class="count">13 / &infin; &nbsp;&middot;&nbsp; more coming</span>
+        <span class="count">14 / &infin; &nbsp;&middot;&nbsp; more coming</span>
       </div>
 
       <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute); margin: 0 0 12px; max-width:600px;">We don't advertise. If a tool here helped, a quick review tells the next person it's safe to trust.</p>
@@ -157,6 +177,24 @@
           </p>
           <div class="card-meta">
             <span class="status live">live &middot; beta</span>
+            <span class="card-arrow">open &rarr;</span>
+          </div>
+        </a>
+
+        <!-- ============ PDF password remover ============ -->
+        <a class="card" href="/pdf-password-remover/">
+          <div class="card-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="11" width="14" height="10" rx="2"/>
+              <path d="M8 11V7a4 4 0 0 1 7.5-2"/>
+            </svg>
+          </div>
+          <h3 class="card-title">PDF password remover</h3>
+          <p class="card-desc">
+            Enter the password on a locked bank statement or tax PDF and download an unlocked copy. Runs in your browser, never uploaded.
+          </p>
+          <div class="card-meta">
+            <span class="status live">live</span>
             <span class="card-arrow">open &rarr;</span>
           </div>
         </a>

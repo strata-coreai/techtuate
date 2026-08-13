@@ -1,0 +1,99 @@
+/* ============================================================
+   pdf password remover - layers on /assets/site.css tokens
+   ============================================================ */
+
+.pr-drop {
+  border: 2px dashed var(--ink);
+  border-radius: var(--r-md);
+  background: var(--bg-soft);
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: background .15s ease, transform .1s ease;
+}
+.pr-drop:hover { background: var(--yellow-wash); }
+.pr-drop.drag { background: var(--yellow-soft); transform: translate(-1px, -1px); }
+.pr-drop .pr-ico {
+  width: 44px; height: 44px; margin: 0 auto 12px;
+  display: grid; place-items: center;
+  background: var(--yellow); border: 2px solid var(--ink); border-radius: 12px;
+}
+.pr-drop h3 {
+  font-family: var(--font-display); font-weight: 800; font-size: 19px; margin: 0 0 4px;
+}
+.pr-drop p { margin: 0; font-size: 13.5px; color: var(--ink-mute); }
+
+/* work panel */
+.pr-work {
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  box-shadow: 4px 4px 0 var(--ink);
+  background: var(--bg);
+  padding: 20px 22px;
+}
+.pr-file {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-bottom: 14px; margin-bottom: 14px;
+  border-bottom: 1.5px solid var(--line);
+}
+.pr-file .name {
+  font-family: var(--font-mono); font-size: 13.5px; font-weight: 700;
+  word-break: break-all;
+}
+.pr-file .name::before { content: "PDF "; color: var(--ink-dim); }
+.pr-file .btn { margin-left: auto; }
+
+.pr-pwrow { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.pr-pwfield { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
+.pr-pwfield span {
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--ink-mute);
+}
+.pr-pwfield .inp {
+  display: flex; align-items: stretch;
+  border: 2px solid var(--ink); border-radius: var(--r-sm); background: var(--bg);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.pr-pwfield input {
+  flex: 1; border: none; background: transparent; padding: 9px 12px;
+  font-family: var(--font-mono); font-size: 14px; color: var(--ink); min-width: 0;
+}
+.pr-pwfield input:focus { outline: none; }
+.pr-pwfield .inp:focus-within { box-shadow: 4px 4px 0 var(--yellow-deep); }
+.pr-toggle {
+  border: none; border-left: 2px solid var(--ink); background: var(--bg-soft);
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: 0 12px; cursor: pointer; color: var(--ink);
+}
+.pr-toggle:hover { background: var(--yellow); }
+
+/* status */
+.pr-status {
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.5;
+  margin: 0 0 14px; min-height: 1.2em;
+}
+.pr-status.busy { color: var(--ink-mute); }
+.pr-status.ok { color: var(--ink); font-weight: 700; }
+.pr-status.err { color: #a12; font-weight: 700; }
+.pr-spin {
+  display: inline-block; width: 12px; height: 12px; margin-right: 7px;
+  border: 2px solid var(--ink-dim); border-top-color: transparent; border-radius: 50%;
+  vertical-align: -1px; animation: pr-rot .7s linear infinite;
+}
+@keyframes pr-rot { to { transform: rotate(360deg); } }
+
+.pr-dl { font-size: 15px; }
+
+/* privacy line under the tool */
+.pr-privacy {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink-mute);
+  margin: 14px 0 0;
+}
+.pr-privacy .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow-deep); border: 1.5px solid var(--ink); flex: none; }
+
+@media (max-width: 720px) {
+  .pr-file .btn { margin-left: 0; }
+  .pr-pwrow .btn { width: 100%; justify-content: center; }
+}
