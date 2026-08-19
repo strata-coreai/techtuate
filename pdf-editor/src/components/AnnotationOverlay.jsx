@@ -3,13 +3,23 @@ import { cssToPdf, pdfToCss } from '../lib/coords.js';
 
 /**
  * Transparent canvas overlay on top of a PageView canvas.
- * Handles pointer input for drawing new annotations and renders all
- * existing annotations for this page. Stored coordinates are in PDF
- * points (scale-invariant); conversion happens on pointer-in and render-out.
+ * Handles pointer input for drawing new annotations, moving a selected one,
+ * and renders all existing annotations for this page. Stored coordinates are
+ * in PDF points (scale-invariant); conversion happens on pointer-in and
+ * render-out.
  */
+
+const FONT_STACKS = {
+  sans: 'Helvetica, Arial, sans-serif',
+  serif: 'Georgia, "Times New Roman", Times, serif',
+  mono: '"Courier New", Courier, monospace',
+};
+function cssFontStack(f) { return FONT_STACKS[f] || FONT_STACKS.sans; }
+function shadowOffset(size) { return Math.max(0.8, size * 0.06); }
+
 export function AnnotationOverlay({
   pageNum,
-  entryId,           // stable entry id — used as annotation map key
+  entryId,
   scale,
   pageHeightPts,
   cssWidth,
@@ -18,13 +28,19 @@ export function AnnotationOverlay({
   activeTool,
   activeColor,
   strokeWidth,
+  textFont,
+  textSize,
+  textBold,
+  textShadow,
   onAddAnnotation,
   onDeleteAnnotation,
+  onUpdateAnnotation,
   selectedId,
   onSelectAnnotation,
 }) {
   const canvasRef = useRef(null);
   const drawing = useRef(null);
+  const moving = useRef(null);
 
   // ── resize canvas to match CSS size ──
   useEffect(() => {
@@ -60,6 +76,14 @@ export function AnnotationOverlay({
       const css = getPos(e);
       const hit = hitTest(annotations, css, scale, pageHeightPts);
       onSelectAnnotation(hit ? hit.id : null);
+      if (hit) {
+        e.currentTarget.setPointerCapture(e.pointerId);
+        moving.current = {
+          id: hit.id,
+          orig: hit,
+          startPdf: cssToPdf({ ...css, scale, pageHeightPts }),
+        };
+      }
       return;
     }
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -67,12 +91,24 @@ export function AnnotationOverlay({
     const pdf = cssToPdf({ ...css, scale, pageHeightPts });
     if (activeTool === 'freedraw') {
       drawing.current = { type: 'freedraw', points: [pdf], color: activeColor, strokeWidth };
+    } else if (activeTool === 'text') {
+      drawing.current = { type: 'text', startPdf: pdf, color: activeColor, textSize, textFont, textBold, textShadow };
     } else {
       drawing.current = { type: activeTool, startPdf: pdf, color: activeColor, strokeWidth };
     }
-  }, [activeTool, activeColor, strokeWidth, annotations, scale, pageHeightPts, onSelectAnnotation]);
+  }, [activeTool, activeColor, strokeWidth, textSize, textFont, textBold, textShadow, annotations, scale, pageHeightPts, onSelectAnnotation]);
 
   const onPointerMove = useCallback((e) => {
+    // ── moving a selected annotation ──
+    if (moving.current) {
+      const css = getPos(e);
+      const nowPdf = cssToPdf({ ...css, scale, pageHeightPts });
+      const dx = nowPdf.x - moving.current.startPdf.x;
+      const dy = nowPdf.y - moving.current.startPdf.y;
+      const patch = translateAnn(moving.current.orig, dx, dy);
+      onUpdateAnnotation(entryId, moving.current.id, patch);
+      return;
+    }
     if (!drawing.current) return;
     const css = getPos(e);
     const pdf = cssToPdf({ ...css, scale, pageHeightPts });
@@ -91,9 +127,10 @@ export function AnnotationOverlay({
     renderAnnotations(ctx, annotations, scale, pageHeightPts, selectedId);
     renderPreview(ctx, drawing.current, scale, pageHeightPts);
     ctx.restore();
-  }, [annotations, scale, pageHeightPts, selectedId]);
+  }, [annotations, scale, pageHeightPts, selectedId, entryId, onUpdateAnnotation]);
 
   const onPointerUp = useCallback((e) => {
+    if (moving.current) { moving.current = null; return; }
     if (!drawing.current) return;
     const d = drawing.current;
     drawing.current = null;
@@ -108,12 +145,21 @@ export function AnnotationOverlay({
       const y = Math.min(d.startPdf.y, pdf.y);
       const w = Math.abs(pdf.x - d.startPdf.x);
       const h = Math.abs(pdf.y - d.startPdf.y);
-      if (w < 2 && h < 2) return;
       if (d.type === 'text') {
         const label = window.prompt('Enter text:');
         if (!label) return;
-        ann = { type: 'text', x, y, width: w, height: h, text: label, fontSize: 12, color: d.color, opacity: 1 };
+        const size = d.textSize || 16;
+        const top = Math.max(d.startPdf.y, pdf.y);
+        const left = Math.min(d.startPdf.x, pdf.x);
+        const bh = Math.max(h, size * 1.3);
+        const bw = Math.max(w, size * 0.6 * label.length, size * 2);
+        ann = {
+          type: 'text', x: left, y: top - bh, width: bw, height: bh,
+          text: label, fontSize: size, font: d.textFont, bold: d.textBold, shadow: d.textShadow,
+          color: d.color, opacity: 1,
+        };
       } else {
+        if (w < 2 && h < 2) return;
         ann = {
           type: d.type, x, y, width: w, height: h,
           color: d.color, strokeWidth: d.strokeWidth,
@@ -123,6 +169,16 @@ export function AnnotationOverlay({
     }
     if (ann) onAddAnnotation(entryId, ann);
   }, [entryId, scale, pageHeightPts, onAddAnnotation]);
+
+  const onDoubleClick = useCallback((e) => {
+    if (activeTool !== 'cursor') return;
+    const css = getPos(e);
+    const hit = hitTest(annotations, css, scale, pageHeightPts);
+    if (hit && hit.type === 'text') {
+      const label = window.prompt('Edit text:', hit.text);
+      if (label != null && label !== '') onUpdateAnnotation(entryId, hit.id, { text: label });
+    }
+  }, [activeTool, annotations, scale, pageHeightPts, entryId, onUpdateAnnotation]);
 
   const onKeyDown = useCallback((e) => {
     if ((e.key === 'Backspace' || e.key === 'Delete') && selectedId != null) {
@@ -140,11 +196,34 @@ export function AnnotationOverlay({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onDoubleClick={onDoubleClick}
       tabIndex={0}
       onKeyDown={onKeyDown}
       aria-label={`Annotation layer page ${pageNum}`}
     />
   );
+}
+
+// ── model helpers ───────────────────────────────────────────────────────────
+
+/** Returns a patch that moves `ann` by (dx, dy) in PDF points. */
+function translateAnn(ann, dx, dy) {
+  if (ann.type === 'freedraw') {
+    return { points: ann.points.map((p) => ({ x: p.x + dx, y: p.y + dy })) };
+  }
+  return { x: ann.x + dx, y: ann.y + dy };
+}
+
+function annBBox(ann) {
+  if (ann.type === 'freedraw') {
+    let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+    for (const p of ann.points) {
+      minx = Math.min(minx, p.x); miny = Math.min(miny, p.y);
+      maxx = Math.max(maxx, p.x); maxy = Math.max(maxy, p.y);
+    }
+    return { x: minx, y: miny, width: maxx - minx, height: maxy - miny };
+  }
+  return { x: ann.x, y: ann.y, width: ann.width ?? 0, height: ann.height ?? 0 };
 }
 
 // ── rendering helpers ──────────────────────────────────────────────────────
@@ -153,12 +232,12 @@ function renderAnnotations(ctx, annotations, scale, pageHeightPts, selectedId) {
   for (const ann of annotations) {
     ctx.save();
     ctx.globalAlpha = ann.opacity ?? 1;
-    if (ann.id === selectedId) {
-      ctx.shadowColor = 'rgba(0,0,0,0.45)';
-      ctx.shadowBlur = 6;
-    }
     renderOne(ctx, ann, scale, pageHeightPts);
     ctx.restore();
+  }
+  if (selectedId != null) {
+    const sel = annotations.find((a) => a.id === selectedId);
+    if (sel) renderSelection(ctx, sel, scale, pageHeightPts);
   }
 }
 
@@ -187,25 +266,63 @@ function renderOne(ctx, ann, scale, pageHeightPts) {
     ctx.lineWidth = ann.strokeWidth ?? 2;
     ctx.strokeRect(tl.x, tl.y, ann.width * scale, ann.height * scale);
   } else if (ann.type === 'text') {
-    const tl = pdfToCss({ x: ann.x, y: ann.y + ann.height, scale, pageHeightPts });
+    const size = ann.fontSize ?? 12;
+    const bh = ann.height ?? size;
+    const tl = pdfToCss({ x: ann.x, y: ann.y + bh, scale, pageHeightPts });
+    const baseX = tl.x;
+    const baseY = tl.y + size * scale; // baseline one line-height below box top
     ctx.fillStyle = ann.color;
-    ctx.font = `${(ann.fontSize ?? 12) * scale}px sans-serif`;
-    ctx.fillText(ann.text, tl.x, tl.y + (ann.fontSize ?? 12) * scale);
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = `${ann.bold ? 'bold ' : ''}${size * scale}px ${cssFontStack(ann.font)}`;
+    if (ann.shadow) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 1.5 * scale;
+      const off = shadowOffset(size) * scale;
+      ctx.shadowOffsetX = off;
+      ctx.shadowOffsetY = off;
+      ctx.fillText(ann.text, baseX, baseY);
+      ctx.restore();
+    } else {
+      ctx.fillText(ann.text, baseX, baseY);
+    }
   }
+}
+
+function renderSelection(ctx, ann, scale, pageHeightPts) {
+  const bb = annBBox(ann);
+  const tl = pdfToCss({ x: bb.x, y: bb.y + bb.height, scale, pageHeightPts });
+  const pad = 3;
+  ctx.save();
+  ctx.strokeStyle = '#1d6fa4';
+  ctx.setLineDash([5, 4]);
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(tl.x - pad, tl.y - pad, bb.width * scale + pad * 2, bb.height * scale + pad * 2);
+  ctx.restore();
 }
 
 function renderPreview(ctx, d, scale, pageHeightPts) {
   if (!d) return;
   ctx.save();
-  ctx.globalAlpha = 0.6;
   if (d.type === 'freedraw') {
+    ctx.globalAlpha = 0.6;
     renderOne(ctx, { ...d, opacity: 1 }, scale, pageHeightPts);
   } else if (d.endPdf) {
     const x = Math.min(d.startPdf.x, d.endPdf.x);
     const y = Math.min(d.startPdf.y, d.endPdf.y);
     const w = Math.abs(d.endPdf.x - d.startPdf.x);
     const h = Math.abs(d.endPdf.y - d.startPdf.y);
-    renderOne(ctx, { type: d.type, x, y, width: w, height: h, color: d.color, strokeWidth: d.strokeWidth, opacity: 0.6 }, scale, pageHeightPts);
+    if (d.type === 'text') {
+      const tl = pdfToCss({ x, y: y + h, scale, pageHeightPts });
+      ctx.globalAlpha = 0.7;
+      ctx.strokeStyle = d.color;
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1;
+      ctx.strokeRect(tl.x, tl.y, w * scale, h * scale);
+    } else {
+      ctx.globalAlpha = 0.6;
+      renderOne(ctx, { type: d.type, x, y, width: w, height: h, color: d.color, strokeWidth: d.strokeWidth, opacity: 0.6 }, scale, pageHeightPts);
+    }
   }
   ctx.restore();
 }

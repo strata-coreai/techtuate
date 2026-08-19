@@ -533,6 +533,40 @@ button, input, select { font: inherit; color: inherit; }
   box-shadow: 3px 3px 0 var(--ink);
 }
 
+/* text-style controls (font / size / bold / shadow) */
+.ann-text-opts { gap: 6px; }
+.ann-font {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 8px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+  cursor: pointer;
+}
+.ann-size { display: inline-flex; align-items: center; gap: 4px; }
+.ann-size input {
+  width: 46px;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: center;
+  padding: 5px 4px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.ann-bold { font-weight: 800; }
+.ann-bold.active, .ann-shadow.active {
+  background: var(--yellow);
+  border-color: var(--ink);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.ann-shadow { font-size: 12px; padding: 6px 10px; }
+
 /* annotation overlay canvas - pointer events only when a draw tool is active */
 .annotation-overlay { display: block; }
 

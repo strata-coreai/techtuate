@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PDFDocument, rgb, degrees } from 'pdf-lib';
+import { PDFDocument, rgb, degrees, StandardFonts } from 'pdf-lib';
 import { pdfjsLib } from './lib/pdfjs.js';
 import { PageView } from './components/PageView.jsx';
 import { Thumbnails } from './components/Thumbnails.jsx';
@@ -90,6 +90,12 @@ export default function App() {
   const [activeColor, setActiveColor] = useState('#ffd60a');
   const [strokeWidth, setStrokeWidth] = useState(2);
   const [selectedId, setSelectedId] = useState(null);
+
+  // Text style (for new text annotations + editing the selected one)
+  const [textFont, setTextFontState] = useState('sans');
+  const [textSize, setTextSizeState] = useState(16);
+  const [textBold, setTextBoldState] = useState(false);
+  const [textShadow, setTextShadowState] = useState(false);
 
   // Image import
   const [pendingImages, setPendingImages] = useState(null);
@@ -356,11 +362,14 @@ export default function App() {
   }, []);
 
   const onAddAnnotation = useCallback((entryId, ann) => {
+    const id = nextAnnId();
     setAnnotationsMap(prev => {
       const n = new Map(prev);
-      n.set(entryId, [...(n.get(entryId) ?? []), { ...ann, id: nextAnnId(), entryId }]);
+      n.set(entryId, [...(n.get(entryId) ?? []), { ...ann, id, entryId }]);
       return n;
     });
+    // Newly placed text becomes selected so it can be styled/moved immediately.
+    if (ann.type === 'text') { setSelectedId(id); setActiveTool('cursor'); }
   }, []);
 
   const onDeleteAnnotation = useCallback((entryId, id) => {
@@ -371,6 +380,40 @@ export default function App() {
   }, []);
 
   const onSelectAnnotation = useCallback(id => setSelectedId(id), []);
+
+  const onUpdateAnnotation = useCallback((entryId, id, patch) => {
+    setAnnotationsMap(prev => {
+      const n = new Map(prev);
+      n.set(entryId, (n.get(entryId) ?? []).map(a => a.id === id ? { ...a, ...patch } : a));
+      return n;
+    });
+  }, []);
+
+  // The currently selected annotation object (across pages), if any.
+  const selectedAnn = useMemo(() => {
+    if (selectedId == null) return null;
+    for (const anns of annotationsMap.values()) {
+      const a = anns.find(x => x.id === selectedId);
+      if (a) return a;
+    }
+    return null;
+  }, [selectedId, annotationsMap]);
+
+  // Load a selected text annotation's style into the toolbar controls.
+  useEffect(() => {
+    if (selectedAnn && selectedAnn.type === 'text') {
+      setTextFontState(selectedAnn.font ?? 'sans');
+      setTextSizeState(selectedAnn.fontSize ?? 16);
+      setTextBoldState(!!selectedAnn.bold);
+      setTextShadowState(!!selectedAnn.shadow);
+    }
+  }, [selectedAnn]);
+
+  // Switching to a drawing tool clears the selection, so the text controls
+  // set defaults for the next placed text rather than editing an old one.
+  useEffect(() => {
+    if (activeTool !== 'cursor') setSelectedId(null);
+  }, [activeTool]);
 
   // ── Structural modification check ─────────────────────────────────────────
   const isStructurallyModified = useMemo(() => {
@@ -394,11 +437,12 @@ export default function App() {
       if (entry.rotation !== 0) p.setRotation(degrees((p.getRotation().angle + entry.rotation) % 360));
       doc.addPage(p);
     }
+    const fontCache = new Map();
     for (let i = 0; i < targetPageOrder.length; i++) {
       const anns = annotationsMap.get(targetPageOrder[i].id) ?? [];
       if (!anns.length) continue;
       const page = doc.getPage(i);
-      drawAnnotationsOnPdfPage(page, anns);
+      await drawAnnotationsOnPdfPage(doc, page, anns, fontCache);
     }
     // Apply form values
     try {
@@ -425,11 +469,12 @@ export default function App() {
       }
     }
     // Apply annotations
+    const fontCache = new Map();
     for (let i = 0; i < pageOrder.length; i++) {
       const anns = annotationsMap.get(pageOrder[i].id) ?? [];
       if (!anns.length) continue;
       const page = doc.getPage(i);
-      drawAnnotationsOnPdfPage(page, anns);
+      await drawAnnotationsOnPdfPage(doc, page, anns, fontCache);
     }
     // Apply form values
     try {
@@ -536,6 +581,16 @@ export default function App() {
   const totalAnnotations = useMemo(() => { let n = 0; for (const a of annotationsMap.values()) n += a.length; return n; }, [annotationsMap]);
   const fieldCount = formFields ? formFields.length : 0;
 
+  // Text-style setters also patch the selected text annotation live (WYSIWYG).
+  const patchSelectedText = (patch) => {
+    if (selectedAnn && selectedAnn.type === 'text') onUpdateAnnotation(selectedAnn.entryId, selectedAnn.id, patch);
+  };
+  const setTextFont = (v) => { setTextFontState(v); patchSelectedText({ font: v }); };
+  const setTextSize = (v) => { setTextSizeState(v); patchSelectedText({ fontSize: v }); };
+  const setTextBold = (v) => { setTextBoldState(v); patchSelectedText({ bold: v }); };
+  const setTextShadow = (v) => { setTextShadowState(v); patchSelectedText({ shadow: v }); };
+  const showTextOptions = activeTool === 'text' || (selectedAnn != null && selectedAnn.type === 'text');
+
   return (
     <div className="app">
       <CoffeePrompt open={coffeeOpen} onResolve={() => coffeeResolverRef.current?.()} />
@@ -600,7 +655,7 @@ export default function App() {
                 onCancel={() => { setShowCompressPanel(false); setCompressError(null); }}
               />
             )}
-            <AnnotationToolbar activeTool={activeTool} setActiveTool={setActiveTool} activeColor={activeColor} setActiveColor={setActiveColor} strokeWidth={strokeWidth} setStrokeWidth={setStrokeWidth} />
+            <AnnotationToolbar activeTool={activeTool} setActiveTool={setActiveTool} activeColor={activeColor} setActiveColor={setActiveColor} strokeWidth={strokeWidth} setStrokeWidth={setStrokeWidth} showTextOptions={showTextOptions} textFont={textFont} setTextFont={setTextFont} textSize={textSize} setTextSize={setTextSize} textBold={textBold} setTextBold={setTextBold} textShadow={textShadow} setTextShadow={setTextShadow} />
             {saveError && <div className="error">{saveError}</div>}
             {compressError && <div className="error">{compressError}</div>}
             {compressResult && (
@@ -618,7 +673,7 @@ export default function App() {
             <div className="pages">
               {pageOrder.map((entry, index) => {
                 const src = sourceDocs.get(entry.sourceDocId);
-                return (<PageView key={entry.id} pdfDoc={src?.pdfDoc} pageNum={entry.sourcePageIndex + 1} entryId={entry.id} rotation={entry.rotation} scale={scale} active={index + 1 === activePage} registerRef={registerRef} annotations={annotationsMap.get(entry.id) ?? []} activeTool={activeTool} activeColor={activeColor} strokeWidth={strokeWidth} onAddAnnotation={onAddAnnotation} onDeleteAnnotation={onDeleteAnnotation} selectedId={selectedId} onSelectAnnotation={onSelectAnnotation} pageHeightPts={pageSizes.get(`${entry.sourceDocId}:${entry.sourcePageIndex}`)?.heightPts ?? 0} />);
+                return (<PageView key={entry.id} pdfDoc={src?.pdfDoc} pageNum={entry.sourcePageIndex + 1} entryId={entry.id} rotation={entry.rotation} scale={scale} active={index + 1 === activePage} registerRef={registerRef} annotations={annotationsMap.get(entry.id) ?? []} activeTool={activeTool} activeColor={activeColor} strokeWidth={strokeWidth} textFont={textFont} textSize={textSize} textBold={textBold} textShadow={textShadow} onAddAnnotation={onAddAnnotation} onDeleteAnnotation={onDeleteAnnotation} onUpdateAnnotation={onUpdateAnnotation} selectedId={selectedId} onSelectAnnotation={onSelectAnnotation} pageHeightPts={pageSizes.get(`${entry.sourceDocId}:${entry.sourcePageIndex}`)?.heightPts ?? 0} />);
               })}
             </div>
           </>)}
@@ -656,7 +711,23 @@ export default function App() {
   );
 }
 
-function drawAnnotationsOnPdfPage(page, anns) {
+const FONT_MAP = {
+  sans:  { normal: StandardFonts.Helvetica,  bold: StandardFonts.HelveticaBold },
+  serif: { normal: StandardFonts.TimesRoman, bold: StandardFonts.TimesRomanBold },
+  mono:  { normal: StandardFonts.Courier,    bold: StandardFonts.CourierBold },
+};
+
+async function resolveFont(doc, cache, family, bold) {
+  const fam = FONT_MAP[family] ? family : 'sans';
+  const key = fam + (bold ? '-b' : '');
+  if (cache.has(key)) return cache.get(key);
+  const std = bold ? FONT_MAP[fam].bold : FONT_MAP[fam].normal;
+  const f = await doc.embedFont(std);
+  cache.set(key, f);
+  return f;
+}
+
+async function drawAnnotationsOnPdfPage(doc, page, anns, fontCache) {
   for (const ann of anns) {
     const color = hexToRgb(ann.color);
     const opacity = ann.opacity ?? 1;
@@ -669,7 +740,16 @@ function drawAnnotationsOnPdfPage(page, anns) {
     } else if (ann.type === 'rectangle') {
       page.drawRectangle({ x: ann.x, y: ann.y, width: ann.width, height: ann.height, borderColor: color, borderWidth: ann.strokeWidth ?? 2, opacity });
     } else if (ann.type === 'text') {
-      page.drawText(ann.text, { x: ann.x, y: ann.y, size: ann.fontSize ?? 12, color, opacity });
+      const size = ann.fontSize ?? 12;
+      const bh = ann.height ?? size;
+      const font = await resolveFont(doc, fontCache, ann.font, ann.bold);
+      // Baseline sits one line-height below the box top, matching the on-screen preview.
+      const baseY = (ann.y + bh) - size;
+      if (ann.shadow) {
+        const off = Math.max(0.8, size * 0.06);
+        page.drawText(ann.text, { x: ann.x + off, y: baseY - off, size, font, color: rgb(0, 0, 0), opacity: 0.35 });
+      }
+      page.drawText(ann.text, { x: ann.x, y: baseY, size, font, color, opacity });
     }
   }
 }

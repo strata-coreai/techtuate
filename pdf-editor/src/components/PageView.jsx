@@ -10,7 +10,8 @@ import { AnnotationOverlay } from './AnnotationOverlay.jsx';
 export function PageView({
   pdfDoc, pageNum, entryId, rotation, scale, active, registerRef,
   annotations, activeTool, activeColor, strokeWidth,
-  onAddAnnotation, onDeleteAnnotation, selectedId, onSelectAnnotation,
+  onAddAnnotation, onDeleteAnnotation, onUpdateAnnotation, selectedId, onSelectAnnotation,
+  textFont, textSize, textBold, textShadow,
   pageHeightPts,
 }) {
   const frameRef = useRef(null);
@@ -95,8 +96,13 @@ export function PageView({
           activeTool={activeTool}
           activeColor={activeColor}
           strokeWidth={strokeWidth}
+          textFont={textFont}
+          textSize={textSize}
+          textBold={textBold}
+          textShadow={textShadow}
           onAddAnnotation={onAddAnnotation}
           onDeleteAnnotation={onDeleteAnnotation}
+          onUpdateAnnotation={onUpdateAnnotation}
           selectedId={selectedId}
           onSelectAnnotation={onSelectAnnotation}
         />
