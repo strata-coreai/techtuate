@@ -4,20 +4,25 @@
 // never in the client. The image is forwarded once for reading and is not
 // stored or logged here.
 //
-// Required env var (set in Cloudflare Pages -> Settings -> Environment variables,
+// Required env var (set in Cloudflare Pages -> Settings -> Variables and Secrets,
 // encrypted):  GEMINI_API_KEY
-// Optional:     GEMINI_MODEL   (defaults to gemini-2.5-flash)
+// Optional:     GEMINI_MODEL   (defaults to gemini-flash-latest)
 //
 // Model is isolated to the small config below so the provider can be swapped
 // (GLM-4.6V, Qwen-VL, Workers AI, etc.) without touching the client.
 
-// gemini-flash-latest is an alias that tracks the newest Flash model, so this
-// will not break when Google retires a specific version (as happened with
-// gemini-2.5-flash). Override with the GEMINI_MODEL env var to pin a version
-// (e.g. gemini-3.5-flash-lite for the cheapest option).
+// gemini-flash-latest is an alias that tracks the newest Flash model. As of
+// 2026 it points to a Gemini 3.x "thinking" model, so we set thinkingLevel to
+// "low" below - otherwise the model spends seconds reasoning by default, which
+// is slow, costs tokens, and on the free tier can get the function killed
+// mid-request (a Cloudflare 502) before it can respond. (Gemini 3 Flash does
+// not support fully turning thinking off; "low" is the minimum. Older 2.5-era
+// models used thinkingBudget instead - if you pin one via GEMINI_MODEL, swap
+// the thinkingConfig accordingly.) Override the model with the GEMINI_MODEL env var.
 const DEFAULT_MODEL = 'gemini-flash-latest';
 const MAX_IMAGES = 2;
 const MAX_BYTES = 6 * 1024 * 1024; // ~6MB of base64 per image, generous for a downscaled JPEG
+const UPSTREAM_TIMEOUT_MS = 25000; // give the model time, but never hang the function
 
 const PROMPT = [
   'You are reading a business card. One or two images may be provided (front and back of the same card).',
@@ -83,103 +88,135 @@ function parseDataUrl(s) {
   return { mime: m[1], data: m[2] };
 }
 
+// Gemini (thinking models included) may return several parts; the JSON we want
+// is in the first part that actually carries text. Skip thought-only parts.
+function extractText(data) {
+  const cand = data && data.candidates && data.candidates[0];
+  const parts = cand && cand.content && cand.content.parts;
+  if (!Array.isArray(parts)) return '';
+  for (const p of parts) {
+    if (p && typeof p.text === 'string' && p.text.trim()) return p.text;
+  }
+  return '';
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
-
-  if (!env.GEMINI_API_KEY) {
-    return json({ ok: false, error: 'Card reading is not configured on this server yet.' }, 503);
-  }
-
-  let payload;
   try {
-    payload = await request.json();
-  } catch (e) {
-    return json({ ok: false, error: 'Invalid request.' }, 400);
-  }
-
-  const imgs = payload && Array.isArray(payload.images) ? payload.images.slice(0, MAX_IMAGES) : [];
-  if (!imgs.length) return json({ ok: false, error: 'No image was provided.' }, 400);
-
-  const parts = [{ text: PROMPT }];
-  for (const raw of imgs) {
-    const parsed = parseDataUrl(raw);
-    if (!parsed) return json({ ok: false, error: 'One of the images was not a valid image.' }, 400);
-    if (parsed.data.length > MAX_BYTES) return json({ ok: false, error: 'That image is too large. Try again - the tool downscales automatically.' }, 413);
-    parts.push({ inline_data: { mime_type: parsed.mime, data: parsed.data } });
-  }
-
-  const model = env.GEMINI_MODEL || DEFAULT_MODEL;
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
-    encodeURIComponent(model) + ':generateContent';
-
-  const body = {
-    contents: [{ parts: parts }],
-    generationConfig: {
-      temperature: 0,
-      responseMimeType: 'application/json',
-      responseSchema: RESPONSE_SCHEMA
+    if (!env.GEMINI_API_KEY) {
+      return json({ ok: false, error: 'Card reading is not configured on this server yet.' }, 503);
     }
-  };
 
-  let res;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': env.GEMINI_API_KEY
-      },
-      body: JSON.stringify(body)
-    });
-  } catch (e) {
-    return json({ ok: false, error: 'Could not reach the reading service. Please try again.' }, 502);
-  }
-
-  if (!res.ok) {
-    // Read the upstream body so we can log it (visible in Cloudflare real-time
-    // function logs) and surface the HTTP status to help debugging.
-    let detail = '';
-    try { detail = await res.text(); } catch (e) { detail = ''; }
-    console.log('scan: gemini error', res.status, detail.slice(0, 800));
-
-    if (res.status === 429) {
-      return json({ ok: false, error: 'The free reading quota has been used up for now. Please try again later or type the details in manually.', status: 429 }, 429);
+    let payload;
+    try {
+      payload = await request.json();
+    } catch (e) {
+      return json({ ok: false, error: 'Invalid request.' }, 400);
     }
-    // Include the status code (and a short detail snippet) so the cause is
-    // visible in the browser Network tab without digging into server logs.
-    return json({
-      ok: false,
-      error: 'The reading service returned an error (HTTP ' + res.status + '). If this is a 404, the model name is wrong - set GEMINI_MODEL to one from your key\'s model list.',
-      status: res.status,
-      detail: detail.slice(0, 400)
-    }, 502);
+
+    const imgs = payload && Array.isArray(payload.images) ? payload.images.slice(0, MAX_IMAGES) : [];
+    if (!imgs.length) return json({ ok: false, error: 'No image was provided.' }, 400);
+
+    const parts = [{ text: PROMPT }];
+    for (const raw of imgs) {
+      const parsed = parseDataUrl(raw);
+      if (!parsed) return json({ ok: false, error: 'One of the images was not a valid image.' }, 400);
+      if (parsed.data.length > MAX_BYTES) return json({ ok: false, error: 'That image is too large. Try again - the tool downscales automatically.' }, 413);
+      parts.push({ inline_data: { mime_type: parsed.mime, data: parsed.data } });
+    }
+
+    const model = env.GEMINI_MODEL || DEFAULT_MODEL;
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
+      encodeURIComponent(model) + ':generateContent';
+
+    const body = {
+      contents: [{ parts: parts }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: RESPONSE_SCHEMA,
+        // Minimize thinking: this is a straight extraction task, and default
+        // ("medium") thinking makes the newer Flash aliases slow enough to time
+        // out on the free tier. "low" is the least the Gemini 3 Flash allows.
+        thinkingConfig: { thinkingLevel: 'low' },
+        // Give the JSON output room even after low thinking uses some tokens
+        // (thinking tokens count against maxOutputTokens).
+        maxOutputTokens: 8192
+      }
+    };
+
+    // Bound the upstream call so a slow/hanging model returns a clean JSON error
+    // instead of letting the whole function get killed with a platform 502.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+
+    let res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': env.GEMINI_API_KEY
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+    } catch (e) {
+      clearTimeout(timer);
+      const aborted = e && (e.name === 'AbortError' || e.name === 'TimeoutError');
+      return json({
+        ok: false,
+        error: aborted
+          ? 'The reading service took too long to respond. Please try again, or type the details in manually.'
+          : 'Could not reach the reading service. Please try again.'
+      }, 504);
+    }
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      let detail = '';
+      try { detail = await res.text(); } catch (e) { detail = ''; }
+      console.log('scan: gemini error', res.status, detail.slice(0, 800));
+
+      if (res.status === 429) {
+        return json({ ok: false, error: 'The free reading quota has been used up for now. Please try again later or type the details in manually.', status: 429 }, 429);
+      }
+      return json({
+        ok: false,
+        error: 'The reading service returned an error (HTTP ' + res.status + '). If this is a 404, the model name is wrong - set GEMINI_MODEL to one from your key\'s model list.',
+        status: res.status,
+        detail: detail.slice(0, 400)
+      }, 502);
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      return json({ ok: false, error: 'The reading service returned an unexpected response.' }, 502);
+    }
+
+    const text = extractText(data);
+    if (!text) {
+      // Surface the finish reason (e.g. SAFETY, MAX_TOKENS) to aid debugging.
+      let reason = '';
+      try { reason = (data.candidates && data.candidates[0] && data.candidates[0].finishReason) || ''; } catch (e) {}
+      return json({ ok: false, error: 'The reader could not find any details on this card.', reason }, 200);
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch (e) {
+      return json({ ok: false, error: 'The reader returned data we could not read. Please type the details in.' }, 200);
+    }
+
+    return json({ ok: true, data: parsed }, 200);
+  } catch (err) {
+    // Last-resort guard: any unexpected throw becomes a readable JSON error
+    // rather than an opaque platform 502.
+    console.log('scan: unhandled error', err && (err.stack || err.message));
+    return json({ ok: false, error: 'Something went wrong reading the card.', detail: String(err && (err.message || err)).slice(0, 300) }, 500);
   }
-
-  let data;
-  try {
-    data = await res.json();
-  } catch (e) {
-    return json({ ok: false, error: 'The reading service returned an unexpected response.' }, 502);
-  }
-
-  // Gemini returns the JSON string inside candidates[0].content.parts[0].text
-  let text = '';
-  try {
-    const cand = data.candidates && data.candidates[0];
-    const p = cand && cand.content && cand.content.parts && cand.content.parts[0];
-    text = (p && p.text) || '';
-  } catch (e) { text = ''; }
-
-  if (!text) return json({ ok: false, error: 'The reader could not find any details on this card.' }, 200);
-
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch (e) {
-    return json({ ok: false, error: 'The reader returned data we could not read. Please type the details in.' }, 200);
-  }
-
-  return json({ ok: true, data: parsed }, 200);
 }
 
 // Non-POST methods get a clean 405 (Pages routes each method to its handler).
