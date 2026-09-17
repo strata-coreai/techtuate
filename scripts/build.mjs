@@ -46,6 +46,7 @@ const STATIC_DIRS = [
   'font-finder',
   'diff-checker',
   'pdf-password-remover',
+  'photo-to-scan',
 ];
 
 // NOTE: the /card-reader/ tool also relies on a Cloudflare Pages Function at

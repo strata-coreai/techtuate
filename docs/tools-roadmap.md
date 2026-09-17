@@ -8,6 +8,15 @@ A prioritized list of single-purpose web tools to add. Ranking is **ROI = search
 - **Build:** rough effort. Trivial = a few hours, Easy = a day, Medium = a week, Hard = multiple weeks.
 - **Privacy edge:** how much does "runs in your browser, no upload" actually matter for this tool vs. server-based alternatives?
 
+## Shipped outside this list
+
+Tools that got built without sitting in a tier above, so nobody re-proposes them:
+
+- **Photo to Scan** (`photo-to-scan`, shipped 2026-09-17) - phone photo of a document to a flat,
+  finger-free, scanner-style page. Local, vanilla, zero deps. Demand is real (the "camscanner
+  alternative" / "scan document without app" cluster) and the privacy edge is high: people scan IDs,
+  visas, payslips and contracts. Spec: docs/specs/photo-to-scan.md. Rival page: /vs/camscanner/.
+
 ## Tier 1 - ship these next (highest ROI)
 
 | # | Tool | Slug | Demand | Build | Privacy edge | Why |

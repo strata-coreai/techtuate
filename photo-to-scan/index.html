@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Photo to Scan - turn a document photo into a flat scan, no upload - techtuate</title>
+  <meta name="description" content="Turn a phone photo of a document into a flat scan in your browser. Auto edges, perspective correction, finger removal, PNG, JPG or PDF. No sign-up." />
+  <meta name="keywords" content="image to scan converter, photo to scan, document scanner online, flatten document photo, perspective correction document photo, remove fingers from scan, jpg to scanned pdf, camscanner alternative, scan a document without an app" />
+  <meta name="color-scheme" content="light" />
+  <link rel="canonical" href="https://techtuate.com/photo-to-scan/" />
+  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Crect x='19' y='11' width='26' height='34' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3Cpath d='M13 53h38' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://techtuate.com/photo-to-scan/" />
+  <meta property="og:title" content="Photo to Scan - free image to scan converter" />
+  <meta property="og:description" content="Flatten a document photo into a crisp scan in your browser. Auto edges, finger removal, PNG, JPG or PDF. No sign-up, nothing uploaded." />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "techtuate Photo to Scan",
+    "url": "https://techtuate.com/photo-to-scan/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web Browser",
+    "browserRequirements": "Requires JavaScript. Requires modern browser.",
+    "description": "Free browser tool that turns a phone photo of a document into a flat scan: automatic edge detection, perspective correction, finger removal, scanner-style cleanup, rotate, 2x resolution and PNG, JPG or PDF export. Runs in your browser, the photo is not uploaded.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "url": "https://techtuate.com/photo-to-scan/",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "how do I turn a photo of a document into a scan?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Drop the photo in, check the four corners of the page, and the tool flattens the perspective into a straight rectangle, evens out the lighting and sharpens the text, then exports PNG, JPG or PDF." }
+      },
+      {
+        "@type": "Question",
+        "name": "is my photo uploaded anywhere?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. Photo to Scan runs entirely in your browser. Edge detection, flattening and cleanup all happen on your device, so it is safe for IDs, visas, receipts and contracts." }
+      },
+      {
+        "@type": "Question",
+        "name": "how does it remove fingers from the scan?",
+        "acceptedAnswer": { "@type": "Answer", "text": "After flattening, it looks for skin-coloured areas touching the edge of the page and fills them with the surrounding paper colour. Anything it misses, you can paint over and it is filled the same way." }
+      },
+      {
+        "@type": "Question",
+        "name": "can I save the scan as a PDF?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Download as PNG, JPG or a single-page PDF, with no watermark and no sign-up. A4 and Letter shapes export at true page size." }
+      },
+      {
+        "@type": "Question",
+        "name": "does increasing resolution add detail?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The 1.5x and 2x options use bicubic upscaling plus sharpening, which makes small text print and zoom more cleanly. It cannot invent detail the camera never captured, so start from the sharpest photo you can." }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <div class="topbanner">
+    tools that should be free, are. no sign-up, no ads.
+    <a href="/why-free/">read why</a>
+  </div>
+
+  <div class="wrap">
+
+    <header class="site">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">tech<span>tuate</span></span>
+      </a>
+      <nav class="top" aria-label="primary">
+        <a href="/#tools">tools</a>
+        <a href="/vs/">vs.</a>
+        <a href="/why-free/">why</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">photo to scan</div>
+      <h1>Photo to Scan, Flatten a Document Photo in Your Browser</h1>
+      <p class="lede">
+        Snap a document, get a scan. Edges found, page flattened, fingers gone, and it looks like it came off a
+        flatbed. Free, no sign-up, and your photo stays on your device.
+      </p>
+    </section>
+
+    <main>
+      <noscript>
+        <div class="callout yellow">
+          <h4>This tool needs JavaScript.</h4>
+          <p>The whole point is that everything runs in your browser. Please enable JavaScript and reload.</p>
+        </div>
+      </noscript>
+
+      <div class="callout yellow">
+        <h4>What this does</h4>
+        <p>Turn a phone photo of a document into a flat, scanner-style page in your browser: it finds the page edges, corrects the perspective, removes fingers holding the page, and exports PNG, JPG or PDF - with no sign-up, no watermark, and the photo never uploaded.</p>
+      </div>
+
+      <section class="tool" id="tool" aria-live="polite">
+      <!-- Step 1: pick a photo -->
+      <div class="stage" id="stage-drop">
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept="image/*" hidden>
+          <span class="drop-mark" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </span>
+          <strong>Drop a photo of a document</strong>
+          <span>or click to choose one. You can also paste an image.</span>
+        </label>
+        <label class="btn btn-ghost camera-btn">
+          <input type="file" id="camera" accept="image/*" capture="environment" hidden>
+          Take a photo
+        </label>
+        <p class="drop-error" id="drop-error" hidden></p>
+      </div>
+
+      <!-- Step 2: corners -->
+      <div class="stage" id="stage-crop" hidden>
+        <div class="work">
+          <div class="bed" id="crop-wrap">
+            <canvas id="crop-canvas"></canvas>
+            <canvas id="loupe" width="240" height="240" hidden></canvas>
+          </div>
+          <aside class="panel">
+            <h2>Check the corners</h2>
+            <p class="hint" id="crop-hint">Drag the yellow corners onto the corners of the page. Fingers inside the page get cleaned up in the next step.</p>
+            <div class="field">
+              <label for="shape">Page shape</label>
+              <select id="shape">
+                <option value="auto">Match the photo</option>
+                <option value="a4">A4</option>
+                <option value="letter">US Letter</option>
+                <option value="id">ID or bank card</option>
+                <option value="passport">Passport page</option>
+                <option value="square">Square</option>
+              </select>
+            </div>
+            <div class="row">
+              <button class="btn btn-ghost" id="btn-detect" type="button">Find edges again</button>
+              <button class="btn btn-ghost" id="btn-full" type="button">Use whole photo</button>
+            </div>
+            <button class="btn btn-primary btn-wide" id="btn-scan" type="button">Make the scan</button>
+            <button class="btn-text" id="btn-new-1" type="button">Start over with a new photo</button>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Step 3: result -->
+      <div class="stage" id="stage-result" hidden>
+        <div class="work">
+          <div class="bed bed-dark" id="result-wrap">
+            <canvas id="result-canvas"></canvas>
+            <div class="busy" id="busy" hidden>Working...</div>
+          </div>
+          <aside class="panel">
+            <div class="field">
+              <span class="label">Look</span>
+              <div class="seg" role="radiogroup" aria-label="Look">
+                <label><input type="radio" name="look" value="color" checked><span>Scan</span></label>
+                <label><input type="radio" name="look" value="gray"><span>Gray</span></label>
+                <label><input type="radio" name="look" value="bw"><span>B&amp;W</span></label>
+                <label><input type="radio" name="look" value="original"><span>Photo</span></label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="sharp">Sharpness</label>
+              <input type="range" id="sharp" min="0" max="100" value="40">
+            </div>
+
+            <div class="field">
+              <span class="label">Rotate</span>
+              <div class="row">
+                <button class="btn btn-ghost btn-icon" id="rot-l" type="button" aria-label="Rotate left">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h11a5 5 0 0 1 0 10H9" /><path d="M8 5 4 9l4 4" /></svg>
+                  Left
+                </button>
+                <button class="btn btn-ghost btn-icon" id="rot-r" type="button" aria-label="Rotate right">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 9H9a5 5 0 0 0 0 10h6" /><path d="m16 5 4 4-4 4" /></svg>
+                  Right
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="label">Clean up</span>
+              <label class="check"><input type="checkbox" id="auto-fingers" checked> Remove fingers at the edges</label>
+              <p class="ps-note" id="finger-note"></p>
+              <button class="btn btn-ghost btn-wide" id="btn-brush" type="button" aria-pressed="false">Paint over anything else</button>
+              <div class="brush-tools" id="brush-tools" hidden>
+                <label for="brush-size">Brush size</label>
+                <input type="range" id="brush-size" min="1" max="12" value="4">
+                <div class="row">
+                  <button class="btn btn-ghost" id="btn-undo" type="button">Undo</button>
+                  <button class="btn btn-ghost" id="btn-clear" type="button">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="label">Resolution</span>
+              <div class="seg" role="radiogroup" aria-label="Resolution">
+                <label><input type="radio" name="scale" value="1" checked><span>1x</span></label>
+                <label><input type="radio" name="scale" value="1.5"><span>1.5x</span></label>
+                <label><input type="radio" name="scale" value="2"><span>2x</span></label>
+              </div>
+              <p class="ps-note" id="size-note"></p>
+            </div>
+
+            <div class="field download">
+              <select id="format" aria-label="File type">
+                <option value="png">PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="pdf">PDF</option>
+              </select>
+              <button class="btn btn-primary" id="btn-download" type="button">Download scan</button>
+            </div>
+
+            <div class="row">
+              <button class="btn-text" id="btn-back" type="button">Adjust corners</button>
+              <button class="btn-text" id="btn-new-2" type="button">New photo</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <p class="local-note">Runs on your device. Your photo is never uploaded.</p>
+
+    </main>
+
+    <section style="margin-top: 48px;">
+      <div class="section-head"><h2>About this tool</h2></div>
+      <p style="max-width:680px; color:var(--ink-mute);">
+        Free, no sign-up. The whole pipeline - finding the page, flattening the perspective, filling in fingers,
+        evening out the lighting and writing the PDF - runs right here in your browser, so the photo is never
+        uploaded. That matters when the document is an ID, a visa page, a payslip or a signed contract.
+        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+      </p>
+    </section>
+
+    <section class="how">
+      <div class="section-head"><h2>How it works</h2></div>
+      <ol>
+        <li><strong>Find the page.</strong> The tool traces the outline of the document, even with text and busy backgrounds around it. Nudge any corner if it guessed wrong.</li>
+        <li><strong>Flatten it.</strong> A perspective correction turns the tilted, trapezoid photo into a straight rectangle with sharp corners. Pick A4, Letter, ID card or passport to lock the proportions.</li>
+        <li><strong>Clean it up.</strong> Fingers touching the page edge are filled with the paper around them, uneven lighting and shadows are evened out, and the text is sharpened. Paint over anything else you want gone.</li>
+      </ol>
+    </section>
+
+    <p class="cross-compare" style="max-width:680px; margin:18px 0 0; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">Compare: <a href="/vs/camscanner/" style="color:inherit;">techtuate vs CamScanner</a> &middot; <a href="/vs/" style="color:inherit;">all comparisons</a> &middot; <a href="/" style="color:inherit;">more tools</a></p>
+
+    <section class="faq" style="margin-top:44px;">
+      <div class="section-head"><h2>Questions people ask</h2></div>
+      <div style="max-width:720px;">
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How do I turn a photo of a document into a scan?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Drop the photo in, check the four corners of the page, and the tool flattens the perspective into a straight rectangle, evens out the lighting and sharpens the text, then exports PNG, JPG or PDF.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Is my photo uploaded anywhere?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">No. Photo to Scan runs entirely in your browser. Edge detection, flattening and cleanup all happen on your device, so it is safe for IDs, visas, receipts and contracts.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How does it remove fingers from the scan?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">After flattening, it looks for skin-coloured areas touching the edge of the page and fills them with the surrounding paper colour. Anything it misses, you can paint over and it is filled the same way.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I save the scan as a PDF?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. Download as PNG, JPG or a single-page PDF, with no watermark and no sign-up. A4 and Letter shapes export at true page size.</p>
+        </details>
+        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
+          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Does increasing resolution add detail?</summary>
+          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">The 1.5x and 2x options use bicubic upscaling plus sharpening, which makes small text print and zoom more cleanly. It cannot invent detail the camera never captured, so start from the sharpest photo you can.</p>
+        </details>
+      </div>
+    </section>
+
+    <footer class="site">
+      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
+      <div>
+        <a href="/pdf-editor/">pdf editor</a> &middot;
+        <a href="/image-resize/">image resize</a> &middot;
+        <a href="/why-free/">why free</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+  <script src="./engine.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
