@@ -73,9 +73,18 @@ const RESPONSE_SCHEMA = {
   }
 };
 
+// Cloudflare swaps any 5xx a Function returns for its own HTML "502 Bad gateway"
+// page, which hides our JSON error and makes the client show a generic network
+// error. So error responses that would be 5xx go out as HTTP 200 with ok:false,
+// and the intended status travels in the body (httpStatus) for debugging.
 function json(body, status) {
+  let code = status || 200;
+  if (code >= 500) {
+    body = Object.assign({ httpStatus: code }, body);
+    code = 200;
+  }
   return new Response(JSON.stringify(body), {
-    status: status || 200,
+    status: code,
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
   });
 }
@@ -151,15 +160,25 @@ export async function onRequestPost(context) {
 
     let res;
     try {
-      res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': env.GEMINI_API_KEY
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal
-      });
+      for (let attempt = 1; ; attempt++) {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': env.GEMINI_API_KEY
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal
+        });
+        // Gemini answers 500/503 when the model is briefly overloaded. One quick
+        // retry clears most of these; the overall timeout above still bounds us.
+        if ((res.status === 503 || res.status === 500) && attempt < 2) {
+          try { await res.text(); } catch (e) {}
+          await new Promise(function (r) { setTimeout(r, 1200); });
+          continue;
+        }
+        break;
+      }
     } catch (e) {
       clearTimeout(timer);
       const aborted = e && (e.name === 'AbortError' || e.name === 'TimeoutError');
@@ -179,6 +198,9 @@ export async function onRequestPost(context) {
 
       if (res.status === 429) {
         return json({ ok: false, error: 'The free reading quota has been used up for now. Please try again later or type the details in manually.', status: 429 }, 429);
+      }
+      if (res.status === 503 || res.status === 500) {
+        return json({ ok: false, error: 'The reading service is busy right now. Please try again in a moment.', status: res.status, detail: detail.slice(0, 400) }, 503);
       }
       return json({
         ok: false,
