@@ -6,11 +6,14 @@
   <title>techtuate - free PDF editor and other powerful little tools. No sign-up, no ads.</title>
   <meta name="description" content="A growing drawer of free little tools - PDF editor, QR codes, image resize and more. Most run right in your browser, so your files stay on your device; a few use AI and say so. No sign-up, no ads." />
   <meta name="keywords" content="free pdf editor, pdf editor no signup, pdf editor in browser, online pdf editor free, free pdf tools, private pdf editor" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#06050a" />
   <link rel="canonical" href="https://techtuate.com/" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M18 22 L32 14 L46 22 L46 42 L32 50 L18 42 Z' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="/assets/site.css" />
-
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/home.css" />
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://techtuate.com/" />
@@ -87,6 +90,36 @@
   }
   </script>
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "url": "https://techtuate.com/",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Are these tools really free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. No account, no card, no trial and no ads. Most of the tools run entirely in your browser, so they cost almost nothing to run and there is nothing to charge you for." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do my files get uploaded?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Not for the tools marked stays on device. Your browser opens and processes the file, and it never leaves the tab. The two tools that read with AI, the business card reader and the font finder, send only the image you give them to Google Gemini to read it. They are labeled, and the image is not stored." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a free PDF editor with no sign-up?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. The techtuate PDF editor annotates, fills forms, reorders and rotates pages and shrinks files, with no account and no watermark. It runs in your browser, so the PDF stays on your device." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is it called techtuate?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It is a brand name, not a misspelling of another word." }
+      }
+    ]
+  }
+  </script>
+
   <!-- TODO: uncomment + fill ratingValue + reviewCount after first 5 Trustpilot reviews accumulate. Use schema.org/AggregateRating to get star rich snippets in Google search results. -->
 
   <!-- =============================================================
@@ -96,505 +129,274 @@
        Do NOT paste a token until ready to ship.
        ============================================================= -->
 
-  <!-- TrustBox script (official Trustpilot widget loader) -->
-  <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-  <!-- End TrustBox script -->
+  <script src="/assets/backdrop.js" defer></script>
+  <script src="/assets/home.js" defer></script>
 </head>
 <body>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <!-- thin understated banner so the founder note stays out of the way -->
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <div class="tt-page">
 
-  <div class="wrap">
-
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="#tools">tools</a>
-        <a href="/vs/">vs.</a>
-        <a href="/why-free/">why</a>
-        <a href="#spread">spread</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="#search" data-focus-search>search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <!-- ============ Hero ============ -->
-    <section class="hero">
-      <div class="eyebrow">free little tools that just work</div>
-      <h1>
-        Little tools that
-        <span class="mark">just work.</span>
-        No catch.
-      </h1>
-      <p class="lede">
-        A growing drawer of free tools - PDF, images, QR codes, passwords and more.
-        Most run entirely in your browser, so your files stay on your device. A few
-        newer ones use AI and are clearly labeled. No sign-up, no ads.
-      </p>
-      <div class="pills">
-        <span class="pill solid">no sign-up</span>
-        <span class="pill">no credit card</span>
-        <span class="pill yellow">no ads</span>
-        <span class="pill">files stay local</span>
-        <span class="pill">no ad tracking</span>
-      </div>
-    </section>
+    <main>
 
-    <!-- ============ Tools (above the fold) ============ -->
-    <section id="tools" aria-labelledby="tools-h">
-      <div class="section-head">
-        <h2 id="tools-h">The tools</h2>
-        <span class="count">15 / &infin; &nbsp;&middot;&nbsp; more coming</span>
-      </div>
-
-      <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute); margin: 0 0 12px; max-width:600px;">We don't advertise. If a tool here helped, a quick review tells the next person it's safe to trust.</p>
-
-      <!-- TrustBox widget - Review Collector -->
-      <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6a0ebf56b6b7934248bc39c4" data-style-height="52px" data-style-width="100%" data-token="30974c3a-fb24-4de1-813e-f5ad70657785" style="margin: 0 0 8px;">
-        <a href="https://www.trustpilot.com/review/techtuate.com" target="_blank" rel="noopener">Trustpilot</a>
-      </div>
-      <!-- End TrustBox widget -->
-      <p style="font-family:var(--font-mono); font-size:11px; color:var(--ink-mute); margin: 0 0 20px; max-width:600px;">That review box is Trustpilot's official widget, and there's a StartupBar badge on this page too. Those are the only third parties here and can set a cookie. Most tools still run entirely in your browser and call no server; the AI ones (like the card reader) are labeled where they send anything out.</p>
-
-      <div class="grid">
-
-        <!-- ============ PDF Editor ============ -->
-        <a class="card" href="/pdf-editor/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-              <path d="M14 3v5h5"/>
-              <path d="M9 13h6M9 17h4"/>
-            </svg>
-          </div>
-          <h3 class="card-title">PDF editor</h3>
-          <p class="card-desc">
-            View, save, annotate, fill forms, reorder &amp; rotate pages, turn images into PDFs. All in the browser.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live &middot; beta</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ PDF password remover ============ -->
-        <a class="card" href="/pdf-password-remover/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="5" y="11" width="14" height="10" rx="2"/>
-              <path d="M8 11V7a4 4 0 0 1 7.5-2"/>
-            </svg>
-          </div>
-          <h3 class="card-title">PDF password remover</h3>
-          <p class="card-desc">
-            Enter the password on a locked bank statement or tax PDF and download an unlocked copy. Runs in your browser, never uploaded.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ JSON Formatter ============ -->
-        <a class="card" href="/json-formatter/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M8 3H7a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1"/>
-              <path d="M16 3h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-1"/>
-            </svg>
-          </div>
-          <h3 class="card-title">JSON Formatter</h3>
-          <p class="card-desc">
-            Paste JSON to instantly format, validate, and minify it. No server, no account, stays in your tab.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Diff checker ============ -->
-        <a class="card" href="/diff-checker/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 7h7M4 12h7M4 17h5"/>
-              <path d="M15 9h6M18 6v6"/>
-              <path d="M15 17h6"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Diff checker</h3>
-          <p class="card-desc">
-            Compare two blocks of text or code, side-by-side or unified. Ignore whitespace or case, share by a link no server sees, export a .diff. No upload.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ QR code generator ============ -->
-        <a class="card" href="/qr-code/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-              <rect x="5" y="5" width="3" height="3" fill="#0a0a0a" stroke="none"/>
-              <rect x="16" y="5" width="3" height="3" fill="#0a0a0a" stroke="none"/>
-              <rect x="5" y="16" width="3" height="3" fill="#0a0a0a" stroke="none"/>
-              <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 17h3v3h-3z"/>
-            </svg>
-          </div>
-          <h3 class="card-title">QR code generator</h3>
-          <p class="card-desc">
-            Type or paste any URL or text, get a static QR code. No redirect server, no tracking, no watermark.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Password generator ============ -->
-        <a class="card" href="/password-generator/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-              <circle cx="12" cy="16" r="1" fill="#0a0a0a" stroke="none"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Password generator</h3>
-          <p class="card-desc">
-            Strong random passwords or XKCD-style passphrases. Cryptographically random, never sent anywhere.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ SVG converter ============ -->
-        <a class="card" href="/svg-converter/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="10" height="10" rx="2"/>
-              <path d="M17 3 L21 3 L21 21 L3 21" />
-              <path d="M9 9 L15 15"/>
-            </svg>
-          </div>
-          <h3 class="card-title">SVG converter</h3>
-          <p class="card-desc">
-            Convert SVG to PNG or JPEG at any size. Transparent, white, or custom background. No upload.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <a class="card" href="/sql-to-excel/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <ellipse cx="12" cy="5" rx="8" ry="3"/>
-              <path d="M4 5 v6 c0 1.66 3.58 3 8 3 s8-1.34 8-3 V5"/>
-              <path d="M4 11 v6 c0 1.66 3.58 3 8 3 s8-1.34 8-3 v-6"/>
-            </svg>
-          </div>
-          <h3 class="card-title">SQL to table</h3>
-          <p class="card-desc">
-            Paste SQL to see the rows it adds as an Excel/CSV table, plus plain notes on what it deletes or changes. No upload.
-          </p>
-          <div class="card-meta">
-            <span class="status beta">beta</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Image & GIF resizer ============ -->
-        <a class="card" href="/image-resize/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <path d="M15 9h6M18 6v6"/>
-              <path d="M3 15l4-4 4 4 3-3 3 3"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Image &amp; GIF resizer</h3>
-          <p class="card-desc">
-            Resize or compress images and animated GIFs. Set exact pixels or a target file size. No upload, no watermark.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Business card reader ============ -->
-        <a class="card" href="/card-reader/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="5" width="20" height="14" rx="2"/>
-              <path d="M2 9h9M6 13h4"/>
-              <circle cx="16.5" cy="12.5" r="2.5"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Business card reader</h3>
-          <p class="card-desc">
-            Snap or upload a business card and save it as a contact. Editable, exports vCard &amp; CSV. <em>* uses a third-party AI service to read the card.</em>
-          </p>
-          <div class="card-meta">
-            <span class="status beta">beta</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Color palette extractor ============ -->
-        <a class="card" href="/color-palette/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <circle cx="15" cy="9" r="1.5" fill="#0a0a0a" stroke="none"/>
-              <path d="M21 15l-5-5L5 21"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Color palette extractor</h3>
-          <p class="card-desc">
-            Drop an image and pull its dominant colors as HEX and RGB. Click to copy a swatch or the whole palette. No upload.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Font finder ============ -->
-        <a class="card" href="/font-finder/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 20 L12 5 L17 20"/>
-              <path d="M9 14h6"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Font finder</h3>
-          <p class="card-desc">
-            Paste a screenshot to identify the fonts, with the closest Microsoft Office and free Google Fonts match. <em>* uses a third-party AI service to read the image.</em>
-          </p>
-          <div class="card-meta">
-            <span class="status beta">beta</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Audio converter ============ -->
-        <a class="card" href="/audio-converter/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 10v4M10 7v10M14 9v6M18 11v2"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Audio converter</h3>
-          <p class="card-desc">
-            Convert audio to MP3 or WAV and trim a clip. Handles m4a, aac, ogg, opus, flac and more. All in the browser, no upload.
-          </p>
-          <div class="card-meta">
-            <span class="status beta">beta</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Photo to Scan ============ -->
-        <a class="card" href="/photo-to-scan/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-              <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-              <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-              <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-              <path d="M3 12h18"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Photo to Scan</h3>
-          <p class="card-desc">
-            Flatten a document photo into a clean scan. Auto edges, finger removal, PDF export. Nothing uploaded.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!-- ============ Word & character counter ============ -->
-        <a class="card" href="/word-counter/">
-          <div class="card-icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 7h14M5 12h14M5 17h8"/>
-            </svg>
-          </div>
-          <h3 class="card-title">Word &amp; character counter</h3>
-          <p class="card-desc">
-            Live word and character counts (with and without spaces), sentences, reading time, and a character-limit check. Nothing uploaded.
-          </p>
-          <div class="card-meta">
-            <span class="status live">live</span>
-            <span class="card-arrow">open &rarr;</span>
-          </div>
-        </a>
-
-        <!--
-          Adding a new tool? Copy a card above, point href to "/<tool>/",
-          swap the SVG icon, set title + description, choose a status:
-            .live  -> shipped & ready
-            .beta  -> usable, still iterating
-            .soon  -> not yet built (use .ghost card)
-        -->
-
-        <div class="card ghost">
-          <div class="card-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#707070" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
-          </div>
-          <h3 class="card-title">More on the way</h3>
-          <p class="card-desc">
-            Image compressor, converter, and more. Got an idea? <a class="tt-feedback" href="#feedback" rel="noopener">Send it over.</a>
-          </p>
-          <div class="card-meta">
-            <span class="status soon">planned</span>
-            <span class="card-arrow"></span>
+      <!-- ============ Hero ============ -->
+      <section class="hero" aria-labelledby="hero-h">
+        <div class="hero-head">
+          <h1 id="hero-h">Free little tools<br />that just <span class="serif">work.</span></h1>
+          <div class="hero-side">
+            <p class="eyebrow"><span class="rule" aria-hidden="true"></span><span><span data-tool-count>15</span> free tools, more drifting in</span></p>
+            <p class="hero-intro">PDFs, images, audio, QR codes, passwords and more. Most run entirely in your browser, so your files never leave your device. No sign-up, no ads, nothing to install.</p>
           </div>
         </div>
 
-      </div>
-    </section>
-
-    <!-- ============ Founder's note (compact) ============ -->
-    <section id="why" class="note" aria-labelledby="why-h">
-      <span class="tag">a quick note</span>
-      <h3 id="why-h">Most "tiny tool" SaaS is a 5-minute script with a paywall.</h3>
-      <p>
-        I got tired of paying $9 a month to merge two PDFs, or $15 to crop a JPG, or making yet another account to convert one file once.
-        So I'm building the little utilities I keep needing, and putting them here. Always free, no sign-up, no ads.
-      </p>
-      <p>
-        All I ask: if one of these saves you a minute, <a href="#spread">tell someone</a>.
-        Or read <a href="/why-free/">why I'm doing this</a>, or see <a href="/vs/">how techtuate stacks up vs. the paid PDF tools</a>.
-      </p>
-      <p class="signoff">- GJ, founder</p>
-    </section>
-
-    <!-- ============ Spread the word ============ -->
-    <section id="spread" class="spread" aria-labelledby="spread-h">
-      <div class="section-head">
-        <h2 id="spread-h">Spread the word</h2>
-        <span class="count">the only "price"</span>
-      </div>
-
-      <p style="max-width:720px; color:var(--ink-mute); margin: 0 0 6px;">
-        These tools stay free for everyone if more people know they exist. Five things you can do in under 30 seconds:
-      </p>
-
-      <div class="spread-grid">
-        <div class="spread-card">
-          <span class="num">1</span>
-          <h4>Send the link to one friend</h4>
-          <p>The one who pays $9/mo for a "PDF Pro" app. They'll thank you.</p>
+        <div class="search" id="search" role="search">
+          <form class="search-bar" action="#tools" autocomplete="off">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+            <label class="sr-only" for="q">Search the tools</label>
+            <input id="q" type="search" name="q" placeholder="what do you need to do?" enterkeyhint="go" spellcheck="false"
+                   role="combobox" aria-expanded="false" aria-controls="results" aria-autocomplete="list" />
+            <button type="button" class="search-clear" hidden>clear</button>
+            <button type="submit" class="search-go">
+              <span class="go-label">Find it</span>
+              <svg class="go-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </form>
+          <div class="results" id="results" hidden></div>
+          <div class="try">
+            <span class="try-label">try</span>
+            <button type="button" class="chip" data-q="pdf">merge two PDFs</button>
+            <button type="button" class="chip" data-q="mp3">turn m4a into mp3</button>
+            <button type="button" class="chip" data-q="gif">shrink a gif</button>
+            <button type="button" class="chip" data-q="business card">scan a business card</button>
+            <button type="button" class="chip" data-q="font">what font is this</button>
+          </div>
         </div>
-        <div class="spread-card">
-          <span class="num">2</span>
-          <h4>Post it once</h4>
-          <p>X, BlueSky, LinkedIn, Mastodon, a Discord, wherever you hang out online.</p>
-        </div>
-        <div class="spread-card">
-          <span class="num">3</span>
-          <h4>Drop it in a team chat</h4>
-          <p>"Hey, here's a free thing that does X." Slack, Teams, group chat, all good.</p>
-        </div>
-        <div class="spread-card">
-          <span class="num">4</span>
-          <h4>Bookmark + come back</h4>
-          <p>Repeat visitors are the best marketing. New tools land every few weeks.</p>
-        </div>
-        <div class="spread-card">
-          <span class="num">5</span>
-          <h4>Submit it</h4>
-          <p>Hacker News, Reddit (r/InternetIsBeautiful, r/webdev), Product Hunt, whatever fits.</p>
+      </section>
+
+      <!-- ============ Marquee ============ -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <ul class="marquee-set"><li>no sign-up</li><li>no ads</li><li>most files never leave your device</li><li>no credit card</li><li>no watermark</li><li>no trial that ends</li><li>nothing to install</li></ul>
+          <ul class="marquee-set"><li>no sign-up</li><li>no ads</li><li>most files never leave your device</li><li>no credit card</li><li>no watermark</li><li>no trial that ends</li><li>nothing to install</li></ul>
         </div>
       </div>
 
-      <div class="spread-actions">
-        <a class="btn" id="share-twitter" href="https://twitter.com/intent/tweet?text=Free%20little%20web%20tools%2C%20no%20sign-up%2C%20no%20ads%2C%20no%20paywall.%20Runs%20in%20your%20browser%3A&amp;url=https%3A%2F%2Ftechtuate.com" target="_blank" rel="noreferrer">
-          Post on X / Twitter
+      <!-- ============ Tools ============
+           Each tool is ONE <a class="tool"> below. Its data-* attributes feed the
+           search (data-kw = synonyms, data-short = one-liner), the group filter
+           (data-groups, ids from GROUPS in /assets/home.js) and the device-only
+           toggle (data-ai="1" for tools that call an AI service). Adding a tool =
+           copy a card, then do the rest of the wiring checklist in CLAUDE.md. -->
+      <section class="tools" id="tools" aria-labelledby="tools-h">
+        <h2 class="tools-title" id="tools-h">I'm wrestling with</h2>
+        <div class="groups" role="group" aria-label="Filter tools by what you are working on"></div>
+        <div class="tools-bar">
+          <p class="group-line" aria-live="polite">All of them, in one place. Pick one above or search for the job.</p>
+          <button type="button" class="toggle" role="switch" aria-checked="false">
+            <span class="toggle-track" aria-hidden="true"></span>
+            only tools that stay on my device
+          </button>
+        </div>
+
+        <div class="grid">
+        <a class="tool" href="/pdf-editor/" data-id="pdf" data-groups="paper design" data-kw="pdf merge combine split sign fill form annotate compress rotate reorder edit editor acrobat" data-short="Edit, sign, merge, shrink" style="--h1:18;--h2:340">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15.5l2.5-2.5 1.5 1.5L15.5 12"/></svg></span>
+          <h3 class="tool-name">PDF editor</h3>
+          <p class="tool-line">Annotate, fill forms, sign, reorder, rotate and shrink PDFs.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
         </a>
-        <a class="btn alt" id="share-bluesky" href="https://bsky.app/intent/compose?text=Free%20little%20web%20tools%2C%20no%20sign-up%2C%20no%20ads%2C%20no%20paywall.%20Runs%20in%20your%20browser%3A%20https%3A%2F%2Ftechtuate.com" target="_blank" rel="noreferrer">
-          Post on BlueSky
+        <a class="tool" href="/pdf-password-remover/" data-id="pdfpw" data-groups="paper" data-kw="pdf password unlock remove protection decrypt locked secured bank statement" data-short="Unlock a PDF you own" style="--h1:40;--h2:10">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5z"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/><path d="M12 15v2"/></svg></span>
+          <h3 class="tool-name">PDF password remover</h3>
+          <p class="tool-line">Type the password on a locked statement or tax PDF and save an unlocked copy.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
         </a>
-        <button class="btn ghost" id="copy-link" type="button">Copy link</button>
-        <a class="btn ghost" href="mailto:?subject=A%20drawer%20of%20free%20little%20tools&amp;body=Found%20these.%20Free%2C%20no%20sign-up%2C%20no%20ads.%20%0A%0Ahttps%3A%2F%2Ftechtuate.com">Email a friend</a>
-      </div>
+        <a class="tool" href="/photo-to-scan/" data-id="scan" data-groups="paper picture" data-kw="scan scanner photo document camscanner flatten pdf receipt paper crop camera" data-short="Document photo to clean scan" style="--h1:120;--h2:160">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3"/><path d="M16 4h3a1 1 0 0 1 1 1v3"/><path d="M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M9 9h6"/><path d="M9 12h6"/><path d="M9 15h4"/></svg></span>
+          <h3 class="tool-name">Photo to scan</h3>
+          <p class="tool-line">Flatten a photo of a page into a clean scan, then save it as a PDF.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/json-formatter/" data-id="json" data-groups="code" data-kw="json format pretty validate minify lint beautify" data-short="Format and validate" style="--h1:195;--h2:230">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H7a2 2 0 0 0-2 2v3.5a2 2 0 0 1-2 2.5 2 2 0 0 1 2 2.5V18a2 2 0 0 0 2 2h1"/><path d="M16 4h1a2 2 0 0 1 2 2v3.5a2 2 0 0 0 2 2.5 2 2 0 0 0-2 2.5V18a2 2 0 0 1-2 2h-1"/></svg></span>
+          <h3 class="tool-name">JSON formatter</h3>
+          <p class="tool-line">Format, validate and minify JSON without it leaving the tab.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/diff-checker/" data-id="diff" data-groups="code paper" data-kw="diff compare difference text code changes patch side by side versions" data-short="Compare two texts" style="--h1:250;--h2:200">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v16H4z"/><path d="M13 4h7v16h-7z"/><path d="M6.5 8.5h2.5"/><path d="M6.5 12h2.5"/><path d="M15.5 12h2.5"/><path d="M15.5 15.5h2.5"/></svg></span>
+          <h3 class="tool-name">Diff checker</h3>
+          <p class="tool-line">Compare two blocks of text or code, side by side or unified.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/qr-code/" data-id="qr" data-groups="paper design people" data-kw="qr code barcode vcard link wifi menu" data-short="Codes with logo or vCard" style="--h1:150;--h2:190">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h2v2h-2z"/><path d="M18 18h2v2h-2z"/><path d="M14 18h2"/><path d="M18 14h2"/></svg></span>
+          <h3 class="tool-name">QR code generator</h3>
+          <p class="tool-line">Static codes with your logo or a vCard. No redirects, no expiry.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/password-generator/" data-id="pwd" data-groups="code people" data-kw="password passphrase secure random strong generator" data-short="Strong, random, local" style="--h1:210;--h2:260">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><path d="M12 15v2"/></svg></span>
+          <h3 class="tool-name">Password generator</h3>
+          <p class="tool-line">Random passwords and passphrases, made on your device.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/svg-converter/" data-id="svg" data-groups="picture design code" data-kw="svg png jpg jpeg convert vector export icon logo" data-short="SVG to PNG or JPEG" style="--h1:265;--h2:300">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19L19 5"/><path d="M5 19a2 2 0 1 1-.01 0"/><path d="M19 5a2 2 0 1 1-.01 0"/><path d="M5 5h6"/><path d="M13 19h6"/></svg></span>
+          <h3 class="tool-name">SVG converter</h3>
+          <p class="tool-line">SVG to PNG or JPEG at any size, on any background.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/sql-to-excel/" data-id="sql" data-groups="code paper" data-kw="sql insert table csv excel xlsx database spreadsheet" data-short="INSERTs as a spreadsheet" style="--h1:225;--h2:190">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6c0-1.66 3.58-3 8-3s8 1.34 8 3-3.58 3-8 3-8-1.34-8-3z"/><path d="M4 6v12c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg></span>
+          <h3 class="tool-name">SQL to table</h3>
+          <p class="tool-line">See what an INSERT adds as a spreadsheet. Never runs your SQL.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/image-resize/" data-id="img" data-groups="picture sound" data-kw="image photo picture resize compress gif jpg png shrink smaller crop" data-short="Resize or compress" style="--h1:330;--h2:20">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 16l4.5-4.5 3.5 3.5 2.5-2.5L20 18"/><path d="M15.5 8.5h.01"/></svg></span>
+          <h3 class="tool-name">Image &amp; GIF resizer</h3>
+          <p class="tool-line">Resize or compress to exact pixels or a target file size.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/card-reader/" data-id="card" data-groups="people paper picture" data-kw="business card scan ocr contact vcard phonebook networking" data-short="Card photo to contact" data-ai="1" style="--h1:48;--h2:20">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3z"/><path d="M7 10.5a1.75 1.75 0 1 1 3.5 0 1.75 1.75 0 0 1-3.5 0"/><path d="M5.8 15.2c.6-1.3 1.7-2 2.95-2s2.35.7 2.95 2"/><path d="M14 10h4"/><path d="M14 13.5h3"/></svg></span>
+          <h3 class="tool-name">Business card reader</h3>
+          <p class="tool-line">Photograph a card and get an editable contact, vCard or CSV.</p>
+          <span class="tool-foot"><span class="tag ai">READS WITH AI *</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/color-palette/" data-id="pal" data-groups="design picture" data-kw="color colour palette hex rgb swatch image extract brand" data-short="Colors from an image" style="--h1:290;--h2:340">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.9-.5-1.1.3-2.1 1.4-2.1H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><path d="M7.5 11h.01"/><path d="M10 7h.01"/><path d="M15 7.5h.01"/></svg></span>
+          <h3 class="tool-name">Color palette extractor</h3>
+          <p class="tool-line">Pull the main colors out of any image as HEX and RGB.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/audio-converter/" data-id="aud" data-groups="sound" data-kw="audio sound mp3 wav m4a aac ogg flac opus convert trim music voice memo" data-short="To MP3 or WAV, trim" style="--h1:172;--h2:140">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2"/><path d="M7 8v8"/><path d="M11 5v14"/><path d="M15 9v6"/><path d="M19 11v2"/></svg></span>
+          <h3 class="tool-name">Audio converter</h3>
+          <p class="tool-line">Convert to MP3 or WAV and trim a clip. m4a, ogg, flac and more.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/font-finder/" data-id="font" data-groups="design picture" data-kw="font identify typeface what font google fonts lettering" data-short="Identify any typeface" data-ai="1" style="--h1:95;--h2:60">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20L11 4h2l6 16"/><path d="M7.5 14h9"/></svg></span>
+          <h3 class="tool-name">Font finder</h3>
+          <p class="tool-line">Screenshot some type and find the font and its free lookalikes.</p>
+          <span class="tool-foot"><span class="tag ai">READS WITH AI *</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="tool" href="/word-counter/" data-id="word" data-groups="paper" data-kw="word count character counter essay reading time text length" data-short="Words, characters, time" style="--h1:5;--h2:330">
+          <span class="tool-bleed" aria-hidden="true"></span>
+          <span class="ticon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h10"/><path d="M4 18h6"/><path d="M17 16l2 2 3-4"/></svg></span>
+          <h3 class="tool-name">Word &amp; character counter</h3>
+          <p class="tool-line">Words, characters, sentences and reading time, live as you type.</p>
+          <span class="tool-foot"><span class="tag local">STAYS ON DEVICE</span><span class="arrow" aria-hidden="true">&#8599;</span></span>
+        </a>
+          <div class="tool-ask">
+            <p class="ask-title">Need something that isn't here?</p>
+            <p>An image compressor and a file converter are next. <a class="tt-feedback" href="#feedback">Suggest one</a></p>
+          </div>
+        </div>
+        <p class="ai-note"><strong>* Reads with AI.</strong> These two send only the image you give them to a third-party AI service (Google Gemini) to read it. The image is not stored and there is no account. Every other tool stays on your device.</p>
+      </section>
 
-      <!-- TrustBox widget - Review Collector -->
-      <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6a0ebf56b6b7934248bc39c4" data-style-height="52px" data-style-width="100%" data-token="5e8a1734-bad8-4068-a206-f57cbb49e82a" style="margin: 24px 0 0;">
-        <a href="https://www.trustpilot.com/review/techtuate.com" target="_blank" rel="noopener">Trustpilot</a>
-      </div>
-      <!-- End TrustBox widget -->
+      <!-- ============ About + FAQ ============ -->
+      <section class="about" aria-labelledby="about-h">
+        <div class="about-grid">
+          <div class="about-copy">
+            <p class="eyebrow">about</p>
+            <h2 id="about-h">What is techtuate?</h2>
+            <p><strong>Techtuate is a free suite of small, single-purpose web tools</strong>: a PDF editor, image and audio converters, a QR code generator, a password generator, a business card reader, a font finder, a word counter and more.</p>
+            <p>Most of them run entirely in your browser, so your files stay on your device. A couple use AI to read an image, and they say so on the page. No accounts, no sign-up and no ads. Here is <a href="/why-free/">why it's free</a>, and how it <a href="/vs/">compares to the paid tools</a>.</p>
+            <p>"Techtuate" is a brand name, not a typo.</p>
+          </div>
+          <div>
+            <p class="eyebrow">questions people ask</p>
+            <div class="faq" data-single-open>
+              <details class="faq-item" open>
+                <summary><h3>Are these tools really free?</h3></summary>
+                <p>Yes. No account, no card, no trial and no ads. Most of the tools run entirely in your browser, so they cost almost nothing to run and there is nothing to charge you for.</p>
+              </details>
+              <details class="faq-item">
+                <summary><h3>Do my files get uploaded?</h3></summary>
+                <p>Not for the tools marked stays on device. Your browser opens and processes the file, and it never leaves the tab. The two tools that read with AI, the business card reader and the font finder, send only the image you give them to Google Gemini to read it. They are labeled, and the image is not stored.</p>
+              </details>
+              <details class="faq-item">
+                <summary><h3>Is there a free PDF editor with no sign-up?</h3></summary>
+                <p>Yes. The techtuate PDF editor annotates, fills forms, reorders and rotates pages and shrinks files, with no account and no watermark. It runs in your browser, so the PDF stays on your device.</p>
+              </details>
+              <details class="faq-item">
+                <summary><h3>Why is it called techtuate?</h3></summary>
+                <p>It is a brand name, not a misspelling of another word.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/pdf-editor/">pdf editor</a> &middot;
-        <a href="/vs/">comparisons</a> &middot;
-        <a href="https://www.trustpilot.com/review/techtuate.com" target="_blank" rel="noopener">rate us</a> &middot;
-        <a class="tt-feedback" href="#feedback" rel="noopener">feedback</a> &middot;
-        <a href="/why-free/">why free</a> &middot;
+      <!-- ============ Founder note ============ -->
+      <section class="founder" id="spread" aria-label="A note from the founder">
+        <blockquote><p>&ldquo;I got tired of paying $9 a month to merge two PDFs.&rdquo;</p></blockquote>
+        <div class="founder-grid">
+          <div>
+            <p>So I started building the little utilities I kept needing and put them here. They stay free because they cost almost nothing to run (<a href="/why-free/">here's why</a>). The only thing I ask: if one saves you a minute, pass it on.</p>
+            <div class="sig">GJ, founder</div>
+          </div>
+          <div class="share">
+            <button type="button" class="btn btn-primary" id="copy-link">Copy the link</button>
+            <a class="btn btn-ghost" href="https://twitter.com/intent/tweet?text=Free%20little%20web%20tools%2C%20no%20sign-up%2C%20no%20ads.%20Most%20run%20right%20in%20your%20browser%3A&amp;url=https%3A%2F%2Ftechtuate.com" target="_blank" rel="noopener">Post it on X</a>
+            <a class="btn btn-ghost" href="https://bsky.app/intent/compose?text=Free%20little%20web%20tools%2C%20no%20sign-up%2C%20no%20ads.%20Most%20run%20right%20in%20your%20browser%3A%20https%3A%2F%2Ftechtuate.com" target="_blank" rel="noopener">Bluesky</a>
+            <a class="btn btn-ghost" href="https://www.trustpilot.com/review/techtuate.com" target="_blank" rel="noopener">Leave a review</a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
         <a href="/free-pdf-editor/">free pdf editor</a>
-      </div>
-      <div class="support-slot" id="support-slot">
-        <a class="btn alt btn-coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener" aria-label="Buy me a coffee on buymeacoffee.com">
-          Buy me a coffee
-        </a>
-      </div>
+        <a class="tt-feedback" href="#feedback">feedback</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
+      <p class="fine">This page loads one third-party embed, a StartupBar directory badge, which may set a cookie. "Leave a review" opens Trustpilot. Everything else here, fonts included, is served by techtuate.</p>
     </footer>
 
   </div>
 
-  <div id="copy-flash" role="status" aria-live="polite">link copied. now go paste it somewhere &#10033;</div>
+  <div class="tt-toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script>
-    document.getElementById('yr').textContent = new Date().getFullYear();
-    document.getElementById('copy-link').addEventListener('click', async () => {
-      const url = window.location.origin || 'https://techtuate.com';
-      try {
-        await navigator.clipboard.writeText(url);
-        const f = document.getElementById('copy-flash');
-        f.classList.add('show');
-        setTimeout(() => f.classList.remove('show'), 1600);
-      } catch (e) {
-        prompt('Copy this link:', url);
-      }
-    });
-
-    // Feedback mailto - assembled at click time so the address never sits in raw HTML.
-    (function(){
-      var u = ['joshi','gaurav'].join('');
-      var d = ['gmail','.com'].join('');
-      var subj = encodeURIComponent('techtuate feedback');
-      document.querySelectorAll('a.tt-feedback').forEach(function(el){
-        el.addEventListener('click', function(){
-          el.href = 'mailto:' + u + '@' + d + '?subject=' + subj;
-        });
-      });
-    })();
-  </script>
-
-  <!-- StartupBar directory badge (third-party embed; loads at runtime) -->
+  <!-- StartupBar directory badge (third-party embed; loads at runtime, disclosed in the footer) -->
   <script async src="https://startupbar.co/widget/loader.js" data-startup-id="dee86658-8955-4f95-b345-12691afee3ad"></script>
 </body>
 </html>

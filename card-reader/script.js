@@ -1,10 +1,12 @@
 /* ============================================================
    techtuate business card reader
-   - capture (upload / camera / paste / drag-drop)
+   - capture (upload / camera / paste / drag-drop / sample card)
    - send image(s) to /api/scan (Cloudflare Pages Function -> Gemini)
-   - editable review, then save to a local IndexedDB phonebook
+   - editable review with flags, reach-out links, then save to a local
+     IndexedDB phonebook
    - export vCard (.vcf) + CSV, copy to clipboard
    Everything except the single /api/scan call stays in this browser.
+   States: empty -> reading -> review (or failed) -> (save) -> empty
    ============================================================ */
 (function () {
   'use strict';
@@ -14,11 +16,15 @@
 
   var MAX_EDGE = 1600;      // downscale longest edge before upload
   var JPEG_Q = 0.85;
+  var SAMPLE_URL = '/card-reader/sample-card.jpg';
 
   // ---- state ----
   var images = { front: null, back: null };
   var wantBack = false;
   var stream = null;
+  var stage = 'empty';      // empty | reading | review | failed
+  var scanSeq = 0;          // ignore late responses after "start over"
+  var freshId = null;       // newest saved contact (highlighted)
 
   // ---- element helpers ----
   function $(id) { return document.getElementById(id); }
@@ -26,18 +32,25 @@
 
   var dropzone = $('dropzone');
   var fileInput = $('file-input');
-  var thumbs = $('thumbs');
+  var emptyBox = $('cr-empty');
+  var hasBox = $('cr-has');
   var thumbFront = $('thumb-front');
   var thumbBack = $('thumb-back');
   var thumbBackWrap = $('thumb-back-wrap');
   var addBackBtn = $('btn-add-back');
-  var scanSection = $('scan-section');
-  var scanBtn = $('btn-scan');
+  var veil = $('cr-veil');
+  var stageLabel = $('stage-label');
+  var ghost = $('cr-ghost');
   var scanStatus = $('scan-status');
+  var failActions = $('cr-fail-actions');
   var review = $('review');
   var form = $('review-form');
+  var reviewNote = $('review-note');
 
-  // which slot the next captured image fills: 'front' unless the back slot is requested and front exists
+  var GHOST_IDLE = 'The details will appear here, ready to edit.';
+  var GHOST_READING = 'Reading the card. Usually a couple of seconds.';
+
+  // which slot the next captured image fills
   function targetSlot() {
     if (wantBack && images.front && !images.back) return 'back';
     return 'front';
@@ -67,51 +80,70 @@
 
   function ingestFile(file) {
     if (!file || !/^image\//.test(file.type)) {
-      setStatus('That does not look like an image. Try a photo of the card.', 'error');
+      showGhostMessage('That does not look like an image. Try a photo of the card.', true);
       return;
     }
     fileToImage(file).then(function (img) {
       var data = drawToJpeg(img, img.naturalWidth, img.naturalHeight);
       setImage(targetSlot(), data);
     }).catch(function (e) {
-      setStatus(e.message || 'Could not read that image.', 'error');
+      showGhostMessage(e.message || 'Could not read that image.', true);
     });
   }
 
+  // A new image arrives: show it and read the card straight away.
+  // Adding the back re-reads front + back together so details merge.
   function setImage(slot, dataUrl) {
     images[slot] = dataUrl;
-    if (slot === 'back') wantBack = true;
-    renderThumbs();
-    // Bring the next action to the user (esp. on mobile, where the "Read card"
-    // button would otherwise be below the fold after a capture).
-    if (images.front) {
-      requestAnimationFrame(function () {
-        try { scanBtn.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
-        scanSection.classList.add('cr-pop');
-        setTimeout(function () { scanSection.classList.remove('cr-pop'); }, 900);
-      });
-    }
-  }
-
-  function removeImage(slot) {
-    images[slot] = null;
     if (slot === 'back') wantBack = false;
-    if (slot === 'front' && images.back) { // promote back to front
-      images.front = images.back; images.back = null; wantBack = false;
-    }
-    renderThumbs();
+    renderCard();
+    scan();
   }
 
-  function renderThumbs() {
-    var has = images.front || images.back;
-    show(thumbs, !!has);
-    show(scanSection, !!images.front);
+  function removeBack() {
+    images.back = null; wantBack = false;
+    renderCard();
+  }
+
+  function renderCard() {
+    var has = !!images.front;
+    show(emptyBox, !has);
+    show(hasBox, has);
     if (images.front) thumbFront.src = images.front;
     show(thumbBackWrap, !!images.back);
     if (images.back) thumbBack.src = images.back;
-    // hide "add back" once a back exists
-    show(addBackBtn, !!images.front && !images.back);
-    clearStatus();
+    show(addBackBtn, has && !images.back);
+  }
+
+  // ---------- stage / ghost ----------
+  function setStage(s, info) {
+    stage = s;
+    var reading = s === 'reading';
+    show(veil, reading);
+    ghost.classList.toggle('reading', reading);
+    show(ghost, s !== 'review');
+    show(form, s === 'review');
+    show(failActions, s === 'failed');
+    addBackBtn.disabled = reading;
+    if (s === 'empty') {
+      stageLabel.textContent = 'front + back supported';
+      showGhostMessage(GHOST_IDLE, false);
+      reviewNote.textContent = '';
+    } else if (reading) {
+      stageLabel.textContent = 'reading\u2026';
+      showGhostMessage(GHOST_READING, false);
+      reviewNote.textContent = '';
+    } else if (s === 'review') {
+      stageLabel.textContent = info || 'ready to check';
+    } else if (s === 'failed') {
+      stageLabel.textContent = 'could not read it';
+      reviewNote.textContent = '';
+    }
+  }
+
+  function showGhostMessage(msg, isError) {
+    scanStatus.textContent = msg;
+    scanStatus.classList.toggle('error', !!isError);
   }
 
   // ---------- capture: upload ----------
@@ -121,32 +153,28 @@
     fileInput.value = '';
   });
 
-  // dropzone click (but not when clicking a button inside)
-  dropzone.addEventListener('click', function (e) {
-    if (e.target.closest('button')) return;
-    fileInput.click();
-  });
+  dropzone.addEventListener('click', function () { fileInput.click(); });
   dropzone.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
   });
 
-  // ---------- capture: drag/drop ----------
+  // ---------- capture: drag/drop (anywhere on the card panel) ----------
+  var cardPanel = dropzone.closest('.cr-card') || dropzone;
   ['dragenter', 'dragover'].forEach(function (ev) {
-    dropzone.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.add('dragover'); });
+    cardPanel.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.add('dragover'); });
   });
   ['dragleave', 'drop'].forEach(function (ev) {
-    dropzone.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.remove('dragover'); });
+    cardPanel.addEventListener(ev, function (e) { e.preventDefault(); dropzone.classList.remove('dragover'); });
   });
-  dropzone.addEventListener('drop', function (e) {
+  cardPanel.addEventListener('drop', function (e) {
     var dt = e.dataTransfer;
     if (dt && dt.files && dt.files[0]) ingestFile(dt.files[0]);
   });
 
   // ---------- capture: paste ----------
-  $('btn-paste').addEventListener('click', function () {
-    setStatus('Press Ctrl/Cmd + V to paste a copied image.', 'working');
-  });
   window.addEventListener('paste', function (e) {
+    var t = e.target;
+    if (t && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return; // let normal text pastes through
     var items = (e.clipboardData && e.clipboardData.items) || [];
     for (var i = 0; i < items.length; i++) {
       if (items[i].type && items[i].type.indexOf('image') === 0) {
@@ -154,6 +182,18 @@
         if (f) { ingestFile(f); e.preventDefault(); return; }
       }
     }
+  });
+
+  // ---------- capture: sample card ----------
+  $('btn-sample').addEventListener('click', function () {
+    fetch(SAMPLE_URL).then(function (r) {
+      if (!r.ok) throw new Error('missing');
+      return r.blob();
+    }).then(function (b) {
+      ingestFile(new File([b], 'sample-card.jpg', { type: b.type || 'image/jpeg' }));
+    }).catch(function () {
+      showGhostMessage('The sample card could not be loaded. Try one of your own.', true);
+    });
   });
 
   // ---------- capture: camera ----------
@@ -166,7 +206,7 @@
 
   function startCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      // fallback: use the file input with capture attribute
+      // fallback: the file input with the capture attribute opens the camera on phones
       fileInput.setAttribute('capture', 'environment');
       fileInput.click();
       fileInput.removeAttribute('capture');
@@ -177,10 +217,10 @@
         stream = s;
         video.srcObject = s;
         show(cameraWrap, true);
-        document.body.classList.add('cr-modal-open');   // lock scroll behind the focused camera
+        document.body.classList.add('cr-modal-open');
       })
       .catch(function () {
-        setStatus('Could not open the camera. You can upload a photo instead.', 'error');
+        showGhostMessage('Could not open the camera. You can upload a photo instead.', true);
       });
   }
 
@@ -191,7 +231,6 @@
     document.body.classList.remove('cr-modal-open');
   }
 
-  // close the camera modal with Escape
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && cameraWrap && !cameraWrap.hidden) stopCamera();
   });
@@ -199,38 +238,28 @@
   function snapCamera() {
     if (!video.videoWidth) return;
     var data = drawToJpeg(video, video.videoWidth, video.videoHeight);
-    setImage(targetSlot(), data);
     stopCamera();
+    setImage(targetSlot(), data);
   }
 
-  // ---------- add back side ----------
+  // ---------- add back / start over ----------
   addBackBtn.addEventListener('click', function () {
     wantBack = true;
     fileInput.click();
   });
-
-  // remove thumbnail
-  thumbs.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-remove]');
-    if (b) removeImage(b.getAttribute('data-remove'));
+  thumbBackWrap.addEventListener('click', function (e) {
+    if (e.target.closest('[data-remove="back"]')) removeBack();
   });
-
-  // ---------- status ----------
-  function setStatus(msg, kind) {
-    scanStatus.innerHTML = (kind === 'working' ? '<span class="cr-spin"></span>' : '') + msg;
-    scanStatus.className = 'cr-status' + (kind ? ' ' + kind : '');
-    show(scanStatus, true);
-  }
-  function clearStatus() { show(scanStatus, false); scanStatus.textContent = ''; }
+  $('btn-discard').addEventListener('click', resetAll);
 
   // ---------- scan ----------
-  scanBtn.addEventListener('click', function () {
+  function scan() {
     if (!images.front) return;
     var payload = { images: [images.front] };
     if (images.back) payload.images.push(images.back);
-
-    scanBtn.disabled = true;
-    setStatus('Reading the card...', 'working');
+    var seq = ++scanSeq;
+    var t0 = performance.now();
+    setStage('reading');
 
     fetch('/api/scan', {
       method: 'POST',
@@ -239,61 +268,92 @@
     }).then(function (res) {
       return res.json().then(function (body) { return { ok: res.ok, body: body }; });
     }).then(function (r) {
-      scanBtn.disabled = false;
+      if (seq !== scanSeq) return;
       if (!r.ok || !r.body || r.body.ok === false) {
         var m = (r.body && r.body.error) || 'The reader could not process this card.';
-        if (r.body && r.body.detail) m += ' [' + String(r.body.detail).slice(0, 200) + ']';
-        setStatus(m + ' You can still type the details in below.', 'error');
-        populateReview({});   // open an empty, editable form so the tool never dead-ends
+        fail(m);
         return;
       }
-      clearStatus();
-      populateReview(r.body.data || r.body || {});
+      var secs = ((performance.now() - t0) / 1000).toFixed(1);
+      populateReview(r.body.data || r.body || {}, true);
+      setStage('review', (images.back ? 'front + back' : 'front') + ' read in ' + secs + 's');
+      afterReview();
     }).catch(function () {
-      scanBtn.disabled = false;
-      setStatus('Network error reaching the reader. You can type the details in below.', 'error');
-      populateReview({});
+      if (seq !== scanSeq) return;
+      fail('Could not reach the reader. Check your connection and try again.');
     });
+  }
+
+  function fail(msg) {
+    setStage('failed');
+    showGhostMessage('Couldn\u2019t read this card. ' + msg, true);
+  }
+
+  $('btn-retry').addEventListener('click', scan);
+  $('btn-manual').addEventListener('click', function () {
+    populateReview({}, false);
+    setStage('review', 'typing it in');
+    afterReview();
   });
+
+  // On narrow screens the contact panel sits below the card: bring it into view.
+  function afterReview() {
+    if (window.matchMedia && matchMedia('(max-width: 980px)').matches) {
+      try { review.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+    }
+  }
 
   // ---------- review form ----------
   var emailsBox = $('emails');
   var phonesBox = $('phones');
   var PHONE_TYPES = ['mobile', 'work', 'home', 'other'];
 
-  function flagIf(input, key, conf) {
-    var c = conf && typeof conf[key] === 'number' ? conf[key] : (input.value ? 1 : 0);
-    if (c < 0.6 || !input.value) input.classList.add('flagged');
-    else input.classList.remove('flagged');
+  function setFlag(row, text) {
+    var f = row.querySelector('.cr-flag');
+    if (f) f.textContent = text || '';
+    updateCheckCount();
+  }
+
+  function updateCheckCount() {
+    var n = [].slice.call(form.querySelectorAll('.cr-flag')).filter(function (f) { return f.textContent; }).length;
+    reviewNote.textContent = form.hidden ? '' : (n ? n + (n === 1 ? ' field' : ' fields') + ' to check' : '');
+  }
+
+  // Editing a field clears its flag.
+  form.addEventListener('input', function (e) {
+    var row = e.target.closest('.cr-field');
+    if (row && row.querySelector('.cr-flag') && row.querySelector('.cr-flag').textContent) setFlag(row, '');
+  });
+
+  function removeBtn(label, onClick) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'cr-x'; b.textContent = '\u00d7';
+    b.setAttribute('aria-label', label);
+    b.addEventListener('click', onClick);
+    return b;
   }
 
   function emailRow(value) {
-    var row = document.createElement('div');
-    row.className = 'cr-multi-row cr-has-acts';
-    var top = document.createElement('div'); top.className = 'cr-row-top';
+    var row = document.createElement('label');
+    row.className = 'cr-field cr-email-row';
+    var lab = document.createElement('span'); lab.className = 'cr-label'; lab.textContent = 'Email';
     var inp = document.createElement('input');
     inp.type = 'email'; inp.placeholder = 'name@company.com'; inp.value = value || '';
     inp.className = 'cr-email';
-    var del = document.createElement('button');
-    del.type = 'button'; del.className = 'cr-del'; del.textContent = '\u00d7';
-    del.setAttribute('aria-label', 'Remove email');
-    del.addEventListener('click', function () { row.remove(); });
-    top.appendChild(inp); top.appendChild(del);
-    var acts = document.createElement('div'); acts.className = 'cr-acts';
-    row.appendChild(top); row.appendChild(acts);
-    row._upd = function () { updateEmailActions(inp, acts); };
-    inp.addEventListener('input', row._upd);
-    row._upd();
+    inp.addEventListener('input', buildReach);
+    var flag = document.createElement('span'); flag.className = 'cr-flag';
+    row.appendChild(lab); row.appendChild(inp); row.appendChild(flag);
+    if (emailsBox.children.length) row.appendChild(removeBtn('Remove email', function () { row.remove(); buildReach(); updateCheckCount(); }));
     return row;
   }
 
   function phoneRow(value, type, e164, isMobile) {
-    var row = document.createElement('div');
-    row.className = 'cr-multi-row cr-has-acts';
+    var row = document.createElement('label');
+    row.className = 'cr-field cr-phone-row';
     if (e164) row.setAttribute('data-e164', e164);
-    var top = document.createElement('div'); top.className = 'cr-row-top';
     var sel = document.createElement('select');
     sel.className = 'cr-ptype';
+    sel.setAttribute('aria-label', 'Phone type');
     var wantType = type || (isMobile ? 'mobile' : 'other');
     PHONE_TYPES.forEach(function (t) {
       var o = document.createElement('option'); o.value = t; o.textContent = t;
@@ -301,75 +361,36 @@
       sel.appendChild(o);
     });
     var inp = document.createElement('input');
-    inp.type = 'tel'; inp.placeholder = '+1 555 123 4567'; inp.value = value || '';
+    inp.type = 'tel'; inp.placeholder = '+60 12 345 6789'; inp.value = value || '';
     inp.className = 'cr-phone';
-    var del = document.createElement('button');
-    del.type = 'button'; del.className = 'cr-del'; del.textContent = '\u00d7';
-    del.setAttribute('aria-label', 'Remove phone');
-    del.addEventListener('click', function () { row.remove(); });
-    top.appendChild(sel); top.appendChild(inp); top.appendChild(del);
-    var acts = document.createElement('div'); acts.className = 'cr-acts';
-    row.appendChild(top); row.appendChild(acts);
-    row._upd = function () { updatePhoneActions(row, sel, inp, acts); };
-    inp.addEventListener('input', row._upd);
-    sel.addEventListener('change', row._upd);
-    row._upd();
+    inp.addEventListener('input', buildReach);
+    sel.addEventListener('change', buildReach);
+    var flag = document.createElement('span'); flag.className = 'cr-flag';
+    row.appendChild(sel); row.appendChild(inp); row.appendChild(flag);
+    if (phonesBox.children.length) row.appendChild(removeBtn('Remove phone', function () { row.remove(); buildReach(); updateCheckCount(); }));
     return row;
   }
 
-  // ---------- reach-out: build deep links from the recognized contact ----------
-  // All client-side. Nothing is sent anywhere; these just open the user's own apps.
-  var ICON = {
-    call: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#0a0a0a" d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z"/></svg>',
-    whatsapp: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#25D366"/><g transform="translate(3 3) scale(0.72)"><path fill="#fff" d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1.1L6.6 10.8z"/></g></svg>',
-    sms: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#34C759" d="M12 3C6.5 3 2 6.6 2 11c0 2.4 1.3 4.5 3.4 5.9-.1 1-.6 2.2-1.4 3.1 1.6-.2 3.2-.8 4.4-1.7 1.1.3 2.3.5 3.6.5 5.5 0 10-3.6 10-8s-4.5-8-10-8z"/></svg>',
-    email: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="none" stroke="#0a0a0a" stroke-width="1.8"/><path d="M3.5 6.5l8.5 6 8.5-6" fill="none" stroke="#0a0a0a" stroke-width="1.6"/></svg>',
-    gmail: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="#fff" stroke="#EA4335" stroke-width="1.5"/><path d="M3.2 6.5l8.8 6 8.8-6" fill="none" stroke="#EA4335" stroke-width="1.8"/></svg>',
-    outlook: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2" fill="#0078D4"/><path d="M4 7.5l8 5 8-5" fill="none" stroke="#fff" stroke-width="1.6"/></svg>',
-    linkedin: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0A66C2"/><circle cx="7" cy="8" r="1.5" fill="#fff"/><rect x="5.7" y="10.4" width="2.6" height="7.6" fill="#fff"/><path fill="#fff" d="M10.6 10.4h2.5v1.05a2.9 2.9 0 0 1 2.5-1.25c2 0 3.2 1.25 3.2 3.7V18h-2.6v-3.85c0-1-.4-1.7-1.35-1.7-.8 0-1.45.6-1.45 1.7V18h-2.6z"/></svg>',
-    web: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#0a0a0a" stroke-width="1.7"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18" fill="none" stroke="#0a0a0a" stroke-width="1.2"/></svg>',
-    facetime: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="2.5" fill="#34C759"/><path d="M16 10l5-3v10l-5-3z" fill="#34C759"/></svg>'
-  };
+  document.querySelector('[data-add="email"]').addEventListener('click', function () {
+    var r = emailRow(''); emailsBox.appendChild(r); r.querySelector('input').focus();
+  });
+  document.querySelector('[data-add="phone"]').addEventListener('click', function () {
+    var r = phoneRow('', 'mobile'); phonesBox.appendChild(r); r.querySelector('input').focus();
+  });
 
-  // FaceTime is only useful on Apple devices (iPhone/iPad/Mac). Show it there (desktop Macs included).
+  // ---------- reach-out: deep links built from the recognized contact ----------
+  // All client-side. Nothing is sent anywhere; these just open the user's own apps.
   var IS_APPLE = /iPhone|iPad|iPod|Macintosh|Mac OS X/.test(navigator.userAgent || '') ||
     (navigator.platform && /Mac|iPhone|iPad|iPod/.test(navigator.platform));
   var IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-
-  // Ship the reach-out layout CSS from JS so it can never drift/cache apart from this script.
-  // (Injected into <head> after site.css, so it wins on equal specificity.)
-  (function injectReachStyles() {
-    if (document.getElementById('cr-reach-style')) return;
-    var css = [
-      '.cr-multi-row.cr-has-acts{flex-direction:column;align-items:stretch;gap:8px}',
-      '.cr-row-top{display:flex;gap:8px;align-items:center}',
-      '.cr-row-top select{max-width:120px}',
-      '.cr-row-top input{flex:1;min-width:0}',
-      '.cr-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px}',
-      '.cr-acts-lead{flex-basis:100%;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-bottom:-3px}',
-      '.cr-connect{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 16px}',
-      '.cr-connect[hidden]{display:none}',
-      '.cr-connect-label{font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-mute)}',
-      '.cr-act{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border:2px solid var(--ink);border-radius:999px;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:13.5px;font-weight:700;line-height:1;text-decoration:none;cursor:pointer;box-shadow:2px 2px 0 var(--ink);transition:transform .12s ease,box-shadow .12s ease,background .12s ease}',
-      '.cr-act.primary{background:var(--yellow)}',
-      '.cr-act:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);background:var(--yellow-wash)}',
-      '.cr-act.primary:hover{background:var(--yellow-soft)}',
-      '.cr-act:active{transform:translate(0,0);box-shadow:1px 1px 0 var(--ink)}',
-      '.cr-act svg{display:block;flex:0 0 auto}',
-      '.cr-act span{white-space:nowrap}'
-    ].join('');
-    var s = document.createElement('style');
-    s.id = 'cr-reach-style';
-    s.textContent = css;
-    document.head.appendChild(s);
-  })();
+  var BRAND = { whatsapp: '#25d366', email: '#ea4335', gmail: '#ea4335', outlook: '#0078d4', call: '#ffd60a', text: '#34c759', facetime: '#34c759', linkedin: '#0a66c2', web: '#8d879c' };
 
   function fieldVal(key) { var el = form.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
   function firstName() { var f = fieldVal('fullName'); return f ? f.split(/\s+/)[0] : ''; }
 
   // Short brand name for the LinkedIn/web people search. The scan supplies a
   // best 1-2 word searchName; if it's missing (or the user retyped company)
-  // we fall back to the first significant word of the company field, since the
+  // fall back to the first significant word of the company field, since the
   // full legal name ("... Technologies Pvt Ltd") makes the search useless.
   var aiCompanySearch = '';
   function companyShort(c) {
@@ -385,7 +406,7 @@
   function usableE164(raw, stored) {
     if (/\+/.test(raw)) return '+' + raw.replace(/[^\d]/g, '');
     if (stored) return stored;
-    return ''; // national-only, no country code -> can't build a WhatsApp link
+    return ''; // national-only, no country code: can't build a WhatsApp link
   }
   function telHref(n) { return 'tel:' + (n || '').replace(/[^\d+]/g, ''); }
   function smsHref(n) { return 'sms:' + (n || '').replace(/[^\d+]/g, ''); }
@@ -407,116 +428,102 @@
   function linkedinHref(q) { return 'https://www.linkedin.com/search/results/people/?keywords=' + enc(q); }
   function webHref(q) { return 'https://www.google.com/search?q=' + enc(q + ' linkedin'); }
 
-  function actionBtn(href, label, icon, external, primary) {
+  function actLink(href, label, color, external) {
     var a = document.createElement('a');
-    a.className = 'cr-act' + (primary ? ' primary' : '');
+    a.className = 'cr-act';
     a.href = href;
     if (external) { a.target = '_blank'; a.rel = 'noopener'; }
-    a.innerHTML = icon + '<span>' + label + '</span>';
-    a.setAttribute('aria-label', label);
+    a.style.setProperty('--c', color);
+    a.innerHTML = '<span class="dot" aria-hidden="true"></span>';
+    a.appendChild(document.createTextNode(label));
     return a;
   }
 
-  function leadLabel() {
-    var s = document.createElement('span');
-    s.className = 'cr-acts-lead';
-    s.textContent = 'Reach out';
-    return s;
-  }
+  var reachBox = $('cr-reach');
+  var reachMoreOpen = false;
 
-  function updatePhoneActions(row, sel, inp, acts) {
-    acts.innerHTML = '';
-    var raw = inp.value.trim();
-    if (!raw) return;
-    var e164 = usableE164(raw, row.getAttribute('data-e164'));
-    var mobile = sel.value === 'mobile';
-    acts.appendChild(leadLabel());
-    if (mobile) {
-      var name = firstName();
-      var waText = name ? 'Hi ' + name + ', great connecting.' : '';
-      // WhatsApp is the primary action for a mobile; if we can't build it, Call is primary.
-      if (e164) acts.appendChild(actionBtn(waHref(e164, waText), 'WhatsApp', ICON.whatsapp, true, true));
-      acts.appendChild(actionBtn(telHref(e164 || raw), 'Call', ICON.call, false, !e164));
-      acts.appendChild(actionBtn(smsHref(e164 || raw), 'Text', ICON.sms, false));
-      if (IS_APPLE) acts.appendChild(actionBtn(ftHref(e164 || raw), 'FaceTime', ICON.facetime, false));
-    } else {
-      acts.appendChild(actionBtn(telHref(e164 || raw), 'Call', ICON.call, false, true));
-    }
-  }
-
-  function updateEmailActions(inp, acts) {
-    acts.innerHTML = '';
-    var e = inp.value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return;
+  // One row of pills for the whole contact: the main four up front
+  // (WhatsApp, Email, Call, LinkedIn), the rest behind "more".
+  function buildReach() {
+    var main = [], extra = [];
     var name = firstName();
-    var subj = 'Great connecting';
-    var body = (name ? 'Hi ' + name : 'Hi there') +
-      ',\n\nIt was great connecting today. I\'d love to stay in touch - happy to continue the conversation whenever suits you.\n\nBest regards,';
-    // Email = mailto: opens the user's default mail app (Gmail/Outlook/Apple Mail) with the message.
-    // Gmail/Outlook = the app scheme on mobile (opens the app), web compose in a new tab on desktop.
-    var webCompose = !IS_MOBILE;
-    acts.appendChild(leadLabel());
-    acts.appendChild(actionBtn(mailtoHref(e, subj, body), 'Email', ICON.email, false, true));
-    acts.appendChild(actionBtn(gmailHref(e, subj, body), 'Gmail', ICON.gmail, webCompose));
-    acts.appendChild(actionBtn(outlookHref(e, subj, body), 'Outlook', ICON.outlook, webCompose));
+
+    var phoneRows = [].slice.call(phonesBox.querySelectorAll('.cr-phone-row')).filter(function (r) {
+      return r.querySelector('.cr-phone').value.trim();
+    });
+    var mobileRow = phoneRows.filter(function (r) { return r.querySelector('.cr-ptype').value === 'mobile'; })[0];
+    var anyPhone = mobileRow || phoneRows[0];
+    if (anyPhone) {
+      var raw = anyPhone.querySelector('.cr-phone').value.trim();
+      var e164 = usableE164(raw, anyPhone.getAttribute('data-e164'));
+      if (mobileRow && e164) main.push(actLink(waHref(e164, name ? 'Hi ' + name + ', great connecting.' : ''), 'WhatsApp', BRAND.whatsapp, true));
+      if (mobileRow) {
+        extra.push(actLink(smsHref(e164 || raw), 'Text', BRAND.text, false));
+        if (IS_APPLE) extra.push(actLink(ftHref(e164 || raw), 'FaceTime', BRAND.facetime, false));
+      }
+    }
+
+    var email = [].slice.call(emailsBox.querySelectorAll('.cr-email')).map(function (i) { return i.value.trim(); })
+      .filter(function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); })[0];
+    if (email) {
+      var subj = 'Great connecting';
+      var body = (name ? 'Hi ' + name : 'Hi there') +
+        ',\n\nIt was great connecting today. I\'d love to stay in touch - happy to continue the conversation whenever suits you.\n\nBest regards,';
+      main.push(actLink(mailtoHref(email, subj, body), 'Email', BRAND.email, false));
+      extra.push(actLink(gmailHref(email, subj, body), 'Gmail', BRAND.gmail, !IS_MOBILE));
+      extra.push(actLink(outlookHref(email, subj, body), 'Outlook', BRAND.outlook, !IS_MOBILE));
+    }
+
+    if (anyPhone) {
+      var r2 = anyPhone.querySelector('.cr-phone').value.trim();
+      main.push(actLink(telHref(usableE164(r2, anyPhone.getAttribute('data-e164')) || r2), 'Call', BRAND.call, false));
+    }
+
+    var full = fieldVal('fullName'), company = fieldVal('company');
+    if (full || company) {
+      var q = (full + ' ' + companySearch(company)).trim();
+      main.push(actLink(linkedinHref(q), 'LinkedIn', BRAND.linkedin, true));
+      extra.push(actLink(webHref(q), 'Web search', BRAND.web, true));
+    }
+
+    reachBox.innerHTML = '';
+    main.forEach(function (a) { reachBox.appendChild(a); });
+    if (extra.length) {
+      if (reachMoreOpen) extra.forEach(function (a) { reachBox.appendChild(a); });
+      var more = document.createElement('button');
+      more.type = 'button'; more.className = 'cr-act more';
+      more.textContent = reachMoreOpen ? 'less' : 'more';
+      more.setAttribute('aria-expanded', String(reachMoreOpen));
+      more.addEventListener('click', function () { reachMoreOpen = !reachMoreOpen; buildReach(); });
+      reachBox.appendChild(more);
+    }
+    show(reachBox, main.length + extra.length > 0);
   }
 
-  // Create the Connect block if it isn't in the markup (so it works even if index.html drifted).
-  function ensureConnectBox() {
-    var box = $('cr-connect');
-    if (box) return box;
-    box = document.createElement('div');
-    box.id = 'cr-connect'; box.className = 'cr-connect'; box.hidden = true;
-    var label = document.createElement('span'); label.className = 'cr-connect-label'; label.textContent = 'Connect';
-    var acts = document.createElement('div'); acts.id = 'cr-connect-actions'; acts.className = 'cr-acts';
-    box.appendChild(label); box.appendChild(acts);
-    var anchor = form.querySelector('.cr-multi'); // the Email fieldset
-    if (anchor) form.insertBefore(box, anchor); else form.appendChild(box);
-    return box;
-  }
-
-  function buildConnect() {
-    var box = ensureConnectBox();
-    var acts = box.querySelector('#cr-connect-actions') || box.querySelector('.cr-acts');
-    if (!acts) return;
-    var name = fieldVal('fullName'); var company = fieldVal('company');
-    acts.innerHTML = '';
-    if (!name && !company) { show(box, false); return; }
-    var q = (name + ' ' + companySearch(company)).trim();
-    acts.appendChild(actionBtn(linkedinHref(q), 'LinkedIn', ICON.linkedin, true));
-    acts.appendChild(actionBtn(webHref(q), 'Web search', ICON.web, true));
-    show(box, true);
-  }
-
-  function refreshActions() {
-    [].slice.call(phonesBox.children).forEach(function (r) { if (r._upd) r._upd(); });
-    [].slice.call(emailsBox.children).forEach(function (r) { if (r._upd) r._upd(); });
-    buildConnect();
-  }
-
-  // name / company edits refresh LinkedIn search + message prefills
   ['fullName', 'company'].forEach(function (k) {
     var el = form.querySelector('[data-key="' + k + '"]');
     if (el) el.addEventListener('input', function () {
-      // Once the user retypes the company, drop the scanned brand name and
-      // derive the search term from what they actually typed.
+      // Once the user retypes the company, drop the scanned brand name.
       if (k === 'company') aiCompanySearch = '';
-      refreshActions();
+      buildReach();
     });
   });
 
-  document.querySelector('[data-add="email"]').addEventListener('click', function () {
-    emailsBox.appendChild(emailRow(''));
-  });
-  document.querySelector('[data-add="phone"]').addEventListener('click', function () {
-    phonesBox.appendChild(phoneRow('', 'mobile'));
-  });
+  // flags: "check" for low-confidence reads, "not on card" for empty ones
+  function flagFor(val, key, conf, fromScan) {
+    if (!fromScan) return '';
+    if (!val) return (key === 'notes') ? '' : 'not on card';
+    var c = conf && typeof conf[key] === 'number' ? conf[key] : 1;
+    return c < 0.6 ? 'check' : '';
+  }
 
-  function setField(key, val, conf) {
+  function setField(key, val, conf, fromScan) {
     var el = form.querySelector('[data-key="' + key + '"]');
     if (!el) return;
     el.value = val || '';
-    flagIf(el, key, conf);
+    var row = el.closest('.cr-field');
+    var f = row && row.querySelector('.cr-flag');
+    if (f) f.textContent = flagFor(el.value, key, conf, fromScan);
   }
 
   function addressToString(a) {
@@ -524,36 +531,6 @@
     if (typeof a === 'string') return a;
     return [a.street, a.city, a.state, a.postalCode, a.country]
       .filter(function (x) { return x; }).join(', ');
-  }
-
-  function populateReview(d) {
-    var conf = d.confidence || {};
-    aiCompanySearch = (d.searchName || '').trim();
-    setField('fullName', d.fullName || d.name || '', conf);
-    setField('jobTitle', d.jobTitle || d.title || '', conf);
-    setField('company', d.company || d.organization || '', conf);
-    setField('website', d.website || d.url || '', conf);
-    setField('address', addressToString(d.address), conf);
-    setField('notes', d.notes || '', conf);
-
-    // emails
-    emailsBox.innerHTML = '';
-    var emails = Array.isArray(d.emails) ? d.emails : (d.email ? [d.email] : []);
-    if (!emails.length) emailsBox.appendChild(emailRow(''));
-    else emails.forEach(function (e) { emailsBox.appendChild(emailRow(typeof e === 'string' ? e : e.value)); });
-
-    // phones
-    phonesBox.innerHTML = '';
-    var phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [{ value: d.phone, type: 'mobile' }] : []);
-    if (!phones.length) phonesBox.appendChild(phoneRow('', 'mobile'));
-    else phones.forEach(function (p) {
-      if (typeof p === 'string') phonesBox.appendChild(phoneRow(p, 'mobile'));
-      else phonesBox.appendChild(phoneRow(p.value, p.isMobile ? 'mobile' : normType(p.type), p.e164 || '', !!p.isMobile));
-    });
-
-    buildConnect();
-    show(review, true);
-    review.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function normType(t) {
@@ -564,25 +541,59 @@
     return PHONE_TYPES.indexOf(t) >= 0 ? t : 'other';
   }
 
+  function populateReview(d, fromScan) {
+    var conf = d.confidence || {};
+    aiCompanySearch = (d.searchName || '').trim();
+    reachMoreOpen = false;
+    setField('fullName', d.fullName || d.name || '', conf, fromScan);
+    setField('jobTitle', d.jobTitle || d.title || '', conf, fromScan);
+    setField('company', d.company || d.organization || '', conf, fromScan);
+    setField('website', d.website || d.url || '', conf, fromScan);
+    setField('address', addressToString(d.address), conf, fromScan);
+    setField('notes', d.notes || '', conf, fromScan);
+
+    emailsBox.innerHTML = '';
+    var emails = Array.isArray(d.emails) ? d.emails : (d.email ? [d.email] : []);
+    if (!emails.length) {
+      var er = emailRow('');
+      if (fromScan) er.querySelector('.cr-flag').textContent = 'not on card';
+      emailsBox.appendChild(er);
+    } else emails.forEach(function (e) { emailsBox.appendChild(emailRow(typeof e === 'string' ? e : e.value)); });
+
+    phonesBox.innerHTML = '';
+    var phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [{ value: d.phone, type: 'mobile' }] : []);
+    if (!phones.length) {
+      var pr = phoneRow('', 'mobile');
+      if (fromScan) pr.querySelector('.cr-flag').textContent = 'not on card';
+      phonesBox.appendChild(pr);
+    } else phones.forEach(function (p) {
+      if (typeof p === 'string') phonesBox.appendChild(phoneRow(p, 'mobile'));
+      else phonesBox.appendChild(phoneRow(p.value, p.isMobile ? 'mobile' : normType(p.type), p.e164 || '', !!p.isMobile));
+    });
+
+    buildReach();
+    show(form, true);
+    updateCheckCount();
+  }
+
   // ---------- collect form into a contact object ----------
   function collectContact() {
-    function val(key) { var el = form.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
     var emails = [].slice.call(emailsBox.querySelectorAll('.cr-email'))
       .map(function (i) { return i.value.trim(); }).filter(Boolean);
-    var phones = [].slice.call(phonesBox.querySelectorAll('.cr-multi-row')).map(function (row) {
+    var phones = [].slice.call(phonesBox.querySelectorAll('.cr-phone-row')).map(function (row) {
       var v = row.querySelector('.cr-phone').value.trim();
       var t = row.querySelector('.cr-ptype').value;
       return v ? { value: v, type: t } : null;
     }).filter(Boolean);
     return {
-      fullName: val('fullName'),
-      jobTitle: val('jobTitle'),
-      company: val('company'),
+      fullName: fieldVal('fullName'),
+      jobTitle: fieldVal('jobTitle'),
+      company: fieldVal('company'),
       emails: emails,
       phones: phones,
-      website: val('website'),
-      address: val('address'),
-      notes: val('notes')
+      website: fieldVal('website'),
+      address: fieldVal('address'),
+      notes: fieldVal('notes')
     };
   }
 
@@ -644,12 +655,18 @@
     return rows.join('\r\n');
   }
 
-  // ---------- clipboard ----------
+  // ---------- toast + clipboard ----------
   var flash = $('copy-flash');
+  function toast(msg) {
+    if (!flash) return;
+    flash.textContent = msg;
+    flash.classList.add('show');
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { flash.classList.remove('show'); }, 1600);
+  }
   function copyText(text, msg) {
-    function done() { if (!flash) return; flash.textContent = msg || 'copied \u2733'; flash.classList.add('show'); setTimeout(function () { flash.classList.remove('show'); }, 1500); }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(function () { window.prompt('Copy:', text); });
+      navigator.clipboard.writeText(text).then(function () { toast(msg || 'Copied'); }).catch(function () { window.prompt('Copy:', text); });
     } else { window.prompt('Copy:', text); }
   }
   function contactToText(c) {
@@ -665,33 +682,42 @@
   }
 
   // ---------- review actions ----------
+  function needsSomething(c) { return !c.fullName && !c.company && !(c.emails || []).length; }
+
   $('btn-download-one').addEventListener('click', function () {
     var c = collectContact();
-    if (!c.fullName && !c.company && !(c.emails || []).length) { setStatus('Add at least a name, company, or email first.', 'error'); return; }
+    if (needsSomething(c)) { toast('Add a name, company or email first'); return; }
     download(safeName(c) + '.vcf', toVCard(c), 'text/vcard');
   });
-  $('btn-copy-one').addEventListener('click', function () { copyText(contactToText(collectContact()), 'contact copied \u2733'); });
-  $('btn-discard').addEventListener('click', resetAll);
+  $('btn-copy-one').addEventListener('click', function () { copyText(contactToText(collectContact()), 'Contact copied'); });
   $('btn-save').addEventListener('click', function () {
     var c = collectContact();
-    if (!c.fullName && !c.company && !(c.emails || []).length) { setStatus('Add at least a name, company, or email before saving.', 'error'); return; }
+    if (needsSomething(c)) { toast('Add a name, company or email before saving'); return; }
     c.id = 'c' + Date.now() + Math.floor(Math.random() * 1000);
     c.createdAt = Date.now();
-    dbPut(c).then(function () { resetCapture(); loadPhonebook(); if (flash) { flash.textContent = 'saved to phonebook \u2733'; flash.classList.add('show'); setTimeout(function () { flash.classList.remove('show'); }, 1500); } });
+    dbPut(c).then(function () {
+      freshId = c.id;
+      resetAll();
+      loadPhonebook();
+      toast('Saved to your phonebook');
+    });
   });
 
-  function resetCapture() {
+  function resetAll() {
+    scanSeq++; // drop any in-flight read
     images = { front: null, back: null }; wantBack = false;
-    renderThumbs();
-    show(review, false);
-    clearStatus();
+    renderCard();
+    form.reset();
+    emailsBox.innerHTML = ''; phonesBox.innerHTML = '';
+    [].slice.call(form.querySelectorAll('.cr-flag')).forEach(function (f) { f.textContent = ''; });
+    setStage('empty');
   }
-  function resetAll() { resetCapture(); }
 
   // ---------- IndexedDB phonebook ----------
   var DB_NAME = 'techtuate-card-reader';
   var STORE = 'contacts';
   var dbP = null;
+  var memStore = [];
   function openDb() {
     if (dbP) return dbP;
     dbP = new Promise(function (resolve, reject) {
@@ -713,7 +739,7 @@
         tx.objectStore(STORE).put(c);
         tx.oncomplete = resolve; tx.onerror = function () { reject(tx.error); };
       });
-    }).catch(function () { /* IndexedDB unavailable: fall back silently, session-only memory */ memStore.push(c); });
+    }).catch(function () { /* IndexedDB unavailable: session-only memory */ memStore.push(c); });
   }
   function dbAll() {
     return openDb().then(function (db) {
@@ -744,7 +770,6 @@
       });
     }).catch(function () { memStore = []; });
   }
-  var memStore = [];
 
   // ---------- phonebook UI ----------
   var pbList = $('pb-list');
@@ -757,7 +782,7 @@
     dbAll().then(function (list) {
       list.sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
       current = list;
-      pbCount.textContent = list.length + ' saved';
+      pbCount.textContent = list.length + ' saved in this browser';
       show(pbEmpty, list.length === 0);
       show(pbList, list.length > 0);
       show(pbBar, list.length > 0);
@@ -766,39 +791,76 @@
     });
   }
 
+  function hueFor(s) {
+    var h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+    return h;
+  }
+  function initials(c) {
+    var src = (c.fullName || c.company || '?').trim();
+    return src.split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+  }
+
   function pbItem(c) {
     var el = document.createElement('div');
-    el.className = 'cr-pb-item';
+    el.className = 'cr-pb-item' + (c.id === freshId ? ' fresh' : '');
+    var h = hueFor((c.fullName || '') + (c.company || ''));
+    var orb = document.createElement('span');
+    orb.className = 'cr-orb'; orb.setAttribute('aria-hidden', 'true');
+    orb.style.setProperty('--h1', String(h));
+    orb.style.setProperty('--h2', String((h + 320) % 360));
+    orb.textContent = initials(c);
+
     var main = document.createElement('div');
     main.className = 'cr-pb-main';
     var name = document.createElement('div');
     name.className = 'cr-pb-name'; name.textContent = c.fullName || c.company || 'Unnamed contact';
     var sub = document.createElement('div');
     sub.className = 'cr-pb-sub';
-    sub.textContent = [c.jobTitle, c.company, (c.emails || [])[0], (c.phones || [])[0] && c.phones[0].value]
-      .filter(Boolean).join(' \u00b7 ');
+    sub.textContent = [c.jobTitle, c.company].filter(Boolean).join(', ') ||
+      [(c.emails || [])[0], (c.phones || [])[0] && c.phones[0].value].filter(Boolean).join(' \u00b7 ');
     main.appendChild(name); main.appendChild(sub);
 
-    var actions = document.createElement('div');
-    actions.className = 'cr-pb-item-actions';
-    actions.appendChild(iconBtn('.vcf', function () { download(safeName(c) + '.vcf', toVCard(c), 'text/vcard'); }));
-    actions.appendChild(iconBtn('copy', function () { copyText(contactToText(c), 'contact copied \u2733'); }));
-    actions.appendChild(iconBtn('delete', function () { dbDel(c.id).then(loadPhonebook); }));
+    var more = document.createElement('button');
+    more.type = 'button'; more.className = 'cr-more';
+    more.setAttribute('aria-label', 'Options for ' + (c.fullName || c.company || 'this contact'));
+    more.setAttribute('aria-expanded', 'false');
+    more.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>';
 
-    el.appendChild(main); el.appendChild(actions);
+    var menu = document.createElement('div');
+    menu.className = 'cr-menu'; menu.hidden = true; menu.setAttribute('role', 'menu');
+    menu.appendChild(menuBtn('Download .vcf', function () { download(safeName(c) + '.vcf', toVCard(c), 'text/vcard'); }));
+    menu.appendChild(menuBtn('Copy details', function () { copyText(contactToText(c), 'Contact copied'); }));
+    menu.appendChild(menuBtn('Delete', function () { dbDel(c.id).then(loadPhonebook); }, 'danger'));
+
+    more.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menu.hidden;
+      closeMenus();
+      menu.hidden = !open;
+      more.setAttribute('aria-expanded', String(open));
+    });
+
+    el.appendChild(orb); el.appendChild(main); el.appendChild(more); el.appendChild(menu);
     return el;
   }
-  function iconBtn(label, fn) {
+  function menuBtn(label, fn, cls) {
     var b = document.createElement('button');
-    b.type = 'button'; b.className = 'cr-icon-btn'; b.textContent = label;
-    b.addEventListener('click', fn);
+    b.type = 'button'; b.textContent = label; b.setAttribute('role', 'menuitem');
+    if (cls) b.className = cls;
+    b.addEventListener('click', function () { closeMenus(); fn(); });
     return b;
   }
+  function closeMenus() {
+    [].slice.call(document.querySelectorAll('.cr-menu')).forEach(function (m) { m.hidden = true; });
+    [].slice.call(document.querySelectorAll('.cr-more')).forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+  }
+  document.addEventListener('click', closeMenus);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenus(); });
 
   $('btn-export-vcf').addEventListener('click', function () {
     if (!current.length) return;
-    var all = current.map(toVCard).join('\r\n');
-    download('techtuate-contacts.vcf', all, 'text/vcard');
+    download('techtuate-contacts.vcf', current.map(toVCard).join('\r\n'), 'text/vcard');
   });
   $('btn-export-csv').addEventListener('click', function () {
     if (!current.length) return;
@@ -811,7 +873,15 @@
     }
   });
 
+  // ---------- feedback mailto (assembled at click time) ----------
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.tt-feedback');
+    if (!a) return;
+    a.href = 'mailto:' + ['joshi', 'gaurav'].join('') + '@' + ['gmail', '.com'].join('') + '?subject=' + encodeURIComponent('techtuate feedback');
+  }, true);
+
   // ---------- init ----------
-  renderThumbs();
+  renderCard();
+  setStage('empty');
   loadPhonebook();
 })();

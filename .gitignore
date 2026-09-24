@@ -5,3 +5,6 @@ dist/
 *.log
 .env
 .env.local
+
+# design handoff (contains a real business card photo; keep out of the repo)
+Techtuate redesign directions/

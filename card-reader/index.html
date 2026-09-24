@@ -6,9 +6,12 @@
   <title>Business card reader - scan a card into a contact, free - techtuate</title>
   <meta name="description" content="Scan a business card and save it as a contact. Upload or snap a photo, get an editable vCard and CSV. Free, no app, no sign-up." />
   <meta name="keywords" content="business card scanner, business card reader, scan business card to contact, card to vcard, business card ocr, no app business card scanner" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#06050a" />
   <link rel="canonical" href="https://techtuate.com/card-reader/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Crect x='12' y='18' width='40' height='28' rx='4' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3Cline x1='18' y1='28' x2='30' y2='28' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3Cline x1='18' y1='36' x2='26' y2='36' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='42' cy='31' r='5' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3C/svg%3E" />
 
@@ -64,202 +67,215 @@
   ]
 }
   </script>
+  <script src="/assets/backdrop.js" defer></script>
 </head>
 <body>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <div class="tt-page">
 
-  <div class="wrap">
-
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ card reader</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="/#tools">tools</a>
-        <a href="/vs/">vs.</a>
-        <a href="/why-free/">why</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <section class="hero">
-      <div class="eyebrow">scan a card, get a contact</div>
-      <h1>Business card reader</h1>
-      <p class="lede">
-        Snap or upload a business card and it reads the details into an editable contact you can save to your phone.
-        No app, no sign-up. Front and back supported. Your saved phonebook stays in this browser.
-      </p>
-    </section>
+    <main class="cr">
+      <a class="cr-back" href="/#tools">&larr; all tools</a>
 
-    <main>
+      <div class="cr-head">
+        <h1>Business card <span class="serif">reader</span></h1>
+        <p>Snap or upload a business card and it turns into a contact you can edit and save to your phone. Front and back. No app, no sign-up, and your phonebook stays in this browser.</p>
+      </div>
+
       <noscript>
-        <div class="callout yellow">
-          <h4>This tool needs JavaScript.</h4>
-          <p>The reader runs in your browser. Please enable JavaScript and reload.</p>
-        </div>
+        <p class="cr-noscript">This tool needs JavaScript. The reader runs in your browser, so please enable JavaScript and reload.</p>
       </noscript>
 
-      <!-- ============ CAPTURE ============ -->
-      <section id="capture" class="cr-panel">
-        <div id="dropzone" class="cr-drop" tabindex="0" role="button" aria-label="Add a business card photo">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="2" y="5" width="20" height="14" rx="2"/>
-            <path d="M2 9h9M6 13h4"/>
-            <circle cx="16.5" cy="12.5" r="2.5"/>
-          </svg>
-          <p class="cr-drop-title">Drop a card photo here, or</p>
-          <div class="cr-actions">
-            <button type="button" class="btn" id="btn-upload">Upload image</button>
-            <button type="button" class="btn ghost" id="btn-camera">Use camera</button>
-            <button type="button" class="btn ghost" id="btn-paste">Paste</button>
-          </div>
-          <p class="cr-hint">or press Ctrl/Cmd + V to paste a copied image</p>
-        </div>
+      <div class="cr-panels">
 
-        <input type="file" id="file-input" accept="image/*" hidden />
-
-        <!-- live camera -->
-        <div id="camera-wrap" class="cr-camera" hidden>
-          <video id="camera-video" playsinline autoplay muted></video>
-          <div class="cr-camera-guide" aria-hidden="true"></div>
-          <div class="cr-camera-bar">
-            <button type="button" class="btn" id="btn-snap">Capture</button>
-            <button type="button" class="btn ghost" id="btn-camera-cancel">Cancel</button>
-          </div>
-        </div>
-
-        <!-- thumbnails -->
-        <div id="thumbs" class="cr-thumbs" hidden>
-          <div class="cr-thumb" data-side="front">
-            <span class="cr-thumb-label">Front</span>
-            <img id="thumb-front" alt="Front of card" />
-            <button type="button" class="cr-thumb-x" data-remove="front" aria-label="Remove front image">&times;</button>
-          </div>
-          <div class="cr-thumb" id="thumb-back-wrap" data-side="back" hidden>
-            <span class="cr-thumb-label">Back</span>
-            <img id="thumb-back" alt="Back of card" />
-            <button type="button" class="cr-thumb-x" data-remove="back" aria-label="Remove back image">&times;</button>
-          </div>
-          <button type="button" class="cr-addback" id="btn-add-back">+ Add back side</button>
-        </div>
-      </section>
-
-      <!-- ============ SCAN ============ -->
-      <section id="scan-section" class="cr-scan" hidden>
-        <button type="button" class="btn alt cr-scan-btn" id="btn-scan">Read card</button>
-        <p class="cr-disclosure">
-          <strong>*</strong> This tool sends the card image to a third-party AI service (Google Gemini) for high-quality reading.
-          The image is used only to read the card. It is not stored by us and there is no account. Your saved phonebook stays in this browser.
-        </p>
-        <div id="scan-status" class="cr-status" hidden></div>
-      </section>
-
-      <!-- ============ REVIEW ============ -->
-      <section id="review" class="cr-review" hidden>
-        <div class="section-head"><h2>Check the details</h2></div>
-        <p class="cr-review-note">Reading is not perfect. Please confirm each field before you save. Flagged fields were low-confidence or empty.</p>
-
-        <form id="review-form" class="cr-form" autocomplete="off">
-          <label class="cr-field"><span>Full name</span><input type="text" name="fullName" data-key="fullName" /></label>
-          <div class="cr-row2">
-            <label class="cr-field"><span>Job title</span><input type="text" name="jobTitle" data-key="jobTitle" /></label>
-            <label class="cr-field"><span>Company</span><input type="text" name="company" data-key="company" /></label>
+        <!-- ============ THE CARD ============ -->
+        <section class="glass cr-panel cr-card" aria-labelledby="card-label">
+          <div class="cr-panel-head">
+            <h2 class="panel-label" id="card-label">the card</h2>
+            <span class="panel-label cr-stage" id="stage-label">front + back supported</span>
           </div>
 
-          <fieldset class="cr-multi">
-            <legend>Email</legend>
-            <div id="emails"></div>
-            <button type="button" class="cr-add" data-add="email">+ Add email</button>
-          </fieldset>
-
-          <fieldset class="cr-multi">
-            <legend>Phone</legend>
-            <div id="phones"></div>
-            <button type="button" class="cr-add" data-add="phone">+ Add phone</button>
-          </fieldset>
-
-          <label class="cr-field"><span>Website</span><input type="text" name="website" data-key="website" /></label>
-          <label class="cr-field"><span>Address</span><input type="text" name="address" data-key="address" /></label>
-          <label class="cr-field"><span>Notes</span><textarea name="notes" data-key="notes" rows="2"></textarea></label>
-
-          <div class="cr-review-actions">
-            <button type="button" class="btn" id="btn-save">Save to phonebook</button>
-            <button type="button" class="btn alt" id="btn-download-one">Download .vcf</button>
-            <button type="button" class="btn ghost" id="btn-copy-one">Copy details</button>
-            <button type="button" class="btn ghost" id="btn-discard">Start over</button>
+          <!-- empty state -->
+          <div id="cr-empty" class="cr-empty">
+            <div id="dropzone" class="cr-drop" tabindex="0" role="button" aria-label="Add a business card photo: drop, paste or choose a file">
+              <span class="cr-drop-title">Drop a card here</span>
+              <span class="cr-drop-hint">or paste a photo with Ctrl / Cmd + V</span>
+            </div>
+            <div class="cr-btns">
+              <button type="button" class="btn btn-primary" id="btn-camera">Take a photo</button>
+              <button type="button" class="btn btn-ghost" id="btn-upload">Upload</button>
+              <button type="button" class="btn btn-link" id="btn-sample">try a sample card</button>
+            </div>
           </div>
-        </form>
-      </section>
+
+          <!-- with a card -->
+          <div id="cr-has" class="cr-has" hidden>
+            <div class="cr-frame" id="cr-frame">
+              <img id="thumb-front" alt="The business card, front" />
+              <div class="cr-veil" id="cr-veil" hidden><div class="cr-sweep"></div></div>
+            </div>
+            <div class="cr-back-row" id="thumb-back-wrap" hidden>
+              <img id="thumb-back" alt="The business card, back" />
+              <span class="cr-back-label">back</span>
+              <button type="button" class="cr-x" data-remove="back" aria-label="Remove the back side">&times;</button>
+            </div>
+            <div class="cr-btns">
+              <button type="button" class="cr-pill-dashed" id="btn-add-back">+ add the back</button>
+              <button type="button" class="btn btn-text" id="btn-discard">start over</button>
+            </div>
+          </div>
+
+          <input type="file" id="file-input" accept="image/*" hidden />
+
+          <p class="cr-disclosure">
+            <span class="cr-glow" aria-hidden="true"></span>
+            <span><strong>* Where the photo goes.</strong> To read the card, the image is sent once to Google Gemini, a third-party AI service. It isn't stored and there's no account. The contacts you save stay in this browser.</span>
+          </p>
+        </section>
+
+        <!-- ============ THE CONTACT ============ -->
+        <section class="glass cr-panel cr-contact" id="review" aria-labelledby="contact-label">
+          <div class="cr-panel-head">
+            <h2 class="panel-label" id="contact-label">the contact</h2>
+            <span class="panel-label cr-check" id="review-note" aria-live="polite"></span>
+          </div>
+
+          <!-- before / while reading, or when reading failed -->
+          <div id="cr-ghost" class="cr-ghost">
+            <div class="cr-bars" aria-hidden="true">
+              <span style="width:88%"></span><span style="width:62%"></span><span style="width:74%"></span>
+              <span style="width:54%"></span><span style="width:80%"></span><span style="width:46%"></span>
+            </div>
+            <p id="scan-status" class="cr-ghost-text" role="status" aria-live="polite">The details will appear here, ready to edit.</p>
+            <div class="cr-btns" id="cr-fail-actions" hidden>
+              <button type="button" class="btn btn-ghost" id="btn-retry">Try again</button>
+              <button type="button" class="btn btn-text" id="btn-manual">Type it in instead</button>
+            </div>
+          </div>
+
+          <!-- review -->
+          <form id="review-form" class="cr-form" autocomplete="off" hidden>
+            <div class="cr-fields">
+              <label class="cr-field"><span class="cr-label">Name</span><input type="text" data-key="fullName" /><span class="cr-flag"></span></label>
+              <label class="cr-field"><span class="cr-label">Title</span><input type="text" data-key="jobTitle" /><span class="cr-flag"></span></label>
+              <label class="cr-field"><span class="cr-label">Company</span><input type="text" data-key="company" /><span class="cr-flag"></span></label>
+              <div id="emails"></div>
+              <div id="phones"></div>
+              <label class="cr-field"><span class="cr-label">Website</span><input type="text" data-key="website" placeholder="add it if you know it" /><span class="cr-flag"></span></label>
+              <label class="cr-field"><span class="cr-label">Address</span><input type="text" data-key="address" /><span class="cr-flag"></span></label>
+              <label class="cr-field"><span class="cr-label">Notes</span><input type="text" data-key="notes" placeholder="where you met, what you talked about" /><span class="cr-flag"></span></label>
+            </div>
+            <div class="cr-adds">
+              <button type="button" class="cr-add" data-add="email">+ email</button>
+              <button type="button" class="cr-add" data-add="phone">+ phone</button>
+            </div>
+
+            <div class="cr-reach" id="cr-reach" aria-label="Reach out" hidden></div>
+
+            <div class="cr-btns cr-actions">
+              <button type="button" class="btn btn-primary" id="btn-save">Save to phonebook</button>
+              <button type="button" class="btn btn-ghost" id="btn-download-one">Download .vcf</button>
+              <button type="button" class="btn btn-text" id="btn-copy-one">Copy</button>
+            </div>
+          </form>
+        </section>
+      </div>
 
       <!-- ============ PHONEBOOK ============ -->
-      <section id="phonebook" class="cr-phonebook">
-        <div class="section-head">
-          <h2>Your phonebook</h2>
-          <span class="count" id="pb-count">0 saved</span>
+      <section class="cr-pb" id="phonebook" aria-labelledby="pb-h">
+        <div class="cr-pb-head">
+          <div class="cr-pb-title">
+            <h2 id="pb-h">Your phonebook</h2>
+            <span class="cr-pb-count" id="pb-count">0 saved in this browser</span>
+          </div>
+          <div class="cr-pb-links" id="pb-bar" hidden>
+            <button type="button" id="btn-export-vcf">export all .vcf</button>
+            <button type="button" id="btn-export-csv">export csv</button>
+            <button type="button" id="btn-clear-pb" class="quiet">clear all</button>
+          </div>
         </div>
-        <p class="cr-pb-note">Saved only in this browser (nothing on a server). Clearing your browser data removes them.</p>
-
-        <div id="pb-empty" class="callout wash">
-          <h4>No contacts yet.</h4>
-          <p>Scan a card above and save it, and it will show up here ready to export.</p>
-        </div>
-
+        <p id="pb-empty" class="cr-pb-empty">No contacts yet. Read a card and save it, and it shows up here ready to export. Nothing is kept on a server, and clearing your browser data removes them.</p>
         <div id="pb-list" class="cr-pb-list" hidden></div>
+      </section>
 
-        <div id="pb-bar" class="cr-pb-bar" hidden>
-          <button type="button" class="btn" id="btn-export-vcf">Export all (.vcf)</button>
-          <button type="button" class="btn ghost" id="btn-export-csv">Export CSV</button>
-          <button type="button" class="btn ghost" id="btn-clear-pb">Clear phonebook</button>
+      <!-- ============ ABOUT + FAQ ============ -->
+      <section class="cr-about" aria-labelledby="about-h">
+        <p class="eyebrow">about this tool</p>
+        <h2 id="about-h" class="sr-only">About the business card reader</h2>
+        <p>Free, no sign-up. The card image is sent once to Google Gemini for reading. That is the one third-party call this tool makes, and like the font finder it is labeled; the other techtuate tools run fully in your browser. We do not store the image or keep an account, and your saved contacts live only in this browser. Part of <a href="/">techtuate</a>, a growing collection of little tools that just work.</p>
+
+        <p class="eyebrow cr-faq-eyebrow">questions people ask</p>
+        <div class="faq">
+          <details class="faq-item">
+            <summary><h3>Is there a business card scanner that works without an app?</h3></summary>
+            <p>Yes. It runs in your web browser on phone or desktop, so there is nothing to install and no account to create. Scan or upload a card and it becomes an editable contact.</p>
+          </details>
+          <details class="faq-item">
+            <summary><h3>Does my saved contact data leave my device?</h3></summary>
+            <p>The card image is sent once to a labeled AI service to read it and is not stored there. Your saved phonebook is kept locally in your browser, not on our servers.</p>
+          </details>
+          <details class="faq-item">
+            <summary><h3>Can I export scanned cards to my phone or CRM?</h3></summary>
+            <p>Yes. You can export contacts as a vCard or CSV file and import them into your phone contacts, Google Contacts, or a spreadsheet.</p>
+          </details>
         </div>
       </section>
 
+      <!-- ============ RELATED (cross-links) ============ -->
+      <section class="cr-related" aria-labelledby="related-h">
+        <h2 id="related-h" class="cr-related-title">goes well with</h2>
+        <div class="cr-related-pills">
+          <a class="cr-rel" href="/qr-code/" style="--h1:150">
+            <span class="ticon xs" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h2v2h-2z"/><path d="M18 18h2v2h-2z"/><path d="M14 18h2"/><path d="M18 14h2"/></svg></span>QR code generator</a>
+          <a class="cr-rel" href="/image-resize/" style="--h1:330">
+            <span class="ticon xs" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 16l4.5-4.5 3.5 3.5 2.5-2.5L20 18"/><path d="M15.5 8.5h.01"/></svg></span>Image &amp; GIF resizer</a>
+          <a class="cr-rel" href="/pdf-editor/" style="--h1:18">
+            <span class="ticon xs" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15.5l2.5-2.5 1.5 1.5L15.5 12"/></svg></span>PDF editor</a>
+        </div>
+        <p class="cross-compare">Compare: <a href="/vs/camcard/">techtuate vs CamCard</a> &middot; <a href="/vs/">all comparisons</a> &middot; <a href="/">more tools</a></p>
+      </section>
     </main>
 
-    <section style="margin-top: 48px;">
-      <div class="section-head"><h2>About this tool</h2></div>
-      <p style="max-width:680px; color:var(--ink-mute);">
-        Free, no sign-up. The card image is sent once to Google Gemini for reading (this is the one third-party call this tool makes, and it is clearly the exception here - the rest of techtuate runs fully in your browser). We do not store the image or keep an account. Your saved contacts live only in this browser.
-        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
-        Made a card to hand out? Design one with the <a href="/qr-code/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">QR code generator</a>.
-      </p>
-    </section>
-
-    <p class="cross-compare" style="max-width:680px; margin:18px 0 0; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">Compare: <a href="/vs/camcard/" style="color:inherit;">techtuate vs CamCard</a> &middot; <a href="/vs/" style="color:inherit;">all comparisons</a> &middot; <a href="/" style="color:inherit;">more tools</a></p>
-
-    <section class="faq" style="margin-top:44px;">
-      <div class="section-head"><h2>Questions people ask</h2></div>
-      <div style="max-width:720px;">
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Is there a business card scanner that works without an app?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. It runs in your web browser on phone or desktop, so there is nothing to install and no account to create. Scan or upload a card and it becomes an editable contact.</p>
-        </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Does my saved contact data leave my device?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">The card image is sent once to a labeled AI service to read it and is not stored there. Your saved phonebook is kept locally in your browser, not on our servers.</p>
-        </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I export scanned cards to my phone or CRM?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. You can export contacts as a vCard or CSV file and import them into your phone contacts, Google Contacts, or a spreadsheet.</p>
-        </details>
-      </div>
-    </section>
-
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/qr-code/">qr code</a> &middot;
-        <a href="/vs/">comparisons</a> &middot;
-        <a href="/why-free/">why free</a>
-      </div>
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a href="/qr-code/">qr code</a>
+        <a class="tt-feedback" href="#feedback">feedback</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
     </footer>
-
   </div>
 
-  <div id="copy-flash" role="status" aria-live="polite">copied &#10033;</div>
+  <!-- live camera (focused full-screen modal) -->
+  <div id="camera-wrap" class="cr-camera" hidden role="dialog" aria-modal="true" aria-label="Camera">
+    <video id="camera-video" playsinline autoplay muted></video>
+    <div class="cr-camera-title">Line the card up inside the frame</div>
+    <div class="cr-camera-guide" aria-hidden="true"></div>
+    <div class="cr-camera-bar">
+      <button type="button" class="btn btn-primary cr-snap" id="btn-snap">Capture</button>
+      <button type="button" class="btn btn-ghost" id="btn-camera-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="tt-toast" id="copy-flash" role="status" aria-live="polite"></div>
 
   <script src="./script.js"></script>
 </body>
