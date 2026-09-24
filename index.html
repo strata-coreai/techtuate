@@ -104,7 +104,7 @@
       {
         "@type": "Question",
         "name": "Do my files get uploaded?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Not for the tools marked stays on device. Your browser opens and processes the file, and it never leaves the tab. The two tools that read with AI, the business card reader and the font finder, send only the image you give them to Google Gemini to read it. They are labeled, and the image is not stored." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Not for the tools marked stays on device. Your browser opens and processes the file, and it never leaves the tab. The two tools that read with AI, the business card reader and the font finder, send only the image you give them to a labeled AI service to read it (Cloudflare Workers AI for the card reader, Google Gemini for the font finder). We don't store the image." }
       },
       {
         "@type": "Question",
@@ -323,7 +323,7 @@
             <p>An image compressor and a file converter are next. <a class="tt-feedback" href="#feedback">Suggest one</a></p>
           </div>
         </div>
-        <p class="ai-note"><strong>* Reads with AI.</strong> These two send only the image you give them to a third-party AI service (Google Gemini) to read it. The image is not stored and there is no account. Every other tool stays on your device.</p>
+        <p class="ai-note"><strong>* Reads with AI.</strong> These two send only the image you give them to a third-party AI service (Cloudflare Workers AI for the card reader, Google Gemini for the font finder) to read it. We don't store the image and there is no account. Every other tool stays on your device.</p>
       </section>
 
       <!-- ============ About + FAQ ============ -->
@@ -345,7 +345,7 @@
               </details>
               <details class="faq-item">
                 <summary><h3>Do my files get uploaded?</h3></summary>
-                <p>Not for the tools marked stays on device. Your browser opens and processes the file, and it never leaves the tab. The two tools that read with AI, the business card reader and the font finder, send only the image you give them to Google Gemini to read it. They are labeled, and the image is not stored.</p>
+                <p>Not for the tools marked stays on device. Your browser opens and processes the file, and it never leaves the tab. The two tools that read with AI, the business card reader and the font finder, send only the image you give them to a labeled AI service to read it (Cloudflare Workers AI for the card reader, Google Gemini for the font finder). We don't store the image.</p>
               </details>
               <details class="faq-item">
                 <summary><h3>Is there a free PDF editor with no sign-up?</h3></summary>

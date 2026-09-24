@@ -113,13 +113,49 @@ function extractText(data) {
   return '';
 }
 
+// ---------------------------------------------------------------------------
+// Primary reader: Cloudflare Workers AI (binding "AI", set in Pages settings).
+// Chosen 2026-09-24 after a 30-card bench (15 Latin script, 15 other scripts
+// and bilingual): Mistral Small 3.1 with a plain "reply in JSON" prompt scored
+// 100% with no failures in ~7s, while Gemini's free tier ran out of quota
+// after 11 cards. It runs on the account's free daily allowance, needs no
+// third-party key, and Cloudflare does not keep or train on the inputs.
+// Gemini (below) is the fallback when Workers AI errors, is out of quota or
+// returns something unreadable. Env: WORKERS_AI_MODEL overrides the model;
+// SCAN_PROVIDER=gemini skips Workers AI entirely.
+// ---------------------------------------------------------------------------
+const WORKERS_MODEL = '@cf/mistralai/mistral-small-3.1-24b-instruct';
+const WORKERS_JSON_HINT = 'Reply with ONLY a JSON object with these keys: fullName, jobTitle, company, searchName, ' +
+  'emails (array of strings), phones (array of {value, type, e164, isMobile}), website, address, notes, ' +
+  'confidence ({fullName, jobTitle, company} numbers 0..1). No markdown, no code fences, no commentary.';
+
+function workersJson(res) {
+  if (!res) return null;
+  const oc = res.choices && res.choices[0] && res.choices[0].message && res.choices[0].message.content;
+  let r = res.response !== undefined ? res.response : (typeof oc === 'string' ? oc : null);
+  if (r && typeof r === 'object' && !Array.isArray(r)) return r;
+  if (typeof r !== 'string') return null;
+  r = r.replace(/```(?:json)?/gi, '');
+  const a = r.indexOf('{'), b = r.lastIndexOf('}');
+  if (a < 0 || b <= a) return null;
+  try { return JSON.parse(r.slice(a, b + 1)); } catch (e) { return null; }
+}
+
+async function readWithWorkers(env, imgs) {
+  const content = [{ type: 'text', text: PROMPT + '\n' + WORKERS_JSON_HINT }].concat(
+    imgs.map(u => ({ type: 'image_url', image_url: { url: u } }))
+  );
+  const res = await env.AI.run(env.WORKERS_AI_MODEL || WORKERS_MODEL, {
+    messages: [{ role: 'user', content: content }], max_tokens: 1500, temperature: 0
+  });
+  const data = workersJson(res);
+  if (!data || typeof data !== 'object') throw new Error('unreadable Workers AI reply');
+  return data;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   try {
-    if (!env.GEMINI_API_KEY) {
-      return json({ ok: false, error: 'Card reading is not configured on this server yet.' }, 503);
-    }
-
     let payload;
     try {
       payload = await request.json();
@@ -136,6 +172,23 @@ export async function onRequestPost(context) {
       if (!parsed) return json({ ok: false, error: 'One of the images was not a valid image.' }, 400);
       if (parsed.data.length > MAX_BYTES) return json({ ok: false, error: 'That image is too large. Try again - the tool downscales automatically.' }, 413);
       parts.push({ inline_data: { mime_type: parsed.mime, data: parsed.data } });
+    }
+
+    // 1) Workers AI first.
+    let workersError = '';
+    if (env.AI && env.SCAN_PROVIDER !== 'gemini') {
+      try {
+        const data = await readWithWorkers(env, imgs);
+        return json({ ok: true, data: data, provider: 'workers' }, 200);
+      } catch (e) {
+        workersError = String(e && e.message || e).slice(0, 200);
+        console.log('scan: workers ai failed, falling back to gemini', workersError);
+      }
+    }
+
+    // 2) Gemini fallback.
+    if (!env.GEMINI_API_KEY) {
+      return json({ ok: false, error: workersError ? 'The reading service is busy right now. Please try again in a moment.' : 'Card reading is not configured on this server yet.', detail: workersError }, 503);
     }
 
     const model = env.GEMINI_MODEL || DEFAULT_MODEL;

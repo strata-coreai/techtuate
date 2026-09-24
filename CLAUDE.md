@@ -24,7 +24,8 @@ Reference implementation of the AI-tool rules above. It uses a single Cloudflare
 - The third-party call **is labelled** on the tool UI (the visible `*` disclosure) and in its About section. Do not quietly remove that label.
 - The Gemini key lives ONLY as the encrypted Cloudflare env var `GEMINI_API_KEY` (optional `GEMINI_MODEL`, default `gemini-flash-latest` - do NOT pin a dated model, Google retires them for new keys; optional `GEMINI_FALLBACK_MODEL`, default `gemini-flash-lite-latest`, used when the main model answers 500/503 "high demand"; set to `none` to disable). Never commit it, never ship it to the client.
 - Functions never return HTTP 5xx: Cloudflare replaces 5xx bodies with its own HTML error page, hiding the JSON. Errors go out as 200 with `ok:false` and `httpStatus` in the body.
-- The provider is isolated in the function so it can be swapped (GLM-4.6V, Qwen-VL, Workers AI) without touching the client.
+- **Since 2026-09-24 the primary reader is Cloudflare Workers AI** (`@cf/mistralai/mistral-small-3.1-24b-instruct`, plain JSON prompt; binding `AI` in Pages settings; `WORKERS_AI_MODEL` overrides; `SCAN_PROVIDER=gemini` forces Gemini). A 30-card bench (15 Latin, 15 other scripts/bilingual) scored it 100% with no failures, ~7s; Gemini's free tier ran out of quota after 11 cards. Gemini stays as the fallback. Workers AI structured output (`response_format` json_schema) was worse than the plain prompt for these models - do not switch to it without re-benchmarking. The font finder still uses Gemini only.
+- The provider is isolated in the function so it can be swapped without touching the client.
 - New AI tools follow this same shape (labeled, keyless client, no stored input). Ask the founder before adding one.
 
 ## Current tools (as of 2026-09-24)
@@ -45,7 +46,7 @@ Local (100% client-side, files never uploaded):
 - `/word-counter/` - words, characters, reading time
 
 AI (labeled, calls a service through a Pages Function):
-- `/card-reader/` - scan a business card into a contact (Gemini via `/functions/api/scan.js`)
+- `/card-reader/` - scan a business card into a contact (Cloudflare Workers AI, Mistral Small 3.1, with Gemini fallback, via `/functions/api/scan.js`)
 - `/font-finder/` - identify fonts in a screenshot (Gemini via `/functions/api/font.js`)
 
 Marketing / SEO: `/`, `/why-free/`, `/free-pdf-editor/`, `/vs/` (hub + one page per competitor).
@@ -82,7 +83,7 @@ techtuate/
 │   └── pdffiller/index.html
 ├── docs/positioning.md     # brand positioning + site-wide messaging rewrite map
 ├── docs/prompts/           # paste-ready Claude Code session prompts
-├── functions/api/scan.js   # Cloudflare Pages Function (Gemini proxy for /card-reader/) - stays at repo root
+├── functions/api/scan.js   # Cloudflare Pages Function for /card-reader/ (Workers AI first, Gemini fallback) - stays at repo root
 ├── card-reader/            # AI tool (vanilla): index.html + script.js + styles.css
 ├── color-palette/          # local tool (vanilla): index.html + script.js + styles.css
 ├── qr-code/  password-generator/  svg-converter/  sql-to-excel/  image-resize/  json-formatter/
