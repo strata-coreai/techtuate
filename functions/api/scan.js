@@ -28,7 +28,7 @@ const MAX_IMAGES = 2;
 const MAX_BYTES = 6 * 1024 * 1024; // ~6MB of base64 per image, generous for a downscaled JPEG
 const UPSTREAM_TIMEOUT_MS = 25000; // give the model time, but never hang the function
 
-const PROMPT = [
+export const PROMPT = [
   'You are reading a business card. One or two images may be provided (front and back of the same card).',
   'Extract the contact details and return ONLY the JSON described by the schema.',
   'Merge information across the front and back into a single contact.',
@@ -43,7 +43,7 @@ const PROMPT = [
   '- confidence: a 0..1 estimate for how sure you are of fullName, jobTitle, and company.'
 ].join('\n');
 
-const RESPONSE_SCHEMA = {
+export const RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
     fullName: { type: 'STRING' },

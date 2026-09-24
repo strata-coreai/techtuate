@@ -1,0 +1,698 @@
+[
+ {
+  "id": "01-en-us",
+  "lang": "English (US)",
+  "name": [
+   "Daniel Okafor"
+  ],
+  "title": "Senior Product Manager",
+  "company": "Brightline Analytics",
+  "emails": [
+   "d.okafor@brightline-analytics.com"
+  ],
+  "phones": [
+   {
+    "printed": "+1 (415) 555-0187",
+    "e164": "+14155550187",
+    "mobile": true
+   },
+   {
+    "printed": "+1 (415) 555-0100",
+    "e164": "+14155550100",
+    "mobile": false
+   }
+  ],
+  "web": "www.brightline-analytics.com"
+ },
+ {
+  "id": "02-en-gb",
+  "lang": "English (UK)",
+  "name": [
+   "Harriet Pembroke"
+  ],
+  "title": "Partner",
+  "company": "Pembroke & Vale Solicitors",
+  "emails": [
+   "h.pembroke@pembrokevale.co.uk"
+  ],
+  "phones": [
+   {
+    "printed": "020 7946 0321",
+    "e164": "+442079460321",
+    "mobile": false
+   },
+   {
+    "printed": "07700 900452",
+    "e164": "+447700900452",
+    "mobile": true
+   }
+  ],
+  "web": "pembrokevale.co.uk"
+ },
+ {
+  "id": "03-en-sg",
+  "lang": "English (Singapore)",
+  "name": [
+   "Marcus Tan Wei Ming",
+   "Marcus Tan"
+  ],
+  "title": "Regional Sales Director, APAC",
+  "company": "Kinetic Freight Pte Ltd",
+  "emails": [
+   "marcus.tan@kineticfreight.sg"
+  ],
+  "phones": [
+   {
+    "printed": "+65 9123 4567",
+    "e164": "+6591234567",
+    "mobile": true
+   },
+   {
+    "printed": "+65 6789 0123",
+    "e164": "+6567890123",
+    "mobile": false
+   }
+  ],
+  "web": "kineticfreight.sg"
+ },
+ {
+  "id": "04-ms-my",
+  "lang": "Malay (Malaysia)",
+  "name": [
+   "Nurul Aisyah binti Ahmad",
+   "Nurul Aisyah Ahmad"
+  ],
+  "title": "Pengurus Pemasaran",
+  "company": "Syarikat Cahaya Timur Sdn. Bhd.",
+  "emails": [
+   "aisyah@cahayatimur.com.my"
+  ],
+  "phones": [
+   {
+    "printed": "+60 12-345 6789",
+    "e164": "+60123456789",
+    "mobile": true
+   },
+   {
+    "printed": "+60 3-2141 5566",
+    "e164": "+60321415566",
+    "mobile": false
+   }
+  ],
+  "web": "www.cahayatimur.com.my"
+ },
+ {
+  "id": "05-id-id",
+  "lang": "Indonesian",
+  "name": [
+   "Rizky Pratama"
+  ],
+  "title": "Kepala Operasional",
+  "company": "PT Nusantara Logistik Mandiri",
+  "emails": [
+   "rizky.pratama@nusalog.co.id"
+  ],
+  "phones": [
+   {
+    "printed": "+62 812-3456-7890",
+    "e164": "+6281234567890",
+    "mobile": true
+   }
+  ],
+  "web": "nusalog.co.id"
+ },
+ {
+  "id": "06-fil-ph",
+  "lang": "English (Philippines)",
+  "name": [
+   "Maria Cristina Dela Cruz",
+   "Maria Cristina dela Cruz"
+  ],
+  "title": "HR Business Partner",
+  "company": "Isla Digital Solutions, Inc.",
+  "emails": [
+   "mcdelacruz@isladigital.ph",
+   "hr@isladigital.ph"
+  ],
+  "phones": [
+   {
+    "printed": "+63 917 555 0142",
+    "e164": "+639175550142",
+    "mobile": true
+   }
+  ],
+  "web": "isladigital.ph"
+ },
+ {
+  "id": "07-vi-vn",
+  "lang": "Vietnamese",
+  "name": [
+   "Nguyễn Thị Hương"
+  ],
+  "title": "Giám đốc Tài chính",
+  "company": "Công ty TNHH Sông Hồng Việt",
+  "emails": [
+   "huong.nguyen@songhongviet.vn"
+  ],
+  "phones": [
+   {
+    "printed": "+84 90 123 4567",
+    "e164": "+84901234567",
+    "mobile": true
+   }
+  ],
+  "web": "songhongviet.vn"
+ },
+ {
+  "id": "08-fr-fr",
+  "lang": "French",
+  "name": [
+   "Élodie Marchand"
+  ],
+  "title": "Directrice Artistique",
+  "company": "Atelier Lumière",
+  "emails": [
+   "elodie@atelier-lumiere.fr"
+  ],
+  "phones": [
+   {
+    "printed": "+33 6 12 34 56 78",
+    "e164": "+33612345678",
+    "mobile": true
+   },
+   {
+    "printed": "+33 1 45 67 89 10",
+    "e164": "+33145678910",
+    "mobile": false
+   }
+  ],
+  "web": "atelier-lumiere.fr"
+ },
+ {
+  "id": "09-de-de",
+  "lang": "German",
+  "name": [
+   "Jürgen Weißmann"
+  ],
+  "title": "Leiter Einkauf",
+  "company": "Schröder Maschinenbau GmbH",
+  "emails": [
+   "j.weissmann@schroeder-mb.de"
+  ],
+  "phones": [
+   {
+    "printed": "+49 171 2345678",
+    "e164": "+491712345678",
+    "mobile": true
+   },
+   {
+    "printed": "+49 89 1234 5670",
+    "e164": "+498912345670",
+    "mobile": false
+   }
+  ],
+  "web": "www.schroeder-mb.de"
+ },
+ {
+  "id": "10-es-mx",
+  "lang": "Spanish (Mexico)",
+  "name": [
+   "Alejandro Núñez Ortega",
+   "Alejandro Núñez"
+  ],
+  "title": "Gerente de Ventas",
+  "company": "Grupo Altamira S.A. de C.V.",
+  "emails": [
+   "anunez@grupoaltamira.mx"
+  ],
+  "phones": [
+   {
+    "printed": "+52 55 1234 5678",
+    "e164": "+525512345678",
+    "mobile": true
+   }
+  ],
+  "web": "grupoaltamira.mx"
+ },
+ {
+  "id": "11-pt-br",
+  "lang": "Portuguese (Brazil)",
+  "name": [
+   "João Victor Albuquerque",
+   "João Albuquerque"
+  ],
+  "title": "Engenheiro de Software",
+  "company": "Tupã Tecnologia Ltda.",
+  "emails": [
+   "joao.victor@tupatec.com.br"
+  ],
+  "phones": [
+   {
+    "printed": "+55 11 98765-4321",
+    "e164": "+5511987654321",
+    "mobile": true
+   }
+  ],
+  "web": "tupatec.com.br"
+ },
+ {
+  "id": "12-it-it",
+  "lang": "Italian",
+  "name": [
+   "Giulia Bianchi"
+  ],
+  "title": "Responsabile Export",
+  "company": "Cantine Colle Verde S.r.l.",
+  "emails": [
+   "g.bianchi@colleverde.it"
+  ],
+  "phones": [
+   {
+    "printed": "+39 333 123 4567",
+    "e164": "+393331234567",
+    "mobile": true
+   },
+   {
+    "printed": "+39 0577 123456",
+    "e164": "+390577123456",
+    "mobile": false
+   }
+  ],
+  "web": "www.colleverde.it"
+ },
+ {
+  "id": "13-nl-nl",
+  "lang": "Dutch",
+  "name": [
+   "Sanne van der Berg"
+  ],
+  "title": "Accountmanager",
+  "company": "Groenhaven B.V.",
+  "emails": [
+   "sanne.vanderberg@groenhaven.nl"
+  ],
+  "phones": [
+   {
+    "printed": "+31 6 12345678",
+    "e164": "+31612345678",
+    "mobile": true
+   }
+  ],
+  "web": "groenhaven.nl"
+ },
+ {
+  "id": "14-pl-pl",
+  "lang": "Polish",
+  "name": [
+   "Łukasz Wiśniewski"
+  ],
+  "title": "Kierownik Projektu",
+  "company": "Żuraw Budownictwo Sp. z o.o.",
+  "emails": [
+   "l.wisniewski@zuraw-bud.pl"
+  ],
+  "phones": [
+   {
+    "printed": "+48 601 234 567",
+    "e164": "+48601234567",
+    "mobile": true
+   }
+  ],
+  "web": "zuraw-bud.pl"
+ },
+ {
+  "id": "15-tr-tr",
+  "lang": "Turkish",
+  "name": [
+   "Ayşe Yılmaz"
+  ],
+  "title": "İş Geliştirme Müdürü",
+  "company": "Boğaziçi Enerji A.Ş.",
+  "emails": [
+   "ayse.yilmaz@bogazicienerji.com.tr"
+  ],
+  "phones": [
+   {
+    "printed": "+90 532 123 45 67",
+    "e164": "+905321234567",
+    "mobile": true
+   },
+   {
+    "printed": "+90 212 555 01 23",
+    "e164": "+902125550123",
+    "mobile": false
+   }
+  ],
+  "web": "bogazicienerji.com.tr"
+ },
+ {
+  "id": "16-zh-cn",
+  "lang": "Chinese (Simplified)",
+  "name": [
+   "王晓明",
+   "Wang Xiaoming"
+  ],
+  "title": "销售总监",
+  "company": "上海星辰科技有限公司",
+  "emails": [
+   "wangxm@xingchen-tech.cn"
+  ],
+  "phones": [
+   {
+    "printed": "+86 138 1234 5678",
+    "e164": "+8613812345678",
+    "mobile": true
+   },
+   {
+    "printed": "+86 21 6123 4567",
+    "e164": "+862161234567",
+    "mobile": false
+   }
+  ],
+  "web": "www.xingchen-tech.cn"
+ },
+ {
+  "id": "17-zh-tw",
+  "lang": "Chinese (Traditional)",
+  "name": [
+   "陳怡君",
+   "Chen Yi-Chun"
+  ],
+  "title": "產品經理",
+  "company": "台北雲端資訊股份有限公司",
+  "emails": [
+   "yichun.chen@tpcloud.com.tw"
+  ],
+  "phones": [
+   {
+    "printed": "+886 912 345 678",
+    "e164": "+886912345678",
+    "mobile": true
+   }
+  ],
+  "web": "tpcloud.com.tw"
+ },
+ {
+  "id": "18-en-zh-my",
+  "lang": "English + Chinese (Malaysia)",
+  "name": [
+   "Lim Chee Keong",
+   "林志强"
+  ],
+  "title": "Managing Director",
+  "company": "Harmony Trading Sdn. Bhd.",
+  "emails": [
+   "ck.lim@harmonytrading.com.my"
+  ],
+  "phones": [
+   {
+    "printed": "+60 16-228 8899",
+    "e164": "+60162288899",
+    "mobile": true
+   },
+   {
+    "printed": "+60 4-226 1188",
+    "e164": "+6042261188",
+    "mobile": false
+   }
+  ],
+  "web": "harmonytrading.com.my"
+ },
+ {
+  "id": "19-ja-jp",
+  "lang": "Japanese",
+  "name": [
+   "佐藤健",
+   "Sato Ken",
+   "Ken Sato"
+  ],
+  "title": "営業部 部長",
+  "company": "株式会社ミライテック",
+  "emails": [
+   "k.sato@miraitech.co.jp"
+  ],
+  "phones": [
+   {
+    "printed": "090-1234-5678",
+    "e164": "+819012345678",
+    "mobile": true
+   },
+   {
+    "printed": "03-1234-5678",
+    "e164": "+81312345678",
+    "mobile": false
+   }
+  ],
+  "web": "www.miraitech.co.jp"
+ },
+ {
+  "id": "20-ja-en",
+  "lang": "Japanese + English",
+  "name": [
+   "Yuki Tanaka",
+   "田中由紀"
+  ],
+  "title": "Marketing Manager",
+  "company": "Sakura Design Co., Ltd.",
+  "emails": [
+   "yuki.tanaka@sakuradesign.jp"
+  ],
+  "phones": [
+   {
+    "printed": "+81 80-9876-5432",
+    "e164": "+818098765432",
+    "mobile": true
+   }
+  ],
+  "web": "sakuradesign.jp"
+ },
+ {
+  "id": "21-ko-kr",
+  "lang": "Korean",
+  "name": [
+   "김민준",
+   "Kim Min-jun",
+   "Minjun Kim"
+  ],
+  "title": "기술 이사",
+  "company": "한빛소프트웨어 주식회사",
+  "emails": [
+   "minjun.kim@hanbitsw.co.kr"
+  ],
+  "phones": [
+   {
+    "printed": "+82 10-1234-5678",
+    "e164": "+821012345678",
+    "mobile": true
+   }
+  ],
+  "web": "hanbitsw.co.kr"
+ },
+ {
+  "id": "22-th-th",
+  "lang": "Thai",
+  "name": [
+   "สมชาย ใจดี",
+   "Somchai Jaidee"
+  ],
+  "title": "ผู้จัดการฝ่ายขาย",
+  "company": "บริษัท สยามเทรด จำกัด",
+  "emails": [
+   "somchai@siamtrade.co.th"
+  ],
+  "phones": [
+   {
+    "printed": "+66 81 234 5678",
+    "e164": "+66812345678",
+    "mobile": true
+   }
+  ],
+  "web": "siamtrade.co.th"
+ },
+ {
+  "id": "23-th-en",
+  "lang": "Thai + English",
+  "name": [
+   "Pimchanok Srisuk",
+   "พิมพ์ชนก ศรีสุข"
+  ],
+  "title": "Senior Architect",
+  "company": "Lotus Studio Co., Ltd.",
+  "emails": [
+   "pimchanok@lotusstudio.co.th"
+  ],
+  "phones": [
+   {
+    "printed": "+66 89 765 4321",
+    "e164": "+66897654321",
+    "mobile": true
+   },
+   {
+    "printed": "+66 2 123 4567",
+    "e164": "+6621234567",
+    "mobile": false
+   }
+  ],
+  "web": "lotusstudio.co.th"
+ },
+ {
+  "id": "24-ta-my",
+  "lang": "Tamil + English (Malaysia)",
+  "name": [
+   "Arun Kumar Rajendran",
+   "Arun Kumar",
+   "அருண் குமார்"
+  ],
+  "title": "Operations Manager",
+  "company": "Kavya Textiles Sdn. Bhd.",
+  "emails": [
+   "arun@kavyatextiles.com.my"
+  ],
+  "phones": [
+   {
+    "printed": "+60 19-876 5432",
+    "e164": "+60198765432",
+    "mobile": true
+   }
+  ],
+  "web": "kavyatextiles.com.my"
+ },
+ {
+  "id": "25-hi-in",
+  "lang": "Hindi + English",
+  "name": [
+   "Priya Sharma",
+   "प्रिया शर्मा"
+  ],
+  "title": "Chief Operating Officer",
+  "company": "Ganga Agro Foods Pvt. Ltd.",
+  "emails": [
+   "priya.sharma@gangaagro.in"
+  ],
+  "phones": [
+   {
+    "printed": "+91 98765 43210",
+    "e164": "+919876543210",
+    "mobile": true
+   },
+   {
+    "printed": "+91 22 2345 6789",
+    "e164": "+912223456789",
+    "mobile": false
+   }
+  ],
+  "web": "gangaagro.in"
+ },
+ {
+  "id": "26-ar-ae",
+  "lang": "Arabic + English (UAE)",
+  "name": [
+   "Omar Al Mansouri",
+   "Omar Al-Mansouri",
+   "عمر المنصوري"
+  ],
+  "title": "Business Development Manager",
+  "company": "Al Noor Trading LLC",
+  "emails": [
+   "omar@alnoortrading.ae"
+  ],
+  "phones": [
+   {
+    "printed": "+971 50 123 4567",
+    "e164": "+971501234567",
+    "mobile": true
+   },
+   {
+    "printed": "+971 4 234 5678",
+    "e164": "+97142345678",
+    "mobile": false
+   }
+  ],
+  "web": "alnoortrading.ae"
+ },
+ {
+  "id": "27-ru-ru",
+  "lang": "Russian",
+  "name": [
+   "Анна Сергеевна Волкова",
+   "Анна Волкова",
+   "Anna Volkova"
+  ],
+  "title": "Руководитель отдела закупок",
+  "company": "ООО «Северный Путь»",
+  "emails": [
+   "a.volkova@severput.ru"
+  ],
+  "phones": [
+   {
+    "printed": "+7 916 123-45-67",
+    "e164": "+79161234567",
+    "mobile": true
+   }
+  ],
+  "web": "severput.ru"
+ },
+ {
+  "id": "28-el-gr",
+  "lang": "Greek",
+  "name": [
+   "Γιώργος Παπαδόπουλος",
+   "Giorgos Papadopoulos"
+  ],
+  "title": "Διευθυντής Πωλήσεων",
+  "company": "Αιγαίο Ναυτιλιακή Α.Ε.",
+  "emails": [
+   "g.papadopoulos@aigaio-nav.gr"
+  ],
+  "phones": [
+   {
+    "printed": "+30 694 123 4567",
+    "e164": "+306941234567",
+    "mobile": true
+   }
+  ],
+  "web": "aigaio-nav.gr"
+ },
+ {
+  "id": "29-he-il",
+  "lang": "Hebrew",
+  "name": [
+   "נועה לוי",
+   "Noa Levi"
+  ],
+  "title": "מנהלת פיתוח עסקי",
+  "company": "אופק טכנולוגיות בע\"מ",
+  "emails": [
+   "noa.levi@ofek-tech.co.il"
+  ],
+  "phones": [
+   {
+    "printed": "+972 52-123-4567",
+    "e164": "+972521234567",
+    "mobile": true
+   }
+  ],
+  "web": "ofek-tech.co.il"
+ },
+ {
+  "id": "30-bn-bd",
+  "lang": "Bengali + English",
+  "name": [
+   "Tanvir Hossain",
+   "তানভীর হোসেন"
+  ],
+  "title": "Head of Procurement",
+  "company": "Padma Garments Ltd.",
+  "emails": [
+   "tanvir.hossain@padmagarments.com.bd"
+  ],
+  "phones": [
+   {
+    "printed": "+880 1712-345678",
+    "e164": "+8801712345678",
+    "mobile": true
+   }
+  ],
+  "web": "padmagarments.com.bd"
+ }
+]
