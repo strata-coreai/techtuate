@@ -21,7 +21,11 @@ const ALLOWED_MODELS = [
   '@cf/meta/llama-4-scout-17b-16e-instruct',
   '@cf/google/gemma-3-12b-it',
   '@cf/mistralai/mistral-small-3.1-24b-instruct',
-  '@cf/meta/llama-3.2-11b-vision-instruct'
+  '@cf/meta/llama-3.2-11b-vision-instruct',
+  '@cf/google/gemma-4-26b-a4b-it',
+  '@cf/qwen/qwen3.8-27b',
+  '@cf/moonshotai/kimi-k2.6',
+  '@cf/zai-org/glm-5.3-flash'
 ];
 const MAX_IMAGES = 2;
 const MAX_BYTES = 6 * 1024 * 1024;
@@ -44,6 +48,8 @@ function toJsonSchema(s) {
   for (const k of Object.keys(s)) {
     out[k] = k === 'type' && typeof s[k] === 'string' ? s[k].toLowerCase() : toJsonSchema(s[k]);
   }
+  // Workers AI structured output only fills what is required, so require every field.
+  if (out.properties && typeof out.properties === 'object') out.required = Object.keys(out.properties);
   return out;
 }
 const SCHEMA = toJsonSchema(RESPONSE_SCHEMA);
@@ -76,7 +82,7 @@ function dataUrlBytes(u) {
   return arr;
 }
 
-async function runModel(env, model, imgs) {
+async function runModel(env, model, imgs, mode) {
   const text = PROMPT + '\n' + JSON_HINT;
 
   // Llama 3.2 Vision takes raw image bytes (one image) and a one-time licence "agree".
@@ -97,6 +103,7 @@ async function runModel(env, model, imgs) {
     imgs.map(u => ({ type: 'image_url', image_url: { url: u } }))
   );
   const base = { messages: [{ role: 'user', content: content }], max_tokens: 1500, temperature: 0 };
+  if (mode === 'prompt') return await env.AI.run(model, base);
   try {
     return await env.AI.run(model, Object.assign({}, base, {
       response_format: { type: 'json_schema', json_schema: SCHEMA }
@@ -126,7 +133,7 @@ export async function onRequestPost(context) {
     const t0 = Date.now();
     let res;
     try {
-      res = await runModel(env, model, imgs);
+      res = await runModel(env, model, imgs, payload.mode === 'prompt' ? 'prompt' : 'schema');
     } catch (e) {
       const msg = String(e && e.message || e).slice(0, 300);
       const quota = /neuron|quota|limit|429|capacity/i.test(msg);
@@ -140,6 +147,19 @@ export async function onRequestPost(context) {
   }
 }
 
-export function onRequestGet() {
+// GET ?models=1 lists the account's vision-capable Workers AI models (for the bench).
+export async function onRequestGet(context) {
+  const { request, env } = context;
+  const url = new URL(request.url);
+  if (url.searchParams.get('models') && env.AI && env.AI.models) {
+    try {
+      const list = await env.AI.models({ per_page: 200 });
+      const vision = (list || []).filter(m => /vision|image|multimodal|vl/i.test(JSON.stringify(m.properties || []) + ' ' + (m.description || '') + ' ' + m.name))
+        .map(m => m.name);
+      return json({ ok: true, allowed: ALLOWED_MODELS, vision: vision });
+    } catch (e) {
+      return json({ ok: false, error: String(e && e.message || e).slice(0, 200) }, 200);
+    }
+  }
   return json({ ok: false, error: 'Use POST.' }, 405);
 }

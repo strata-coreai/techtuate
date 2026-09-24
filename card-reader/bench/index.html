@@ -30,8 +30,10 @@
     <div class="bar">
       <label class="m"><input type="checkbox" class="prov" value="gemini" checked /> Gemini</label>
       <label class="m"><input type="checkbox" class="prov" value="@cf/meta/llama-4-scout-17b-16e-instruct" checked /> Llama 4 Scout</label>
-      <label class="m"><input type="checkbox" class="prov" value="@cf/google/gemma-3-12b-it" checked /> Gemma 3 12B</label>
-      <label class="m"><input type="checkbox" class="prov" value="@cf/mistralai/mistral-small-3.1-24b-instruct" /> Mistral Small 3.1</label>
+      <label class="m"><input type="checkbox" class="prov" value="@cf/meta/llama-4-scout-17b-16e-instruct|prompt" /> Llama 4 Scout (prompt JSON)</label>
+      <label class="m"><input type="checkbox" class="prov" value="@cf/mistralai/mistral-small-3.1-24b-instruct" checked /> Mistral Small 3.1</label>
+      <label class="m"><input type="checkbox" class="prov" value="@cf/mistralai/mistral-small-3.1-24b-instruct|prompt" /> Mistral Small 3.1 (prompt JSON)</label>
+      <label class="m">extra model <input id="extra" type="text" placeholder="@cf/... or @cf/...|prompt" style="width:260px" /></label>
       <label class="m"><input type="checkbox" class="prov" value="@cf/meta/llama-3.2-11b-vision-instruct" /> Llama 3.2 Vision</label>
       <label class="m">cards <input id="limit" type="number" value="30" min="1" max="30" style="width:60px" /></label>
       <button class="btn btn-primary" id="run">Run</button>
@@ -99,7 +101,8 @@
         lastGemini = performance.now();
         r = await fetch('/api/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ images: [img] }) });
       } else {
-        r = await fetch('/api/scan-workers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ images: [img], model: prov }) });
+        var pm = prov.split('|');
+        r = await fetch('/api/scan-workers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ images: [img], model: pm[0], mode: pm[1] || 'schema' }) });
       }
       try { body = await r.json(); } catch (e) { body = { ok: false, error: 'non-JSON HTTP ' + r.status }; }
       if (r.status === 429 && prov === 'gemini' && attempt < 2) { $('status').textContent = 'Gemini rate limit, waiting 65s...'; await sleep(65000); continue; }
@@ -110,6 +113,7 @@
 
   function cls(v) { return v >= 1 ? 'good' : (v > 0 ? 'mid' : 'bad'); }
   function short(p) { return p === 'gemini' ? 'gemini' : p.split('/').pop(); }
+  window.BENCH_RUN = function () { $('run').click(); };
 
   function render(provs) {
     var sum = {};
@@ -146,6 +150,7 @@
 
   $('run').addEventListener('click', async function () {
     var provs = [].slice.call(document.querySelectorAll('.prov:checked')).map(function (x) { return x.value; });
+    if ($('extra').value.trim()) provs.push($('extra').value.trim());
     var truth = await fetch('truth.json').then(function (r) { return r.json(); });
     var n = Math.min(30, Math.max(1, +$('limit').value || 30));
     results.rows = []; results.done = false; results.provs = provs;
