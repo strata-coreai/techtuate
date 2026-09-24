@@ -17,6 +17,10 @@
 // Cloudflare 502) before it can respond.
 
 const DEFAULT_MODEL = 'gemini-flash-latest';
+// When the main model is overloaded (Gemini 503 "high demand"), the last attempt
+// goes to the lighter Flash-Lite alias, which usually has spare capacity.
+// Override with GEMINI_FALLBACK_MODEL, or set it to "none" to disable.
+const DEFAULT_FALLBACK_MODEL = 'gemini-flash-lite-latest';
 const MAX_BYTES = 6 * 1024 * 1024; // ~6MB of base64, generous for a downscaled screenshot
 const UPSTREAM_TIMEOUT_MS = 25000; // give the model time, but never hang the function
 
@@ -135,8 +139,11 @@ export async function onRequestPost(context) {
     ];
 
     const model = env.GEMINI_MODEL || DEFAULT_MODEL;
-    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
-      encodeURIComponent(model) + ':generateContent';
+    const fallbackModel = env.GEMINI_FALLBACK_MODEL || DEFAULT_FALLBACK_MODEL;
+    const urlFor = function (m) {
+      return 'https://generativelanguage.googleapis.com/v1beta/models/' +
+        encodeURIComponent(m) + ':generateContent';
+    };
 
     const body = {
       contents: [{ parts: parts }],
@@ -159,21 +166,32 @@ export async function onRequestPost(context) {
 
     let res;
     try {
-      for (let attempt = 1; ; attempt++) {
-        res = await fetch(url, {
+      // Plan: main model, a quick retry of it, then the fallback model. Only a
+      // 500/503 (overloaded) moves on to the next step; the timeout bounds it all.
+      const plan = [model, model];
+      if (fallbackModel && fallbackModel !== 'none' && fallbackModel !== model) plan.push(fallbackModel);
+      for (let i = 0; i < plan.length; i++) {
+        const m = plan[i];
+        // The fallback may be an older model that rejects thinkingLevel, so it
+        // gets the request without a thinkingConfig (its default is light anyway).
+        let reqBody = body;
+        if (m !== model) {
+          const gc = Object.assign({}, body.generationConfig);
+          delete gc.thinkingConfig;
+          reqBody = Object.assign({}, body, { generationConfig: gc });
+        }
+        res = await fetch(urlFor(m), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'x-goog-api-key': env.GEMINI_API_KEY
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify(reqBody),
           signal: controller.signal
         });
-        // Gemini answers 500/503 when the model is briefly overloaded. One quick
-        // retry clears most of these; the overall timeout above still bounds us.
-        if ((res.status === 503 || res.status === 500) && attempt < 2) {
+        if ((res.status === 503 || res.status === 500) && i < plan.length - 1) {
           try { await res.text(); } catch (e) {}
-          await new Promise(function (r) { setTimeout(r, 1200); });
+          if (plan[i + 1] === m) await new Promise(function (r) { setTimeout(r, 1200); });
           continue;
         }
         break;

@@ -6,8 +6,9 @@
 // Then add the folder name to the TOOLS array below.
 
 import { execSync } from 'node:child_process';
-import { cpSync, mkdirSync, rmSync, existsSync, copyFileSync } from 'node:fs';
-import { join, resolve, dirname } from 'node:path';
+import { cpSync, mkdirSync, rmSync, existsSync, copyFileSync, readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { join, resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -111,5 +112,40 @@ for (const d of STATIC_DIRS) {
 for (const tool of TOOLS) {
   buildTool(tool);
 }
+
+// --- cache-busting ---
+// Cloudflare serves CSS/JS with a 4-hour browser cache, so after a deploy a
+// returning visitor can get the NEW html with the OLD script and styles (this
+// broke the card reader once). Every local .css/.js reference in the built
+// HTML gets ?v=<content hash>, so a changed file is always a new URL and an
+// unchanged one stays cached. Vite-built tools already hash their files.
+function walkHtml(dir, out) {
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name);
+    if (statSync(p).isDirectory()) walkHtml(p, out);
+    else if (name.endsWith('.html')) out.push(p);
+  }
+  return out;
+}
+const hashCache = new Map();
+function hashOf(file) {
+  if (!hashCache.has(file)) {
+    hashCache.set(file, createHash('sha1').update(readFileSync(file)).digest('hex').slice(0, 10));
+  }
+  return hashCache.get(file);
+}
+let busted = 0;
+for (const htmlFile of walkHtml(dist, [])) {
+  const html = readFileSync(htmlFile, 'utf8');
+  const next = html.replace(/(<(?:script|link)\b[^>]*?\b(?:src|href)=")([^"?#]+\.(?:css|js))(")/g, (m, pre, url, post) => {
+    if (/^(?:[a-z]+:)?\/\//i.test(url) || url.startsWith('data:')) return m; // external
+    const file = url.startsWith('/') ? join(dist, url) : join(dirname(htmlFile), url);
+    if (!existsSync(file)) return m;
+    busted++;
+    return pre + url + '?v=' + hashOf(file) + post;
+  });
+  if (next !== html) writeFileSync(htmlFile, next);
+}
+log(`cache-busted ${busted} css/js references`);
 
 log('done ->', dist);
