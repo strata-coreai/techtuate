@@ -69,7 +69,7 @@ These six alone would 5-10x the surface area of the site. Each ships in under a 
 The minimum bar for shipping a tool to techtuate (any tier):
 
 1. Lives at `/<slug>/` as a self-contained page (or Vite app for the complex few).
-2. Matches the palette (white / `#ffd60a` / black, neo-brutalist), via `/assets/site.css`.
+2. Matches the Flow design system in `docs/design-system.md` (dark glass, one yellow accent, line icon + hue on the home card).
 3. Mobile-friendly down to ~360 px.
 4. Has its own `<title>`, meta description, canonical, OG tags, and JSON-LD (WebApplication).
 5. Listed in `index.html` tool grid and in `sitemap.xml`.

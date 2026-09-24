@@ -1,127 +1,187 @@
-/* Photo to Scan - tool-specific styles.
-   Loaded AFTER /assets/site.css, so everything here is scoped to the tool
-   workspace (.tool) or given a ps- prefix. The page chrome (topbanner,
-   header.site, .hero, .callout, footer.site) comes from the shared sheet. */
+/* Photo to Scan - tool-specific styles ("Flow" dark theme).
+   Loaded AFTER /assets/flow.css + /assets/flow-pages.css, so everything
+   here is scoped to the tool workspace (.tool) or given a ps- prefix.
+   The page chrome (nav, page head, footer) comes from the shared sheets.
+   The scan itself (result canvas, exported file) keeps its real colors. */
 
 [hidden] { display: none !important; }
 
+/* one-liner callout sits flush with the top of the panel */
+.tool-ui > .callout.yellow { margin-top: 0; }
+
 /* ---------- tool frame ---------- */
 .tool {
-  --ps-sun: var(--yellow);
-  --ps-fog: #f2f2f2;
-  --ps-mute: var(--ink-mute);
-  --ps-edge: 3px solid var(--ink);
+  --ps-sun: var(--accent);
+  --ps-mute: var(--text-3);
+  --ps-edge: 1px solid rgba(255,255,255,.08);
 
   border: var(--ps-edge);
-  border-radius: var(--r-md);
-  box-shadow: 5px 5px 0 var(--ink);
-  background: var(--bg);
+  border-radius: 22px;
+  background: rgba(255,255,255,.03);
   overflow: hidden;
   min-height: 320px;
-  margin: 24px 0 0;
+  margin: 20px 0 0;
 }
 
 /* ---------- step 1: pick a photo ---------- */
-.tool #stage-drop { padding: 24px; display: grid; gap: 14px; justify-items: center; }
+/* no second frame around the drop zone itself */
+.tool:has(#stage-drop:not([hidden])) { border-color: transparent; background: transparent; min-height: 0; }
+.tool #stage-drop { padding: 0; }
+.tool #stage-drop { display: grid; gap: 14px; justify-items: center; }
 .tool .drop {
   width: 100%; min-height: 300px; display: grid; place-content: center; justify-items: center;
-  gap: 8px; text-align: center; padding: 32px 20px; cursor: pointer;
-  background: var(--ps-fog); border: 3px dashed var(--ink); border-radius: var(--r-sm);
+  gap: 10px; text-align: center; padding: 36px 20px; cursor: pointer;
+  background: radial-gradient(80% 90% at 50% 40%, rgba(255,214,10,.07), rgba(0,0,0,0));
+  border: 1.5px dashed rgba(255,214,10,.45); border-radius: 22px;
+  color: var(--text-3); font-size: 14.5px;
+  transition: border-color .2s, background .2s;
 }
-.tool .drop strong { font-family: var(--font-display); font-size: 24px; letter-spacing: -0.02em; }
-.tool .drop.over { background: var(--ps-sun); border-style: solid; }
-.tool .drop:focus-within { outline: 3px solid var(--ps-sun); outline-offset: 3px; }
-.tool .drop-mark { position: relative; width: 78px; height: 96px; margin-bottom: 10px; background: var(--bg); border: 2px solid var(--ink); }
-.tool .drop-mark i { position: absolute; width: 16px; height: 16px; background: var(--ps-sun); border: 3px solid var(--ink); }
-.tool .drop-mark i:nth-child(1) { top: -9px; left: -9px; }
-.tool .drop-mark i:nth-child(2) { top: -9px; right: -9px; }
-.tool .drop-mark i:nth-child(3) { bottom: -9px; right: -9px; }
-.tool .drop-mark i:nth-child(4) { bottom: -9px; left: -9px; }
-.tool .drop-error { margin: 0; font-weight: 600; background: var(--ps-sun); border: var(--ps-edge); padding: 8px 12px; }
+.tool .drop:hover { border-color: rgba(255,214,10,.8); }
+.tool .drop strong {
+  font-family: var(--f-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; letter-spacing: 0; color: var(--text);
+}
+.tool .drop.over {
+  border-style: solid; border-color: var(--accent);
+  background: radial-gradient(80% 90% at 50% 40%, rgba(255,214,10,.16), rgba(0,0,0,0));
+}
+.tool .drop:focus-within { outline: 2px solid rgba(255,214,10,.6); outline-offset: 3px; }
+.tool .drop-mark {
+  position: relative; width: 70px; height: 88px; margin-bottom: 14px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.18); border-radius: 6px;
+}
+.tool .drop-mark i {
+  position: absolute; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--ps-sun); box-shadow: 0 0 12px 2px rgba(255,214,10,.45);
+}
+.tool .drop-mark i:nth-child(1) { top: -7px; left: -7px; }
+.tool .drop-mark i:nth-child(2) { top: -7px; right: -7px; }
+.tool .drop-mark i:nth-child(3) { bottom: -7px; right: -7px; }
+.tool .drop-mark i:nth-child(4) { bottom: -7px; left: -7px; }
+.tool .drop-error {
+  margin: 0; font-size: 14px; color: var(--accent);
+  background: rgba(255,214,10,.07); border: 1px solid rgba(255,214,10,.3);
+  border-radius: 14px; padding: 10px 14px;
+}
 
 /* ---------- workspace ---------- */
 .tool .work { display: grid; grid-template-columns: minmax(0, 1fr) 300px; }
 .tool .bed {
   position: relative; display: grid; place-items: center; padding: 20px; min-height: 360px;
-  background: var(--ps-fog); border-right: var(--ps-edge); overflow: hidden;
+  background: rgba(0,0,0,.35); border-right: var(--ps-edge); overflow: hidden;
 }
-.tool .bed-dark { background: var(--ink); }
+.tool .bed-dark { background: rgba(0,0,0,.45); }
 .tool .bed canvas { display: block; max-width: 100%; }
-.tool #crop-canvas { touch-action: none; cursor: default; }
-.tool #result-canvas { box-shadow: 0 0 0 3px var(--bg); }
+.tool #crop-canvas { touch-action: none; cursor: default; border-radius: 4px; }
+.tool #result-canvas { box-shadow: 0 30px 60px -24px rgba(0,0,0,.9); }
 .tool #result-canvas.painting { cursor: crosshair; touch-action: none; }
 .tool #loupe {
   position: absolute; width: 120px; height: 120px; pointer-events: none;
-  border: var(--ps-edge); border-radius: 50%; background: var(--bg); box-shadow: 4px 4px 0 var(--ink);
+  border: 2px solid var(--accent); border-radius: 50%; background: #fff;
+  box-shadow: 0 12px 30px -8px rgba(0,0,0,.8);
 }
 .tool .busy {
-  position: absolute; top: 16px; left: 16px; background: var(--ps-sun); border: var(--ps-edge);
-  padding: 4px 10px; font-weight: 700;
+  position: absolute; top: 16px; left: 16px;
+  background: var(--ps-sun); color: #06050a; border-radius: 999px;
+  padding: 5px 12px; font-family: var(--f-mono); font-size: 12px; font-weight: 500;
 }
 
 /* ---------- side panel ---------- */
-.tool .panel { padding: 20px; display: grid; gap: 18px; align-content: start; }
-.tool .panel h2 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; margin: 0; }
-.tool .hint { margin: -8px 0 0; font-size: 14.5px; color: var(--ps-mute); line-height: 1.5; }
-.tool .field { display: grid; gap: 8px; }
+.tool .panel { padding: 20px; display: grid; gap: 20px; align-content: start; }
+.tool .panel h2 { font-family: var(--f-display); font-weight: 500; font-size: 24px; letter-spacing: -0.03em; margin: 0; color: var(--text); }
+.tool .hint { margin: -8px 0 0; font-size: 14px; color: var(--ps-mute); line-height: 1.55; }
+.tool .field { display: grid; gap: 10px; }
 .tool .field > label,
 .tool .label,
-.tool .brush-tools > label { font-weight: 700; font-size: 14.5px; }
-.tool .ps-note { margin: 0; font-size: 13.5px; color: var(--ps-mute); min-height: 1em; }
+.tool .brush-tools > label {
+  font-family: var(--f-mono); font-size: 11px; font-weight: 400;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.tool .brush-tools { display: grid; gap: 10px; }
+.tool .ps-note { margin: 0; font-size: 13px; color: var(--ps-mute); min-height: 1em; }
+.tool .ps-note:empty { display: none; }
 .tool .row { display: flex; gap: 8px; flex-wrap: wrap; }
 .tool .row > .btn { flex: 1 1 auto; }
 
 /* ---------- form controls ---------- */
 .tool select, .tool input[type="range"] { width: 100%; }
-.tool select {
-  font: inherit; font-weight: 600; padding: 9px 10px; border: var(--ps-edge); background: var(--bg);
-  border-radius: var(--r-sm); color: var(--ink);
+.tt-main .tool select {
+  appearance: none; -webkit-appearance: none; cursor: pointer;
+  font: inherit; font-size: 14.5px; font-weight: 500; color: var(--text);
+  padding: 10px 34px 10px 16px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px;
+  background-color: var(--field);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px; background-repeat: no-repeat;
 }
-.tool input[type="range"] { accent-color: var(--ink); }
-.tool .check { display: flex; gap: 8px; align-items: center; font-size: 14.5px; font-weight: 500; }
-.tool .check input { width: 18px; height: 18px; accent-color: var(--ink); }
+.tt-main .tool select:hover { border-color: rgba(255,214,10,.5); }
+.tool input[type="range"] { accent-color: var(--accent); }
+.tt-main .tool .field > .check {
+  display: flex; gap: 10px; align-items: center; cursor: pointer;
+  font-family: var(--f-body); font-size: 14.5px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text-2);
+}
+.tool .check input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
 
 /* ---------- buttons (override the shared .btn inside the workspace) ---------- */
 .tool .btn {
-  font: inherit; font-weight: 700; font-size: 14.5px;
+  font: inherit; font-weight: 500; font-size: 14.5px;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px 14px; border: var(--ps-edge); border-radius: var(--r-sm);
-  background: var(--bg); color: var(--ink);
-  cursor: pointer; box-shadow: 3px 3px 0 var(--ink);
-  transition: transform .06s, box-shadow .06s;
+  padding: 10px 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px;
+  background: transparent; color: var(--text);
+  cursor: pointer; box-shadow: none;
+  transition: background .2s, border-color .2s, color .2s;
 }
-.tool .btn:hover { background: var(--ps-fog); color: var(--ink); transform: none; box-shadow: 3px 3px 0 var(--ink); }
-.tool .btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.tool .btn:hover { border-color: var(--accent); background: transparent; color: #fff; }
+.tool .btn:active { transform: none; box-shadow: none; }
 .tool .btn:focus-visible,
 .tool .btn-text:focus-visible,
 .tool select:focus-visible,
-.tool .seg input:focus-visible + span { outline: 3px solid var(--ps-sun); outline-offset: 2px; }
-.tool .btn-primary { background: var(--ps-sun); font-size: 16px; padding: 12px 16px; }
-.tool .btn-primary:hover { background: #ffe34d; }
+.tool .seg input:focus-visible + span { outline: 2px solid rgba(255,214,10,.7); outline-offset: 2px; }
+.tool .btn-primary { background: var(--ps-sun); border-color: var(--ps-sun); color: #06050a; font-weight: 600; font-size: 15.5px; padding: 12px 18px; }
+.tool .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #06050a; }
 .tool .btn-wide { width: 100%; }
-.tool .btn[aria-pressed="true"] { background: var(--ink); color: var(--ps-sun); }
-.tool .btn[aria-pressed="true"]:hover { background: var(--ink); color: var(--ps-sun); }
-.tool .btn-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: square; }
+.tool .btn[aria-pressed="true"],
+.tool .btn[aria-pressed="true"]:hover { background: rgba(255,214,10,.12); border-color: var(--accent); color: var(--accent); }
+.tool .btn-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .tool .btn-text {
-  font: inherit; font-size: 14.5px; font-weight: 600; background: none; border: 0; padding: 4px 0;
-  color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; justify-self: start;
+  font: inherit; font-size: 14px; font-weight: 400; background: none; border: 0; padding: 4px 0;
+  color: var(--text-2); text-decoration: underline; text-decoration-color: rgba(255,214,10,.5);
+  text-underline-offset: 4px; cursor: pointer; justify-self: start;
 }
+.tool .btn-text:hover { color: #fff; }
+.tool .panel > .row:last-child { gap: 18px; }
 
 /* ---------- segmented controls ---------- */
-.tool .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: var(--ps-edge); border-radius: var(--r-sm); overflow: hidden; }
+.tool .seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 3px;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 999px; background: rgba(255,255,255,.03);
+}
 .tool .seg label { position: relative; cursor: pointer; }
-.tool .seg label + label { border-left: var(--ps-edge); }
 .tool .seg input { position: absolute; opacity: 0; }
-.tool .seg span { display: block; text-align: center; padding: 8px 4px; font-weight: 700; font-size: 14.5px; }
-.tool .seg input:checked + span { background: var(--ps-sun); }
+.tool .seg span {
+  display: block; text-align: center; padding: 7px 4px; border-radius: 999px;
+  font-weight: 500; font-size: 14px; color: var(--text-3);
+  transition: background .2s, color .2s;
+}
+.tool .seg label:hover span { color: #fff; }
+.tool .seg input:checked + span { background: var(--ps-sun); color: #06050a; }
 
-.tool .download { grid-template-columns: 92px 1fr; }
+.tool .download { grid-template-columns: 96px 1fr; }
 
 /* ---------- below the tool ---------- */
-.local-note { font-weight: 600; font-size: 14.5px; margin: 18px 0 0; }
+.local-note {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--f-mono); font-size: 12px; font-weight: 400; color: var(--text-3);
+  margin: 16px 0 0; padding-left: 4px;
+}
+.local-note::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none;
+  background: var(--local); box-shadow: 0 0 10px 1px rgba(143,227,192,.45);
+}
 .how { margin-top: 48px; max-width: 760px; }
-.how ol { margin: 0; padding-left: 1.3em; display: grid; gap: 12px; color: var(--ink-mute); }
-.how ol strong { color: var(--ink); }
+.how ol { margin: 0; padding-left: 1.3em; display: grid; gap: 12px; color: var(--text-3); }
+.how ol li::marker { color: var(--accent); }
+.how ol strong { color: var(--text); font-weight: 500; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 820px) {
@@ -129,14 +189,14 @@
   .tool .bed { border-right: 0; border-bottom: var(--ps-edge); padding: 12px; min-height: 260px; }
 }
 @media (max-width: 420px) {
-  .tool { box-shadow: 3px 3px 0 var(--ink); }
-  .tool #stage-drop, .tool .panel { padding: 14px; }
-  .tool .drop strong { font-size: 20px; }
+  .tool { border-radius: 18px; }
+  .tool .panel { padding: 14px; }
+  .tool .drop { min-height: 260px; }
 }
 
 .tool .btn.camera-btn { display: none; }
 @media (pointer: coarse) { .tool .btn.camera-btn { display: inline-flex; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .tool .btn { transition: none; }
+  .tool .btn, .tool .seg span, .tool .drop { transition: none; }
 }

@@ -6,9 +6,13 @@
   <title>__TOOL_NAME__ - free, in your browser, no sign-up - techtuate</title>
   <meta name="description" content="__TOOL_DESCRIPTION__" />
   <meta name="keywords" content="__TOOL_KEYWORDS__" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#06050a" />
   <link rel="canonical" href="https://techtuate.com/__TOOL_SLUG__/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/flow-pages.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M18 22 L32 14 L46 22 L46 42 L32 50 L18 42 Z' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
 
   <meta property="og:type" content="website" />
@@ -30,80 +34,91 @@
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
+  <script src="/assets/backdrop.js" defer></script>
 </head>
 <body>
 
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <div class="wrap">
+  <div class="tt-page">
 
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ __TOOL_CRUMB__</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="/#tools">tools</a>
-        <a href="/vs/">vs.</a>
-        <a href="/why-free/">why</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <section class="hero">
-      <div class="eyebrow">__TOOL_TAGLINE__</div>
-      <h1>__TOOL_NAME__</h1>
-      <p class="lede">__TOOL_DESCRIPTION__</p>
-    </section>
+    <div class="tt-main">
+      <a class="tt-backlink" href="/#tools">&larr; all tools</a>
 
-    <main>
-      <noscript>
-        <div class="callout yellow">
-          <h4>This tool needs JavaScript.</h4>
-          <p>The whole point is that everything runs in your browser. Please enable JavaScript and reload.</p>
+      <div class="page-head">
+        <!-- H1 pattern: wrap the last (or most meaningful) word in the yellow serif accent,
+             e.g. <h1>Business card <span class="serif">reader</span></h1> -->
+        <h1>__TOOL_NAME__</h1>
+        <p class="lede">__TOOL_DESCRIPTION__</p>
+      </div>
+
+      <main class="tool-ui">
+        <noscript>
+          <div class="callout yellow">
+            <h4>This tool needs JavaScript.</h4>
+            <p>The whole point is that everything runs in your browser. Please enable JavaScript and reload.</p>
+          </div>
+        </noscript>
+
+        <!-- ============ TOOL UI GOES HERE ============ -->
+        <div class="callout">
+          <h4>TODO</h4>
+          <p>Replace this with the actual tool UI. Use the shared Flow styles in <code>/assets/flow.css</code> + <code>/assets/flow-pages.css</code> - <code>.btn</code>, <code>.callout</code>, <code>.compare</code>, etc. - so it matches every other page.</p>
         </div>
-      </noscript>
+        <!-- Controls: pill buttons (<button class="btn primary"> for the main action, <button class="btn ghost"> for secondary),
+             hairline borders rgba(255,255,255,.1-.16), dark glass result panels rgba(255,255,255,.04) with radius 16-22px,
+             selected states #ffd60a with #06050a text. See /card-reader/styles.css for a finished example. -->
+        <!-- ============ /TOOL UI ============ -->
 
-      <!-- ============ TOOL UI GOES HERE ============ -->
-      <div class="callout">
-        <h4>TODO</h4>
-        <p>Replace this with the actual tool UI. Use the styles in <code>/assets/site.css</code> - <code>.btn</code>, <code>.callout</code>, <code>.compare</code>, etc. - so it matches every other page.</p>
-      </div>
-      <!-- ============ /TOOL UI ============ -->
+      </main>
 
-    </main>
+      <section class="tt-section">
+        <p class="eyebrow">about this tool</p>
+        <h2 class="sr-only">About this tool</h2>
+        <!-- LOCAL tool (default): the file is processed in the browser, nothing uploaded. Keep this blurb. -->
+        <p>
+          Free, no sign-up. Runs entirely in your browser - nothing is uploaded.
+          Part of <a href="/">techtuate</a>, a growing collection of little tools that just work.
+        </p>
+        <!-- AI tool variant: if this tool calls a third-party AI service via a Cloudflare Pages Function, DELETE the
+             paragraph above and use the labeled version below (and add a visible "*" disclosure near the action button;
+             see /card-reader/ for the pattern):
+        <p>
+          Free, no sign-up. This tool sends your input once to a third-party AI service (name it) to do the processing -
+          it is not stored and there is no account. Everything else stays in your browser.
+          Part of <a href="/">techtuate</a>, a growing collection of little tools that just work.
+        </p>
+        -->
+        <!-- Founder note (index.html) uses "no ads" but never "no ads, ever" - ads are a possible future path. Do not re-add "ever". -->
 
-    <section style="margin-top: 48px;">
-      <div class="section-head"><h2>About this tool</h2></div>
-      <!-- LOCAL tool (default): the file is processed in the browser, nothing uploaded. Keep this blurb. -->
-      <p style="max-width:680px; color:var(--ink-mute);">
-        Free, no sign-up. Runs entirely in your browser - nothing is uploaded.
-        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
-      </p>
-      <!-- AI tool variant: if this tool calls a third-party AI service via a Cloudflare Pages Function, DELETE the
-           paragraph above and use the labeled version below (and add a visible "*" disclosure near the action button;
-           see /card-reader/ for the pattern):
-      <p style="max-width:680px; color:var(--ink-mute);">
-        Free, no sign-up. This tool sends your input once to a third-party AI service (name it) to do the processing -
-        it is not stored and there is no account. Everything else stays in your browser.
-        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
-      </p>
-      -->
-      <!-- Founder note (index.html) uses "no ads" but never "no ads, ever" - ads are a possible future path. Do not re-add "ever". -->
+      </section>
 
-    </section>
+    </div>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/pdf-editor/">pdf editor</a> &middot;
-        <a href="/vs/">comparisons</a> &middot;
-        <a href="/why-free/">why free</a>
-      </div>
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
     </footer>
-
   </div>
 
   <script>

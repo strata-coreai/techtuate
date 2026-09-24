@@ -3,7 +3,7 @@
 // works identically in dev and in the Cloudflare Pages build.
 //
 // `GlobalWorkerOptions.workerPort` accepts a Worker instance directly
-// — that's the right hook when we already have a constructed worker.
+// - that's the right hook when we already have a constructed worker.
 import * as pdfjsLib from 'pdfjs-dist';
 import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
 

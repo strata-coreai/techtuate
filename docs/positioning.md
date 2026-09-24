@@ -112,7 +112,7 @@ Rewrite the constraints block from "100% client-side / no functions / no data le
 ## Explicitly NOT changing
 - The `/vs/` per-competitor file-upload distinction (true + ranks).
 - "Free, no sign-up, no ads." (still true)
-- The palette, voice, neo-brutalist look, no-em-dash rule.
+- The voice and no-em-dash rule. (The visual look was later replaced by the dark "Flow" design system on 2026-09-24; see `docs/design-system.md`.)
 - The card-reader's existing `*` disclosure and the third-party labeling pattern.
 
 ## Resolved decisions (2026-07-28)

@@ -10,7 +10,7 @@ Before real work, read `CLAUDE.md` (full context + hard constraints + current to
 - Never use em-dashes or en-dashes anywhere. Plain hyphens only. Forever rule (em-dashes "scream AI").
 - Local tools stay 100% client-side. An AI tool may call a third-party service ONLY through a Cloudflare Pages Function proxy (API key server-side), with a visible "*" disclosure on the tool, no account, and no stored user input. Ask me before adding a new AI dependency. Pattern to copy: `/card-reader/` + `/functions/api/scan.js`.
 - Say "no ads" (true today) but never "no ads, ever" - ads are a possible future path once traffic passes the AI free-tier ceiling. Do not re-add absolute "nothing ever leaves your device / no server / no third parties" claims as whole-site statements; scope "your files stay on your device" to the local tools only.
-- Free static hosting on Cloudflare Pages (everything builds to `./dist/`). No accounts, no credit cards. Same palette (white / #ffd60a / black, neo-brutalist, Inter Tight) and voice across every page. Mobile-friendly down to ~360px.
+- Free static hosting on Cloudflare Pages (everything builds to `./dist/`). No accounts, no credit cards. Same design and voice across every page: the dark "Flow" design system (see docs/design-system.md: dark glass, one yellow #ffd60a accent, Bricolage Grotesque / Instrument Serif / Geist, line icons tinted per tool). No AI or assistant attribution anywhere on the site. Mobile-friendly down to ~360px.
 - Third-party embeds (Trustpilot, StartupBar) are allowed but must be disclosed on pages where they load.
 
 ## Workflow reality (important)

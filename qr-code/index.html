@@ -6,9 +6,13 @@
   <title>Free branded QR code generator - custom logo and colors, free - techtuate</title>
   <meta name="description" content="Generate static QR codes with your logo and brand colors. No tracking, no redirect, no sign-up. Download as PNG, SVG, or PDF. Free forever." />
   <meta name="keywords" content="free qr code generator, branded qr code, qr code with logo, qr code custom colors, qr code no tracking, qr code no signup, static qr code, qr code generator no redirect" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#06050a" />
   <link rel="canonical" href="https://techtuate.com/qr-code/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/flow-pages.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Crect x='12' y='12' width='16' height='16' rx='2' fill='none' stroke='%230a0a0a' stroke-width='3'/%3E%3Crect x='36' y='12' width='16' height='16' rx='2' fill='none' stroke='%230a0a0a' stroke-width='3'/%3E%3Crect x='12' y='36' width='16' height='16' rx='2' fill='none' stroke='%230a0a0a' stroke-width='3'/%3E%3Crect x='16' y='16' width='8' height='8' fill='%230a0a0a'/%3E%3Crect x='40' y='16' width='8' height='8' fill='%230a0a0a'/%3E%3Crect x='16' y='40' width='8' height='8' fill='%230a0a0a'/%3E%3Crect x='36' y='36' width='4' height='4' fill='%230a0a0a'/%3E%3Crect x='44' y='36' width='4' height='4' fill='%230a0a0a'/%3E%3Crect x='36' y='44' width='4' height='4' fill='%230a0a0a'/%3E%3Crect x='44' y='44' width='4' height='4' fill='%230a0a0a'/%3E%3C/svg%3E" />
 
   <meta property="og:type" content="website" />
@@ -39,196 +43,262 @@
     /* ---- layout ---- */
     .qr-layout {
       display: grid;
-      grid-template-columns: 1fr 220px;
-      gap: 28px;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: clamp(20px, 3vw, 36px);
       align-items: start;
     }
-    @media (max-width: 620px) {
-      .qr-layout { grid-template-columns: 1fr; }
-      .qr-preview-col { display: flex; flex-direction: column; align-items: flex-start; }
+    @media (max-width: 720px) {
+      .qr-layout { grid-template-columns: minmax(0, 1fr); }
+      .qr-preview-col { display: flex; flex-direction: column; align-items: stretch; }
     }
 
     /* ---- textarea ---- */
-    .qr-textarea {
+    .tt-main .qr-textarea {
       width: 100%;
-      min-height: 90px;
-      font-family: var(--font-mono);
+      min-height: 110px;
+      font-family: var(--f-mono);
       font-size: 15px;
-      padding: 12px 14px;
-      border: 2px solid var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
+      padding: 16px 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      box-shadow: none;
       resize: vertical;
       box-sizing: border-box;
-      background: #fff;
-      color: var(--ink);
+      background: rgba(8,6,14,.55);
+      color: var(--text);
       outline: none;
       line-height: 1.5;
     }
-    .qr-textarea:focus { border-color: var(--yellow); }
-    .qr-textarea::placeholder { color: var(--ink-dim); }
+    .tt-main .qr-textarea:focus { border-color: rgba(255,214,10,.6); box-shadow: 0 0 0 3px rgba(255,214,10,.12); }
+    .qr-textarea::placeholder { color: var(--faint); }
 
     /* ---- option rows ---- */
-    .qr-options { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
-    .qr-option-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .qr-options { display: flex; flex-direction: column; gap: 16px; margin-top: 22px; }
+    .qr-option-row { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
     .qr-option-label {
-      font-size: 12px;
-      font-weight: 700;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      font-weight: 400;
       text-transform: uppercase;
-      letter-spacing: .05em;
-      min-width: 112px;
-      color: var(--ink);
+      letter-spacing: .08em;
+      min-width: 130px;
+      color: #8d879c;
     }
 
-    /* ECL radios */
-    .qr-radios { display: flex; gap: 6px; flex-wrap: wrap; }
-    .qr-radio { display: flex; align-items: center; gap: 4px; font-size: 13px; cursor: pointer; }
-    .qr-radio input { accent-color: var(--ink); cursor: pointer; }
-    .qr-radio input:disabled + * { opacity: 0.45; }
+    /* ECL: radios styled as a segmented pill group */
+    .qr-radios {
+      display: inline-flex; gap: 2px; flex-wrap: wrap; padding: 3px;
+      border-radius: 999px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03);
+    }
+    .tt-main .qr-radio {
+      position: relative; display: inline-flex; align-items: center;
+      padding: 7px 14px; border-radius: 999px;
+      font-size: 13.5px; color: var(--text-2); cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .qr-radio:hover { color: #fff; }
+    .qr-radio input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+    .tt-main .qr-radio:has(input:checked) { background: #ffd60a; color: #06050a; font-weight: 600; }
+    .qr-radio:has(input:focus-visible) { outline: 2px solid rgba(255,214,10,.6); outline-offset: 2px; }
+    .qr-radio:has(input:disabled) { opacity: .4; cursor: not-allowed; }
+    .qr-radio:has(input:disabled:checked) { opacity: .9; }
     .qr-radio input:disabled { cursor: not-allowed; }
 
     /* ECL note */
     .qr-ecl-note {
-      font-size: 12px;
-      color: #555;
-      font-style: italic;
+      font-size: 12.5px;
+      color: var(--text-3);
       margin-top: -6px;
-      padding-left: 122px;
+      padding-left: 144px;
       display: none;
     }
     .qr-ecl-note.visible { display: block; }
 
     /* size buttons */
-    .qr-size-row { display: flex; gap: 6px; flex-wrap: wrap; }
-    .qr-size-btn {
-      font-size: 12px; font-weight: 700;
-      padding: 4px 11px;
-      border: 2px solid var(--ink);
-      background: #fff; cursor: pointer;
+    .qr-size-row {
+      display: inline-flex; gap: 2px; flex-wrap: wrap; padding: 3px;
+      border-radius: 999px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03);
     }
-    .qr-size-btn:hover { background: var(--yellow); }
-    .qr-size-btn.active { background: var(--yellow); box-shadow: 2px 2px 0 var(--ink); }
+    .qr-size-btn {
+      font-family: var(--f-body); font-size: 13.5px; font-weight: 500;
+      padding: 7px 14px; border-radius: 999px;
+      border: 0; background: transparent; color: var(--text-2); cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .qr-size-btn:hover { color: #fff; background: rgba(255,255,255,.06); }
+    .qr-size-btn.active, .qr-size-btn.active:hover { background: #ffd60a; color: #06050a; font-weight: 600; box-shadow: none; }
 
     /* color pickers */
-    .qr-color-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .qr-color-pair { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-    .qr-color-pair input[type="color"] {
-      width: 32px; height: 32px;
-      border: 2px solid var(--ink); padding: 2px; cursor: pointer; background: none;
+    .qr-color-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .qr-color-pair {
+      display: inline-flex; align-items: center; gap: 10px; font-size: 13.5px;
+      padding: 4px 5px 4px 14px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03);
     }
+    .qr-color-pair label { color: var(--text-2); cursor: pointer; }
+    .tt-main .qr-color-pair input[type="color"] {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.2); padding: 0; cursor: pointer; background: none; overflow: hidden;
+    }
+    .qr-color-pair input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .qr-color-pair input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+    .qr-color-pair input[type="color"]::-moz-color-swatch { border: 0; border-radius: 50%; }
     .qr-contrast-warn {
-      font-size: 12px; color: #b00; font-weight: 700;
-      margin-top: -4px; padding-left: 122px; display: none;
+      font-size: 12.5px; color: #ffd60a; font-weight: 500;
+      margin-top: -6px; padding-left: 144px; display: none;
     }
     .qr-contrast-warn.visible { display: block; }
 
     /* ---- logo section ---- */
     .qr-section {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid #ddd;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,.07);
     }
     .qr-section-title {
-      font-size: 12px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .05em;
-      margin-bottom: 10px; color: var(--ink);
+      font-family: var(--f-mono);
+      font-size: 11px; font-weight: 400;
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-bottom: 12px; color: #8d879c;
     }
 
-    .qr-logo-upload-label {
-      display: inline-block; cursor: pointer;
-      font-size: 13px; font-weight: 700;
-      padding: 6px 14px;
-      border: 2px solid var(--ink);
-      background: #fff;
+    .tt-main .qr-logo-upload-label {
+      display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: var(--text-2);
+      padding: 10px 18px; border-radius: 999px;
+      border: 1px dashed rgba(255,214,10,.45);
+      background: rgba(255,214,10,.04);
+      transition: border-color .2s, color .2s, background .2s;
     }
-    .qr-logo-upload-label:hover { background: var(--yellow); }
+    .tt-main .qr-logo-upload-label:hover { border-color: rgba(255,214,10,.85); color: #fff; background: rgba(255,214,10,.08); }
     #qr-logo-input { display: none; }
 
-    .qr-logo-controls { margin-top: 12px; display: none; }
+    .qr-logo-controls { margin-top: 14px; }
     .qr-logo-preview-row {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+      padding: 8px 10px 8px 8px; border-radius: 18px; width: fit-content;
+      border: 1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.04);
     }
     #qr-logo-thumb {
-      width: 40px; height: 40px;
-      border: 2px solid var(--ink);
-      object-fit: contain; background: #fff;
+      width: 44px; height: 44px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.1);
+      object-fit: contain; background: rgba(255,255,255,.9);
     }
     #qr-logo-remove {
-      font-size: 12px; font-weight: 700;
-      padding: 4px 10px;
-      border: 2px solid var(--ink);
-      background: #fff; cursor: pointer;
+      font-family: var(--f-body); font-size: 13px; font-weight: 500;
+      padding: 7px 14px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: transparent; color: var(--text-2); cursor: pointer;
+      transition: border-color .2s, color .2s;
     }
-    #qr-logo-remove:hover { background: #fdd; }
+    #qr-logo-remove:hover { border-color: #ffd60a; color: #fff; }
 
     .qr-range {
       -webkit-appearance: none; appearance: none;
-      height: 4px; background: var(--ink);
-      outline: none; cursor: pointer; width: 130px;
+      height: 4px; border-radius: 999px; background: rgba(255,255,255,.14);
+      outline: none; cursor: pointer; width: 160px; max-width: 100%;
     }
     .qr-range:disabled { opacity: 0.4; cursor: not-allowed; }
     .qr-range::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px; height: 16px;
-      background: var(--yellow); border: 2px solid var(--ink); cursor: pointer;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #ffd60a; border: 0; box-shadow: 0 0 0 4px rgba(255,214,10,.18); cursor: pointer;
     }
-    .qr-range-val { font-family: var(--font-mono); font-size: 13px; font-weight: 700; min-width: 30px; }
+    .qr-range::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #ffd60a; border: 0; box-shadow: 0 0 0 4px rgba(255,214,10,.18); cursor: pointer;
+    }
+    .qr-range::-moz-range-track { height: 4px; border-radius: 999px; background: rgba(255,255,255,.14); }
+    .qr-range-val { font-family: var(--f-mono); font-size: 12.5px; color: var(--text-2); min-width: 34px; }
 
-    .qr-halo-row { margin-top: 8px; display: flex; align-items: center; gap: 6px; font-size: 13px; }
-    .qr-halo-row input { accent-color: var(--ink); cursor: pointer; }
+    .qr-halo-row { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+    .qr-halo-row input { accent-color: #ffd60a; cursor: pointer; width: 16px; height: 16px; }
     .qr-halo-row label { cursor: pointer; }
 
     /* ---- privacy note ---- */
     .qr-privacy {
-      margin-top: 16px; font-size: 12px; color: var(--ink-mute);
-      border-left: 3px solid var(--yellow); padding-left: 10px; line-height: 1.6;
+      display: flex; gap: 12px; align-items: flex-start;
+      margin: 24px 0 0; padding: 14px 18px; border-radius: 18px;
+      background: rgba(255,255,255,.035);
+      font-size: 13.5px; color: #b3acc2; line-height: 1.6; text-wrap: pretty;
+    }
+    .qr-privacy::before {
+      content: ""; flex: 0 0 auto; width: 8px; height: 8px; margin-top: 7px; border-radius: 50%;
+      background: #8fe3c0; box-shadow: 0 0 10px 1px rgba(143,227,192,.45);
     }
 
     /* ---- preview column ---- */
-    .qr-preview-col { min-width: 200px; }
+    .qr-preview-col { min-width: 0; }
     .qr-canvas-wrap {
-      border: 2px solid var(--ink);
-      box-shadow: 4px 4px 0 var(--ink);
-      display: inline-flex;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px;
+      box-shadow: none;
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: #fff;
-      width: 200px;
-      min-height: 200px;
+      background: rgba(255,255,255,.04);
+      width: 100%;
+      min-height: 260px;
+      padding: 18px;
+      box-sizing: border-box;
       overflow: hidden;
     }
-    .qr-canvas-wrap canvas { display: block; width: 200px; height: auto; }
-    .qr-placeholder { color: var(--ink-dim); font-size: 13px; text-align: center; line-height: 1.6; padding: 20px; }
+    .qr-canvas-wrap canvas {
+      display: block; width: 100%; max-width: 224px; height: auto;
+      border-radius: 10px; box-shadow: 0 24px 50px -24px rgba(0,0,0,.9);
+    }
+    .qr-placeholder {
+      color: var(--faint); font-family: var(--f-serif); font-style: italic;
+      font-size: 22px; text-align: center; line-height: 1.25; padding: 20px;
+    }
 
     /* ---- export bar ---- */
-    .qr-export-bar { margin-top: 12px; width: 200px; }
+    .qr-export-bar { margin-top: 14px; width: 100%; }
 
     .qr-banner-row {
-      display: flex; align-items: flex-start; gap: 7px;
-      padding: 9px 10px;
-      border: 2px solid var(--ink);
-      background: #fffde7;
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.035);
       cursor: pointer;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      transition: border-color .2s;
     }
-    .qr-banner-row input[type="checkbox"] { accent-color: var(--ink); margin-top: 2px; flex-shrink: 0; cursor: pointer; }
-    .qr-banner-label-text { font-size: 13px; font-weight: 700; line-height: 1.3; }
-    .qr-banner-sub { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+    .qr-banner-row:hover { border-color: rgba(255,214,10,.4); }
+    .qr-banner-row input[type="checkbox"] { accent-color: #ffd60a; margin-top: 2px; flex-shrink: 0; cursor: pointer; width: 16px; height: 16px; }
+    .qr-banner-label-text { font-size: 13.5px; font-weight: 500; line-height: 1.3; color: var(--text); }
+    .qr-banner-sub { font-size: 12px; color: #8d879c; margin-top: 3px; }
 
-    .qr-dl-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .qr-dl-row .btn { font-size: 13px; padding: 7px 13px; }
-
-    @media (max-width: 480px) {
-      .qr-export-bar { width: 100%; }
-      .qr-dl-row { flex-direction: column; }
-      .qr-dl-row .btn { width: 100%; text-align: center; }
-    }
+    .qr-dl-row { display: flex; flex-direction: column; gap: 8px; }
+    .qr-dl-row .btn { font-size: 14px; padding: 11px 16px; width: 100%; }
 
     /* ---- about section ---- */
     .about-cta {
-      margin-top: 20px; padding: 14px 16px;
-      border: 2px solid var(--yellow);
-      background: #fffde7;
-      font-size: 14px; line-height: 1.5;
+      display: flex; gap: 14px; align-items: flex-start;
+      max-width: 680px; margin-top: 22px; padding: 16px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,214,10,.28);
+      background: rgba(255,214,10,.07);
+      font-size: 14.5px; line-height: 1.6; color: var(--text-2);
+    }
+    .about-cta::before {
+      content: ""; flex: 0 0 auto; width: 9px; height: 9px; margin-top: 7px; border-radius: 50%;
+      background: #ffd60a; box-shadow: 0 0 12px 2px rgba(255,214,10,.5);
+    }
+    .qr-about p { max-width: 680px; }
+    .qr-about h3 { margin: 32px 0 6px; font-size: 20px; font-weight: 500; }
+    .qr-about .qr-comparisons { margin-top: 22px; font-family: var(--f-mono); font-size: 12px; color: var(--faint); }
+    .qr-about .qr-comparisons a { color: var(--muted); text-decoration: none; }
+    .qr-about .qr-comparisons a:hover { color: #ffd60a; }
+    @media (max-width: 520px) {
+      .qr-option-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .qr-option-label { min-width: 0; }
+      .qr-ecl-note, .qr-contrast-warn { padding-left: 0; }
+      .qr-size-row, .qr-radios { display: grid; width: 100%; box-sizing: border-box; }
+      .qr-size-row { grid-template-columns: repeat(3, 1fr); }
+      .qr-radios { grid-template-columns: repeat(4, 1fr); }
+      .qr-size-btn, .tt-main .qr-radio { padding: 8px 4px; font-size: 12.5px; justify-content: center; text-align: center; }
     }
   </style>
   <script type="application/ld+json">
@@ -264,35 +334,38 @@
   ]
 }
   </script>
+  <script src="/assets/backdrop.js" defer></script>
 </head>
 <body>
 
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <div class="wrap">
+  <div class="tt-page">
 
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ qr code</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="/#tools">tools</a>
-        <a href="/vs/">vs.</a>
-        <a href="/why-free/">why</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <section class="hero">
-      <div class="eyebrow">no redirect, no tracking, no sign-up</div>
-      <h1>QR code generator</h1>
-      <p class="lede">Type or paste anything - a URL, WiFi password, contact card - and get a scannable QR code with your logo and colors if you want, free. Runs entirely in your browser.</p>
-    </section>
+    <div class="tt-main">
+      <a class="tt-backlink" href="/#tools">&larr; all tools</a>
 
-    <main>
+    <div class="page-head">
+        <h1>QR code <span class="serif">generator</span></h1>
+        <p class="lede">Type or paste anything - a URL, WiFi password, contact card - and get a scannable QR code with your logo and colors if you want, free. Runs entirely in your browser.</p>
+      </div>
+
+    <main class="tool-ui">
       <noscript>
         <div class="callout yellow">
           <h4>This tool needs JavaScript.</h4>
@@ -361,7 +434,7 @@
             <input type="file" id="qr-logo-input" accept="image/png,image/jpeg,image/jpg,image/svg+xml" />
             <label for="qr-logo-input" class="qr-logo-upload-label">Upload logo (PNG / JPG / SVG)</label>
 
-            <div class="qr-logo-controls" id="qr-logo-controls">
+            <div class="qr-logo-controls" id="qr-logo-controls" style="display:none">
               <div class="qr-logo-preview-row">
                 <img id="qr-logo-thumb" src="" alt="Logo preview" />
                 <button id="qr-logo-remove" type="button">Remove</button>
@@ -409,63 +482,66 @@
       </div>
     </main>
 
-    <section style="margin-top: 52px;">
-      <div class="section-head"><h2>About this tool</h2></div>
-      <p style="max-width:680px; color:var(--ink-mute);">
+    <section class="tt-section qr-about">
+      <p class="eyebrow">about this tool</p>
+      <h2 class="sr-only">About this tool</h2>
+      <p>
         Free, forever, no sign-up. Runs entirely in your browser - nothing is uploaded.
-        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+        Part of <a href="/">techtuate</a>, a growing collection of little tools that just work.
       </p>
-      <p style="max-width:680px; color:var(--ink-mute); margin-top:12px;">
+      <p>
         This generates a <strong>static QR code</strong> - the destination is baked directly into the pixels. No redirect server, no tracking, no link rot if a service shuts down.
       </p>
 
-      <h3 style="margin-top: 28px; font-size: 18px;">Why logo and color customization are free</h3>
-      <p style="max-width:680px; color:var(--ink-mute); margin-top:8px;">
+      <h3>Why logo and color customization are free</h3>
+      <p>
         Most QR code tools (QR Tiger, Flowcode, Beaconstac) charge $5-15 per month to add your logo or change colors. The browser already has color pickers and canvas drawing built in. There is nothing to charge you for.
       </p>
-      <p style="max-width:680px; color:var(--ink-mute); margin-top:8px;">
+      <p>
         High error correction is automatically applied when you add a logo - this preserves scannability even with a portion of the QR obscured by the image.
       </p>
 
-      <div class="about-cta" style="max-width:680px; margin-top:20px;">
-        Putting this QR on a business card? Soon you'll be able to design one free at /name-card/. (The tool isn't built yet - just text for now.)
+      <div class="about-cta">
+        <span>Putting this QR on a business card? Soon you'll be able to design one free at /name-card/. (The tool isn't built yet - just text for now.)</span>
       </div>
 
-      <p style="max-width:680px; margin-top:20px; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
+      <p class="qr-comparisons">
         Comparisons: <a href="/vs/bitly-qr/">vs. Bitly QR</a> &middot; <a href="/vs/qr-io/">vs. QR.io</a> &middot; <a href="/vs/adobe-express-qr/">vs. Adobe Express</a> &middot; <a href="/vs/qr-tiger/">vs. QR Tiger</a>
       </p>
     </section>
 
-    <p class="cross-compare" style="max-width:680px; margin:18px 0 0; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">Compare: <a href="/vs/bitly-qr/" style="color:inherit;">techtuate vs Bitly QR</a> &middot; <a href="/vs/" style="color:inherit;">all comparisons</a> &middot; <a href="/" style="color:inherit;">more tools</a></p>
+    <p class="cross-compare">Compare: <a href="/vs/bitly-qr/">techtuate vs Bitly QR</a> &middot; <a href="/vs/">all comparisons</a> &middot; <a href="/">more tools</a></p>
 
-    <section class="faq" style="margin-top:44px;">
-      <div class="section-head"><h2>Questions people ask</h2></div>
-      <div style="max-width:720px;">
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Do free QR codes expire?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Static codes like these do not expire, because the data is encoded directly in the image rather than routed through a redirect link that a service could turn off.</p>
+    <section class="tt-section faq-section">
+      <p class="eyebrow">questions people ask</p>
+      <h2 class="sr-only">Questions people ask</h2>
+      <div class="faq">
+        <details class="faq-item">
+          <summary><h3>Do free QR codes expire?</h3></summary>
+          <p>Static codes like these do not expire, because the data is encoded directly in the image rather than routed through a redirect link that a service could turn off.</p>
         </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I add a logo to a QR code for free?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. You can overlay a logo and set custom colors, then download the result as PNG, SVG, or PDF at no cost and without an account.</p>
+        <details class="faq-item">
+          <summary><h3>Can I add a logo to a QR code for free?</h3></summary>
+          <p>Yes. You can overlay a logo and set custom colors, then download the result as PNG, SVG, or PDF at no cost and without an account.</p>
         </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Does this QR code track scans?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">No. These are static codes with no tracking redirect, so scans go straight to your content and are not logged by us.</p>
+        <details class="faq-item">
+          <summary><h3>Does this QR code track scans?</h3></summary>
+          <p>No. These are static codes with no tracking redirect, so scans go straight to your content and are not logged by us.</p>
         </details>
       </div>
     </section>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/pdf-editor/">pdf editor</a> &middot;
-        <a href="/vs/qr-tiger/">vs. QR Tiger</a> &middot;
-        <a href="/vs/">comparisons</a> &middot;
-        <a href="/why-free/">why free</a>
-      </div>
-    </footer>
+    </div>
 
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
+    </footer>
   </div>
 
   <script src="assets/qrcode.min.js"></script>

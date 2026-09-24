@@ -7,7 +7,10 @@
   <meta name="description" content="Side-by-side comparisons of techtuate's free tools against paid alternatives. PDF editor, QR code generator, password generator. Pricing, free-tier limits, privacy, sign-up requirements. Updated 2026." />
   <meta name="keywords" content="free pdf editor comparison, free qr code generator comparison, free password generator comparison, smallpdf alternative, bitly qr alternative, bitwarden alternative" />
   <link rel="canonical" href="https://techtuate.com/vs/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/flow-pages.css" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://techtuate.com/vs/" />
@@ -26,31 +29,69 @@
     "dateModified": "2026-08-05"
   }
   </script>
+  <script src="/assets/backdrop.js" defer></script>
+  <style>
+    /* page-local article polish (flow) */
+    .prose .cta h3 { margin: 0 0 10px; font-size: clamp(26px, 3vw, 36px); line-height: 1.1; }
+    .prose .cross-compare { margin-top: 28px; line-height: 1.9; }
+    /* comparison tables: framed, scrollable, sticky label column on small screens */
+    .prose div.compare { overflow-x: auto; border-radius: 22px; border: 1px solid var(--line); background: rgba(12,10,20,.55); }
+    .prose div.compare > table { width: 100%; border-collapse: collapse; }
+    .prose .compare thead th:first-child, .prose .compare tbody td:first-child { position: sticky; left: 0; z-index: 1; background: #0e0c15; }
+    .prose div.compare tbody td:first-child { color: var(--text); font-weight: 500; }
+    @media (max-width: 760px) { .prose .compare th, .prose .compare td { min-width: 120px; } .prose .compare thead th:first-child, .prose .compare tbody td:first-child { min-width: 104px; } }
+    @media (max-width: 640px) { .prose .compare { font-size: 13.5px; } .prose .compare th, .prose .compare td { padding-left: 12px; padding-right: 12px; } }
+    /* hub: wider tables and cards, text column stays readable */
+    .prose.hub { max-width: none; }
+    .prose.hub > h1, .prose.hub > h2, .prose.hub > p, .prose.hub > .callout, .prose.hub > .cta { max-width: 760px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; margin: 18px 0 32px; }
+    .prose a.card {
+      display: flex; flex-direction: column; min-height: 190px; padding: 22px 22px 18px; border-radius: 24px;
+      background: var(--glass-card); border: 1px solid rgba(255,255,255,.09); color: var(--text); text-decoration: none;
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+      transition: transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s;
+    }
+    .prose a.card:hover, .prose a.card:focus-visible { transform: translateY(-4px); border-color: rgba(255,214,10,.45); color: var(--text); }
+    .card-icon {
+      width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; margin-bottom: 16px;
+      border: 1px solid var(--line-2); background: rgba(255,214,10,.08);
+      font-family: var(--f-serif); font-style: italic; font-size: 20px; line-height: 1; color: var(--accent);
+    }
+    .prose .card-title { margin: 0 0 6px; font-size: 20px; font-weight: 500; letter-spacing: -0.025em; line-height: 1.15; color: var(--text); }
+    .prose .card-desc { margin: 0 0 16px; font-size: 14px; line-height: 1.55; font-weight: 300; color: var(--text-3); }
+    .card-meta { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .card-meta .status { font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .card-arrow { font-size: 18px; line-height: 1; color: var(--text); transition: transform .3s, color .3s; }
+    .prose a.card:hover .card-arrow { transform: translateX(3px); color: var(--accent); }
+    @media (prefers-reduced-motion: reduce) { .prose a.card, .card-arrow { transition: none; } .prose a.card:hover { transform: none; } }
+  </style>
 </head>
 <body>
 
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <div class="wrap">
+  <div class="tt-page">
 
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ compare</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="/#tools">tools</a>
-        <a href="/vs/" class="active">vs.</a>
-        <a href="/why-free/">why</a>
-        <a href="/#spread">spread</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <article class="prose">
-      <h1>How techtuate's tools stack up vs. the paid alternatives</h1>
+    <div class="tt-main narrow">
+      <a class="tt-backlink" href="/#tools">&larr; all tools</a>
+
+    <article class="prose hub">
+      <h1>How techtuate's tools stack up vs. the paid <span class="serif">alternatives</span></h1>
       <p class="byline">Updated August 2026. Pricing and limits checked against vendor sites.</p>
 
       <p class="lede">
@@ -158,7 +199,7 @@
       <h2>PDF editor - pick a competitor for a deeper look</h2>
       <p>Each page below has a focused breakdown - what they do well, where the paywall kicks in, and what techtuate covers for free.</p>
 
-      <div class="grid" style="margin-top:18px;">
+      <div class="grid">
         <a class="card" href="/vs/adobe-acrobat/">
           <div class="card-icon" aria-hidden="true">A</div>
           <h3 class="card-title">vs. Adobe Acrobat</h3>
@@ -202,7 +243,7 @@
         Branded QR codes (with your logo and custom colors) are treated as a premium feature by most tools, costing $7-10/mo. techtuate generates them in your browser at no cost, with no account required.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/bitly-qr/">
           <div class="card-icon" aria-hidden="true">Bi</div>
           <h3 class="card-title">vs. Bitly QR</h3>
@@ -234,7 +275,7 @@
         Both Bitwarden and 1Password have excellent password generators built into their apps. They win on vault storage, auto-fill, and cross-device sync. techtuate wins on "open a URL and generate a password in 5 seconds with no install and no account."
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/bitwarden-password-generator/">
           <div class="card-icon" aria-hidden="true">Bw</div>
           <h3 class="card-title">vs. Bitwarden</h3>
@@ -254,7 +295,7 @@
         Online SQL editors are built to run your SQL. techtuate's SQL to table tool is built to read it without running it - so you can see the rows a script adds, get plain-English warnings about anything it deletes or changes, and export straight to Excel. Different job, and for that job nothing leaves your browser.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/sqliteonline/">
           <div class="card-icon" aria-hidden="true">So</div>
           <h3 class="card-title">vs. SQLite Online</h3>
@@ -268,7 +309,7 @@
         Sites like EZGIF resize and compress your images and GIFs on their servers, which means an upload, some ads, and dimension or size caps. techtuate does the same resizing in your browser - nothing is uploaded, no ads, and you can target an exact file size directly.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/ezgif/">
           <div class="card-icon" aria-hidden="true">Ez</div>
           <h3 class="card-title">vs. EZGIF</h3>
@@ -282,7 +323,7 @@
         Most business card scanners are app installs or funnel you into a CRM account. techtuate reads a card in the browser and, more importantly, turns it into instant reach-out - WhatsApp, call, text, email, or a LinkedIn search - with no app and no sign-up.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/camcard/">
           <div class="card-icon" aria-hidden="true">Cc</div>
           <h3 class="card-title">vs. CamCard</h3>
@@ -296,7 +337,7 @@
         Font matchers are good at naming a typeface and then pointing you at a paid foundry font. techtuate identifies the family and hands you the closest Microsoft Office font and a free Google Fonts match you can actually use.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/whatthefont/">
           <div class="card-icon" aria-hidden="true">Wtf</div>
           <h3 class="card-title">vs. WhatTheFont</h3>
@@ -310,7 +351,7 @@
         The popular online JSON formatters process on their servers and lean on ads. techtuate formats, validates, and minifies in your browser, so sensitive JSON is not uploaded.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/jsonformatter-org/">
           <div class="card-icon" aria-hidden="true">Jf</div>
           <h3 class="card-title">vs. JSONFormatter.org</h3>
@@ -324,7 +365,7 @@
         General converters upload your file and meter free use by conversion minutes. techtuate converts audio to MP3/WAV (and trims) and SVG to PNG/JPEG in your browser, with no upload and no cap.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/cloudconvert/">
           <div class="card-icon" aria-hidden="true">Cc</div>
           <h3 class="card-title">vs. CloudConvert</h3>
@@ -338,7 +379,7 @@
         Coolors is a full palette-building app with accounts; techtuate just extracts colors from an image. WordCounter.net leans on ad and writing-tool upsells; techtuate keeps the counts clean and local.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/coolors/">
           <div class="card-icon" aria-hidden="true">Co</div>
           <h3 class="card-title">vs. Coolors</h3>
@@ -358,7 +399,7 @@
         CamScanner is the default way people turn a page into a PDF, but it is an app install with an account, and its free tier watermarks what you export. techtuate flattens a photo you already took, in the browser, with no watermark.
       </p>
 
-      <div class="grid" style="margin-top:18px; margin-bottom:32px;">
+      <div class="grid">
         <a class="card" href="/vs/camscanner/">
           <div class="card-icon" aria-hidden="true">Cs</div>
           <h3 class="card-title">vs. CamScanner</h3>
@@ -384,13 +425,16 @@
 
     </article>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/pdf-editor/">pdf editor</a> &middot;
-        <a href="/vs/">comparisons</a> &middot;
-        <a href="/why-free/">why free</a>
-      </div>
+    </div>
+
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
     </footer>
   </div>
 

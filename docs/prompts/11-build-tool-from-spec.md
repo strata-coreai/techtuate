@@ -12,7 +12,7 @@ Build a new techtuate tool from a spec file. The spec is in `docs/specs/<slug>.m
 
 - **Local-first.** Core tools are 100% client-side. AI tools may use a Cloudflare Pages Function proxy to a labeled third-party service; if the spec implies a server, confirm it fits the AI-tool rules in CLAUDE.md (labeled, keyless client, no stored input) rather than assuming it is disallowed.
 - **No new third-party fetches at runtime.** Build-time deps (npm packages) are fine; runtime CDN script tags are not.
-- **Palette + voice match the rest of the site.** Use `/assets/site.css`. Mirror `:root` tokens if you must add anything.
+- **Design + voice match the rest of the site.** Follow `docs/design-system.md`: the page loads `/assets/flow.css` + `/assets/flow-pages.css` + `/assets/backdrop.js`; the tool sits in the glass `main.tool-ui`; use the shared tokens, pill controls and the card-reader drop zone pattern. Run the pre-ship checklist at the end of that doc.
 - **Mobile-friendly to ~360 px.**
 - **Never use em-dashes (—) or en-dashes (–).** Use plain hyphens (-). This is a forever rule.
 - **No UI library, no router, no state library.** Plain CSS + React-only (if vite scaffold).
@@ -26,7 +26,8 @@ When `scaffold: vanilla`:
 2. In `<slug>/index.html`, find-and-replace:
    - `__TOOL_NAME__` -> spec name
    - `__TOOL_SLUG__` -> spec slug
-   - `__TOOL_TAGLINE__` -> spec tagline (one short line)
+   - `__TOOL_CRUMB__` -> short lowercase name for the nav breadcrumb (e.g. `qr code`)
+   - then wrap the H1's last word in `<span class="serif">...</span>` (the yellow serif accent)
    - `__TOOL_DESCRIPTION__` -> spec description (meta-length, ~150 chars)
    - `__TOOL_KEYWORDS__` -> comma-separated keywords from spec
 3. Replace the `<!-- TOOL UI GOES HERE -->` block with the actual UI.
@@ -40,7 +41,7 @@ When `scaffold: vite`:
 2. Set `base: '/<slug>/'` in `vite.config.js`.
 3. Update `package.json` name and description.
 4. Rebuild `src/App.jsx`, `src/styles.css` for the tool.
-5. Keep the palette tokens at the top of `styles.css` identical to `/assets/site.css`'s `:root`.
+5. Keep the Flow tokens and `@font-face` rules at the top of `styles.css` identical to `pdf-editor/src/styles.css` (fonts load from `/assets/fonts/`).
 
 ## After implementing
 

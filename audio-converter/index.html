@@ -6,9 +6,13 @@
   <title>Free audio converter - MP3, WAV, trim audio, in your browser - techtuate</title>
   <meta name="description" content="Convert audio to MP3 or WAV and trim clips right in your browser. Files never upload. Free, no sign-up, no watermark. A private alternative to online audio converters." />
   <meta name="keywords" content="free audio converter, convert to mp3 online, m4a to mp3, wav to mp3, trim audio online, audio converter no upload, online audio converter alternative" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#06050a" />
   <link rel="canonical" href="https://techtuate.com/audio-converter/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/flow-pages.css" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Cpath d='M20 26 L20 38 M28 20 L28 44 M36 24 L36 40 M44 28 L44 36' fill='none' stroke='%230a0a0a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
 
@@ -64,38 +68,38 @@
   ]
 }
   </script>
+  <script src="/assets/backdrop.js" defer></script>
 </head>
 <body>
 
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <div class="wrap">
+  <div class="tt-page">
 
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ audio converter</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="/#tools">tools</a>
-        <a href="/vs/">vs.</a>
-        <a href="/why-free/">why</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <section class="hero">
-      <div class="eyebrow">convert &amp; trim audio, in your browser</div>
-      <h1>Audio converter</h1>
-      <p class="lede">
-        Drop audio files, convert them to MP3 or WAV, and trim out the part you want. Handles MP3, WAV,
-        M4A, AAC, OGG, Opus and FLAC going in. Runs entirely in your browser - your files are never uploaded.
-      </p>
-    </section>
+    <div class="tt-main">
+      <a class="tt-backlink" href="/#tools">&larr; all tools</a>
 
-    <main>
+    <div class="page-head">
+        <h1>Audio <span class="serif">converter</span></h1>
+        <p class="lede">Drop audio files, convert them to MP3 or WAV, and trim out the part you want. Handles MP3, WAV, M4A, AAC, OGG, Opus and FLAC going in. Runs entirely in your browser - your files are never uploaded.</p>
+      </div>
+
+    <main class="tool-ui">
       <noscript>
         <div class="callout yellow">
           <h4>This tool needs JavaScript.</h4>
@@ -106,7 +110,7 @@
       <!-- ============ DROP ZONE ============ -->
       <section class="ac-panel">
         <div id="dropzone" class="ac-drop" tabindex="0" role="button" aria-label="Add audio files">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 18V5l12-2v13"/>
             <circle cx="6" cy="18" r="3"/>
             <circle cx="18" cy="16" r="3"/>
@@ -167,45 +171,49 @@
 
     </main>
 
-    <section style="margin-top: 48px;">
-      <div class="section-head"><h2>About this tool</h2></div>
-      <p style="max-width:680px; color:var(--ink-mute);">
+    <section class="tt-section">
+      <p class="eyebrow">about this tool</p>
+      <h2 class="sr-only">About this tool</h2>
+      <p>
         Free, no sign-up. Your audio is decoded with the browser's Web Audio API, trimmed and re-encoded right
-        here in the tab, and never uploaded. MP3 output uses <a href="https://github.com/gtramontina/lamejs" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">lamejs</a> (LAME, in JavaScript);
+        here in the tab, and never uploaded. MP3 output uses <a href="https://github.com/gtramontina/lamejs">lamejs</a> (LAME, in JavaScript);
         WAV output is written directly. Most online converters send your file to a server first - this one does not.
-        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+        Part of <a href="/">techtuate</a>, a growing collection of little tools that just work.
       </p>
     </section>
 
-    <p class="cross-compare" style="max-width:680px; margin:18px 0 0; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">Compare: <a href="/vs/cloudconvert/" style="color:inherit;">techtuate vs CloudConvert</a> &middot; <a href="/vs/" style="color:inherit;">all comparisons</a> &middot; <a href="/" style="color:inherit;">more tools</a></p>
+    <p class="cross-compare">Compare: <a href="/vs/cloudconvert/">techtuate vs CloudConvert</a> &middot; <a href="/vs/">all comparisons</a> &middot; <a href="/">more tools</a></p>
 
-    <section class="faq" style="margin-top:44px;">
-      <div class="section-head"><h2>Questions people ask</h2></div>
-      <div style="max-width:720px;">
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How do I convert M4A to MP3 without uploading?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Open the tool, pick your m4a file, and it decodes and re-encodes to MP3 locally in the browser tab, so the audio never leaves your device.</p>
+    <section class="tt-section faq-section">
+      <p class="eyebrow">questions people ask</p>
+      <h2 class="sr-only">Questions people ask</h2>
+      <div class="faq">
+        <details class="faq-item">
+          <summary><h3>How do I convert M4A to MP3 without uploading?</h3></summary>
+          <p>Open the tool, pick your m4a file, and it decodes and re-encodes to MP3 locally in the browser tab, so the audio never leaves your device.</p>
         </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Can I trim an audio clip and convert it at the same time?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Yes. You can set start and end points to trim, then export the trimmed section as MP3 or WAV in one step.</p>
+        <details class="faq-item">
+          <summary><h3>Can I trim an audio clip and convert it at the same time?</h3></summary>
+          <p>Yes. You can set start and end points to trim, then export the trimmed section as MP3 or WAV in one step.</p>
         </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">What audio formats can I convert from?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">It reads mp3, wav, m4a, aac, ogg, opus and flac, and exports to MP3 or WAV.</p>
+        <details class="faq-item">
+          <summary><h3>What audio formats can I convert from?</h3></summary>
+          <p>It reads mp3, wav, m4a, aac, ogg, opus and flac, and exports to MP3 or WAV.</p>
         </details>
       </div>
     </section>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/image-resize/">image resizer</a> &middot;
-        <a href="/color-palette/">color palette</a> &middot;
-        <a href="/why-free/">why free</a>
-      </div>
-    </footer>
+    </div>
 
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
+    </footer>
   </div>
 
   <div id="copy-flash" role="status" aria-live="polite">done &#10033;</div>

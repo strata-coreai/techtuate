@@ -6,9 +6,13 @@
   <title>Color palette extractor - get the dominant colors from any image, free - techtuate</title>
   <meta name="description" content="Drop an image and pull its dominant colors as HEX and RGB. Copy a single swatch or the whole palette. Free, no sign-up, runs in your browser - your image is never uploaded." />
   <meta name="keywords" content="color palette extractor, dominant colors from image, image color picker, get hex colors from image, color palette generator, extract colors from photo" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#06050a" />
   <link rel="canonical" href="https://techtuate.com/color-palette/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/flow-pages.css" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd60a'/%3E%3Ccircle cx='24' cy='24' r='7' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3Ccircle cx='42' cy='26' r='7' fill='%230a0a0a'/%3E%3Ccircle cx='28' cy='42' r='7' fill='none' stroke='%230a0a0a' stroke-width='4'/%3E%3C/svg%3E" />
 
@@ -64,38 +68,38 @@
   ]
 }
   </script>
+  <script src="/assets/backdrop.js" defer></script>
 </head>
 <body>
 
-  <div class="topbanner">
-    tools that should be free, are. no sign-up, no ads.
-    <a href="/why-free/">read why</a>
-  </div>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
 
-  <div class="wrap">
+  <div class="tt-page">
 
-    <header class="site">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-name">tech<span>tuate</span></span>
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ color palette</span>
       </a>
-      <nav class="top" aria-label="primary">
-        <a href="/#tools">tools</a>
-        <a href="/vs/">vs.</a>
-        <a href="/why-free/">why</a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
       </nav>
     </header>
 
-    <section class="hero">
-      <div class="eyebrow">dominant colors from any image</div>
-      <h1>Color palette extractor</h1>
-      <p class="lede">
-        Drop an image and get its dominant colors as HEX and RGB. Click any swatch to copy it, or grab the
-        whole palette at once. Runs entirely in your browser - your image is never uploaded.
-      </p>
-    </section>
+    <div class="tt-main">
+      <a class="tt-backlink" href="/#tools">&larr; all tools</a>
 
-    <main>
+    <div class="page-head">
+        <h1>Color palette <span class="serif">extractor</span></h1>
+        <p class="lede">Drop an image and get its dominant colors as HEX and RGB. Click any swatch to copy it, or grab the whole palette at once. Runs entirely in your browser - your image is never uploaded.</p>
+      </div>
+
+    <main class="tool-ui">
       <noscript>
         <div class="callout yellow">
           <h4>This tool needs JavaScript.</h4>
@@ -106,7 +110,7 @@
       <!-- ============ CAPTURE ============ -->
       <section class="cp-panel">
         <div id="dropzone" class="cp-drop" tabindex="0" role="button" aria-label="Add an image">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <path d="M21 15l-5-5L5 21"/>
@@ -154,44 +158,48 @@
 
     </main>
 
-    <section style="margin-top: 48px;">
-      <div class="section-head"><h2>About this tool</h2></div>
-      <p style="max-width:680px; color:var(--ink-mute);">
+    <section class="tt-section">
+      <p class="eyebrow">about this tool</p>
+      <h2 class="sr-only">About this tool</h2>
+      <p>
         Free, no sign-up. The image is read straight from an HTML5 canvas in your browser - nothing is uploaded.
         It samples the pixels and groups them (median-cut quantization) to find the most dominant colors, sorted by how much of the image they cover.
-        Part of <a href="/" style="border-bottom:2px solid var(--yellow); text-decoration:none; color:inherit; font-weight:600;">techtuate</a>, a growing collection of little tools that just work.
+        Part of <a href="/">techtuate</a>, a growing collection of little tools that just work.
       </p>
     </section>
 
-    <p class="cross-compare" style="max-width:680px; margin:18px 0 0; font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">Compare: <a href="/vs/coolors/" style="color:inherit;">techtuate vs Coolors</a> &middot; <a href="/vs/" style="color:inherit;">all comparisons</a> &middot; <a href="/" style="color:inherit;">more tools</a></p>
+    <p class="cross-compare">Compare: <a href="/vs/coolors/">techtuate vs Coolors</a> &middot; <a href="/vs/">all comparisons</a> &middot; <a href="/">more tools</a></p>
 
-    <section class="faq" style="margin-top:44px;">
-      <div class="section-head"><h2>Questions people ask</h2></div>
-      <div style="max-width:720px;">
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How do I get the HEX codes from an image?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Drop the image into the tool and it samples the dominant colors, showing each as a HEX and RGB value you can copy with one click.</p>
+    <section class="tt-section faq-section">
+      <p class="eyebrow">questions people ask</p>
+      <h2 class="sr-only">Questions people ask</h2>
+      <div class="faq">
+        <details class="faq-item">
+          <summary><h3>How do I get the HEX codes from an image?</h3></summary>
+          <p>Drop the image into the tool and it samples the dominant colors, showing each as a HEX and RGB value you can copy with one click.</p>
         </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">How do I extract a color palette from a photo?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">Add the photo and the tool returns its main colors as a palette; you can copy the whole set or any single swatch.</p>
+        <details class="faq-item">
+          <summary><h3>How do I extract a color palette from a photo?</h3></summary>
+          <p>Add the photo and the tool returns its main colors as a palette; you can copy the whole set or any single swatch.</p>
         </details>
-        <details class="faq-q" style="border:2px solid var(--ink);border-radius:var(--r-md);background:var(--bg);padding:12px 16px;margin-bottom:10px;box-shadow:2px 2px 0 var(--ink);">
-          <summary style="cursor:pointer;font-weight:700;font-family:var(--font-display);">Does the tool upload my image to get the colors?</summary>
-          <p style="margin:10px 0 0;color:var(--ink-mute);line-height:1.55;">No. The image is read locally in your browser tab, so it is not uploaded to a server.</p>
+        <details class="faq-item">
+          <summary><h3>Does the tool upload my image to get the colors?</h3></summary>
+          <p>No. The image is read locally in your browser tab, so it is not uploaded to a server.</p>
         </details>
       </div>
     </section>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div>
-        <a href="/svg-converter/">svg converter</a> &middot;
-        <a href="/image-resize/">image resizer</a> &middot;
-        <a href="/why-free/">why free</a>
-      </div>
-    </footer>
+    </div>
 
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
+    </footer>
   </div>
 
   <div id="copy-flash" role="status" aria-live="polite">copied &#10033;</div>

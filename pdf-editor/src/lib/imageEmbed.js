@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 
-// Header sniff — avoids relying on File.type which browsers sometimes mis-report
+// Header sniff - avoids relying on File.type which browsers sometimes mis-report
 function isJpeg(buffer) {
   const b = new Uint8Array(buffer, 0, 3);
   return b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF;
@@ -37,7 +37,7 @@ export async function embedImagesToBuffer(imageFiles, pageSizeMode = 'fit-letter
       imgW = iw * ratio; imgH = ih * ratio;
       imgX = (pageW - imgW) / 2;
       imgY = (pageH - imgH) / 2;
-    } else { // fit-letter (default) — 0.5" margin on all sides
+    } else { // fit-letter (default) - 0.5" margin on all sides
       pageW = 612; pageH = 792;
       const margin = 36; // 0.5 inch = 36 pts
       const maxW = pageW - 2 * margin;

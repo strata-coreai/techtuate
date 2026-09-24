@@ -592,11 +592,10 @@ export default function App() {
   const showTextOptions = activeTool === 'text' || (selectedAnn != null && selectedAnn.type === 'text');
 
   return (
-    <div className="app">
+    <div className={`app${isOpen ? ' is-open' : ''}`}>
       <CoffeePrompt open={coffeeOpen} onResolve={() => coffeeResolverRef.current?.()} />
       <header className="topbar">
-        <a className="brand" href="/" title="Back to techtuate"><span className="brand-mark" aria-hidden="true"></span><span>tech<span>tuate</span></span></a>
-        <span className="sep">/</span><span className="tool-name">pdf-editor</span>
+        <a className="brand" href="/" aria-label="techtuate home"><span className="brand-dot" aria-hidden="true"></span><span className="brand-word">techtuate</span><span className="brand-crumb" aria-hidden="true">/ pdf editor</span></a>
         <div className="spacer" />
         {isOpen && (
           <div className="file-info">
@@ -608,10 +607,15 @@ export default function App() {
             <button className="btn ghost icon" onClick={clear} title="Close">close</button>
           </div>
         )}
+        <nav className="top-links" aria-label="primary">
+          <a href="/#tools">tools</a>
+          <a href="/why-free/">why it's free</a>
+          <a href="/vs/">compare</a>
+        </nav>
       </header>
       <div className={`workspace${showFormPanel && isOpen ? ' with-form' : ''}`}>
         <aside className="sidebar">
-          {isOpen ? (<><h4>Pages</h4><Thumbnails pageOrder={pageOrder} sourceDocs={sourceDocs} activePage={activePage} onPick={goTo} onReorder={onReorder} onRotate={onRotate} onDuplicate={onDuplicate} onDelete={onDeletePage} /></>) : (<><h4>About</h4><p style={{ color: 'var(--ink-mute)', fontSize: 13, lineHeight: 1.55 }}>A client-side PDF editor. Open a file to start. Nothing is uploaded.</p></>)}
+          {isOpen ? (<><h4>Pages</h4><Thumbnails pageOrder={pageOrder} sourceDocs={sourceDocs} activePage={activePage} onPick={goTo} onReorder={onReorder} onRotate={onRotate} onDuplicate={onDuplicate} onDelete={onDeletePage} /></>) : (<><h4>About</h4><p className="sidebar-about">A client-side PDF editor. Open a file to start. Nothing is uploaded.</p></>)}
         </aside>
         <main
           className={`viewer${viewerDragOver ? ' img-drag-over' : ''}`}
@@ -758,11 +762,11 @@ function EmptyState({ loading, error, dragOver, onDragOver, onDragLeave, onDrop,
   return (
     <div className="empty"><div className={`drop${dragOver ? ' over' : ''}`} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
       <h2>Open a PDF</h2><p>Drop a PDF or images here, or pick one from your computer. Stays on your device.</p>
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div className="drop-actions">
         <button className="btn primary" onClick={onPick} disabled={loading}>{loading ? <span className="loading">opening…</span> : 'Choose PDF'}</button>
         <button className="btn" onClick={onPickImages} disabled={loading}>or use images &rarr;</button>
       </div>
-      {error && <div className="error" style={{ marginTop: 18 }}>{error}</div>}
+      {error && <div className="error">{error}</div>}
     </div></div>
   );
 }

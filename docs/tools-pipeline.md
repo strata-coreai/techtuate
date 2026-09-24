@@ -26,7 +26,7 @@ Most tools fit one of two scaffolds:
 
 ### a) Vanilla single-file HTML (use for ~70% of tools)
 
-Copy `_template/` to `<slug>/`. One self-contained `index.html` with inline JS + a `<link>` to `/assets/site.css`. No build step. Examples that fit: QR code, password generator, word counter, tip calculator, age calculator, base64, regex tester, color picker, EXIF stripper, JSON formatter (small one).
+Copy `_template/` to `<slug>/`. One self-contained `index.html` with inline JS, already wired to the Flow design system (`/assets/flow.css` + `/assets/flow-pages.css`; see `docs/design-system.md`). No build step. Examples that fit: QR code, password generator, word counter, tip calculator, age calculator, base64, regex tester, color picker, EXIF stripper, JSON formatter (small one).
 
 ### b) Vite + React (use only when state gets complex)
 

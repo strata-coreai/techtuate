@@ -22,7 +22,7 @@ export function FormPanel({ formFields, formValues, setFormValues, flattenForm, 
     return (
       <div className="form-panel-inner">
         <p className="form-empty-msg">
-          No form fields detected. This tool fills existing fields — it doesn't add new ones.
+          No form fields detected. This tool fills existing fields - it doesn't add new ones.
         </p>
       </div>
     );
@@ -73,7 +73,7 @@ function FieldInput({ field, value, onChange }) {
         type="text"
         value={val}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="—"
+        placeholder="-"
       />
     );
   }
@@ -92,7 +92,7 @@ function FieldInput({ field, value, onChange }) {
   if (type === 'dropdown' || type === 'optionList') {
     return (
       <select className="form-select" value={val} onChange={(e) => onChange(e.target.value)}>
-        <option value="">—</option>
+        <option value="">-</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
     );
@@ -119,7 +119,7 @@ function FieldInput({ field, value, onChange }) {
 
   // unknown / fallback
   return (
-    <input className="form-input" type="text" value={val} onChange={(e) => onChange(e.target.value)} placeholder="—" />
+    <input className="form-input" type="text" value={val} onChange={(e) => onChange(e.target.value)} placeholder="-" />
   );
 }
 

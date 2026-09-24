@@ -89,7 +89,7 @@
     card.innerHTML =
       '<div class="ac-file-head">' +
         '<h3 class="ac-file-name"></h3>' +
-        '<div style="display:flex;align-items:center;gap:12px;">' +
+        '<div class="ac-file-tools">' +
           '<span class="ac-file-meta"></span>' +
           '<button type="button" class="ac-file-remove" title="Remove">remove</button>' +
         '</div>' +
@@ -176,7 +176,7 @@
     var data = f.buffer.getChannelData(0);
     var step = Math.max(1, Math.floor(data.length / cssW));
     var mid = cssH / 2;
-    g.fillStyle = '#0a0a0a';
+    g.fillStyle = '#c9c2d8';
     for (var x = 0; x < cssW; x++) {
       var start = x * step, end = Math.min(data.length, start + step), max = 0;
       for (var i = start; i < end; i++) { var a = Math.abs(data[i]); if (a > max) max = a; }

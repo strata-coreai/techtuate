@@ -12,7 +12,7 @@ import { PDFDocument } from 'pdf-lib';
  *   });
  *
  * The round-trip case (no mutation) verifies that load → save produces
- * a file that's still a valid PDF — that's this session's milestone.
+ * a file that's still a valid PDF - that's this session's milestone.
  *
  * @param {ArrayBuffer} arrayBuffer
  * @param {object} [opts]

@@ -7,23 +7,54 @@
   <meta name="description" content="EZGIF resizes images and GIFs on its server, with ads and size caps. techtuate does it in your browser - nothing is uploaded, no ads, no dimension limits beyond your device. When to use each." />
   <meta name="keywords" content="ezgif alternative, resize gif without upload, ezgif vs, private gif resizer, resize image no upload, compress gif online, ezgif resize alternative" />
   <link rel="canonical" href="https://techtuate.com/vs/ezgif/" />
-  <link rel="stylesheet" href="/assets/site.css" />
+  <link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/assets/flow.css" />
+  <link rel="stylesheet" href="/assets/flow-pages.css" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://techtuate.com/vs/ezgif/" />
   <meta property="og:title" content="techtuate vs. EZGIF (2026)" />
   <meta property="og:description" content="A server-side image and GIF toolbox vs. a browser-only resizer that never uploads your files. When to reach for each." />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"techtuate vs. EZGIF","url":"https://techtuate.com/vs/ezgif/","datePublished":"2026-07-01","author":{"@type":"Organization","name":"techtuate"}}</script>
+  <script src="/assets/backdrop.js" defer></script>
+  <style>
+    /* page-local article polish (flow) */
+    .prose .cta h3 { margin: 0 0 10px; font-size: clamp(26px, 3vw, 36px); line-height: 1.1; }
+    .prose .cross-compare { margin-top: 28px; line-height: 1.9; }
+    /* comparison tables: framed, scrollable, sticky label column on small screens */
+    .prose div.compare { overflow-x: auto; border-radius: 22px; border: 1px solid var(--line); background: rgba(12,10,20,.55); }
+    .prose div.compare > table { width: 100%; border-collapse: collapse; }
+    .prose .compare thead th:first-child, .prose .compare tbody td:first-child { position: sticky; left: 0; z-index: 1; background: #0e0c15; }
+    .prose div.compare tbody td:first-child { color: var(--text); font-weight: 500; }
+    @media (max-width: 760px) { .prose .compare th, .prose .compare td { min-width: 120px; } .prose .compare thead th:first-child, .prose .compare tbody td:first-child { min-width: 104px; } }
+    @media (max-width: 640px) { .prose .compare { font-size: 13.5px; } .prose .compare th, .prose .compare td { padding-left: 12px; padding-right: 12px; } }
+  </style>
 </head>
 <body>
-  <div class="topbanner">tools that should be free, are. no sign-up, no ads. <a href="/why-free/">read why</a></div>
-  <div class="wrap">
-    <header class="site">
-      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name">tech<span>tuate</span></span></a>
-      <nav class="top"><a href="/#tools">tools</a><a href="/vs/" class="active">vs.</a><a href="/why-free/">why</a></nav>
+  <canvas class="tt-backdrop" aria-hidden="true"></canvas>
+  <div class="tt-vignette" aria-hidden="true"></div>
+
+  <div class="tt-page">
+
+    <header class="tt-nav">
+      <a class="tt-brand" href="/" aria-label="techtuate home">
+        <span class="tt-dot" aria-hidden="true"></span>
+        <span class="tt-word">techtuate</span>
+        <span class="tt-crumb" aria-hidden="true">/ compare</span>
+      </a>
+      <nav class="tt-links" aria-label="primary">
+        <a class="tt-hide-sm" href="/#tools">tools</a>
+        <a class="tt-hide-sm" href="/why-free/">why it's free</a>
+        <a class="tt-hide-sm" href="/vs/">compare</a>
+        <a class="tt-pill-search" href="/#search">search <span class="tt-kbd" aria-hidden="true">/</span></a>
+      </nav>
     </header>
 
+    <div class="tt-main narrow">
+      <a class="tt-backlink" href="/vs/">&larr; all comparisons</a>
+
     <article class="prose">
-      <h1>techtuate vs. EZGIF</h1>
+      <h1>techtuate <span class="serif">vs.</span> EZGIF</h1>
       <p class="byline">Checked July 2026. Both are free - this is about where your files go and where the limits kick in.</p>
 
       <p class="lede">
@@ -66,14 +97,21 @@
         <a class="btn" href="/image-resize/">Open the Image &amp; GIF resizer</a>
       </div>
 
-      <p style="font-family:var(--font-mono); font-size:12px; color:var(--ink-dim);">
+      <p class="cross-compare">
         See also: <a href="/vs/">all comparisons</a> &middot; <a href="/image-resize/">Image &amp; GIF resizer</a> &middot; <a href="/qr-code/">QR code generator</a>
       </p>
     </article>
 
-    <footer class="site">
-      <div>&copy; <span id="yr"></span> techtuate &middot; made by hand, given for free</div>
-      <div><a href="/image-resize/">image &amp; gif resizer</a> &middot; <a href="/vs/">comparisons</a></div>
+    </div>
+
+    <footer class="tt-footer">
+      <span><span class="tt-word">techtuate</span> &nbsp;made by hand, given for free &middot; &copy; <span id="yr">2026</span></span>
+      <nav aria-label="footer">
+        <a href="/#tools">all tools</a>
+        <a href="/why-free/">why it's free</a>
+        <a href="/vs/">compare</a>
+        <a class="coffee" href="https://buymeacoffee.com/techtuate" target="_blank" rel="noopener">buy me a coffee</a>
+      </nav>
     </footer>
   </div>
   <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
