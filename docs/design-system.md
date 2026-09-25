@@ -118,9 +118,9 @@ Copy it from `/_template/index.html` rather than typing it. Notes:
 | Diff checker | 250 / 200 | Font finder | 95 / 60 |
 | QR code | 150 / 190 | Word counter | 5 / 330 |
 | Password generator | 210 / 260 | SVG converter | 265 / 300 |
-| SQL to table | 225 / 190 | | |
+| SQL to table | 225 / 190 | Business card maker | 70 / 40 |
 
-  A new tool takes the free hue furthest from its neighbours (roughly 70, 135, 240, 310 are open) and an h2 20-50 degrees away.
+  A new tool takes the free hue furthest from its neighbours (roughly 135, 240, 310 are open) and an h2 20-50 degrees away.
 - Where the icon appears: the home tool card (source of truth, inline SVG), the search results (read from the card automatically), and "goes well with" pills on other tools (`.ticon.xs`). Use the same paths everywhere.
 - UI icons inside tools (upload, lock, copy...) follow the same line style in `currentColor`. The only filled or colored marks are the glowing yellow dot (brand and disclosure) and user content.
 - Favicons stay the existing yellow rounded square with a black line glyph.
