@@ -172,3 +172,8 @@
 .print-only, .digital-only { }
 body.is-digital .print-only { display: none !important; }
 body:not(.is-digital) .digital-only { display: none !important; }
+
+.bcm-how { margin-top: 12px; }
+.bcm-how[hidden] { display: none; }
+.bcm-how .bcm-tick { align-items: flex-start; margin-top: 10px; line-height: 1.45; }
+.bcm-how .bcm-tick input { margin-top: 2px; flex: 0 0 auto; }

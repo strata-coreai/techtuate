@@ -45,6 +45,7 @@ Local (100% client-side, files never uploaded):
 - `/audio-converter/` - convert to MP3/WAV, trim
 - `/word-counter/` - words, characters, reading time
 - `/business-card-maker/` - 8 templates, vCard/link QR, print PDF (bleed + crop marks), home-print sheet, 300 DPI PNG, digital QR. Own layout engine (`engine.js` + `templates.js`, mm units) renders SVG/canvas/jsPDF; fonts subset in `business-card-maker/fonts/`. The optional "digitize your card" scan reuses `/api/scan` and carries the `*` disclosure.
+- `/c/` - contact landing page opened by the business card QR. The contact is packed into the URL fragment (`/c/#1<base64url of fields joined by U+001F>`, field order in `c/contact.js`), which browsers never send to a server; the page shows the card and a "Save to contacts" button (vCard). noindex, not in the sitemap. Do not change the link format without keeping old links decodable - printed cards live for years.
 
 AI (labeled, calls a service through a Pages Function):
 - `/card-reader/` - scan a business card into a contact (Cloudflare Workers AI, Mistral Small 3.1, with Gemini fallback, via `/functions/api/scan.js`)

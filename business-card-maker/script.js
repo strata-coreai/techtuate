@@ -58,7 +58,7 @@
   }
   function freshState() {
     return { v: 1, format: 'double', tpl: 'boardroom', size: defaultSize(), accent: null, font: null, step: 0,
-      d: {}, qr: { mode: 'vcard', f: Object.assign({}, QR_DEFAULT), link: '' }, logo: null,
+      d: {}, qr: { mode: 'vcard', f: Object.assign({}, QR_DEFAULT), link: '', offline: false }, logo: null,
       dq: { logo: 1, fg: '#111111', caption: 1 }, paper: /-US$|-CA$/i.test(navigator.language || '') ? 'letter' : 'a4', pngBleed: false };
   }
   var S = freshState();
@@ -101,6 +101,22 @@
     a.download = name; document.body.appendChild(a); a.click(); a.remove();
     if (typeof blobOrUrl !== 'string') setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
   }
+  // Save a vCard so it lands in the phone's contacts, not a text viewer.
+  // iPhone/iPad: open the card in Safari, which shows the native "Create New Contact" sheet.
+  // Android: download as text/x-vcard, the type the Contacts app opens.
+  // Computers: plain download (Outlook, Apple Contacts or a Google Contacts import).
+  function saveContact(filename, text) {
+    var ua = navigator.userAgent || '';
+    var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var android = /Android/i.test(ua);
+    var blob = new Blob([text], { type: android ? 'text/x-vcard' : 'text/vcard' });
+    var url = URL.createObjectURL(blob);
+    if (ios) { window.location.href = url; setTimeout(function () { URL.revokeObjectURL(url); }, 60000); return; }
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
   function fileBase() {
     var n = (trimv(S.d.name) || 'business-card').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     return n || 'business-card';
@@ -126,15 +142,28 @@
     L.push('END:VCARD');
     return L.join('\r\n');
   }
+  // Contact link: https://techtuate.com/c/#1<base64url>. The contact rides in the part after "#",
+  // which browsers never send to a server; /c/ decodes it and saves it to the phone's contacts.
+  // Every scanner app opens links, while many show a raw vCard as plain text.
+  var LINK_KEYS = ['name', 'title', 'company', 'mobile', 'office', 'email', 'web', 'address', 'linkedin'];
+  function contactLink() {
+    var d = details(), f = S.qr.f;
+    var vals = LINK_KEYS.map(function (k) { return f[k] ? String(d[k] || '').replace(/[\u0000-\u001f]/g, ' ') : ''; });
+    vals.push(String(accentOf(tpl())).replace('#', '').toLowerCase());
+    var bytes = new TextEncoder().encode(vals.join('\u001f')), bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return 'https://techtuate.com/c/#1' + btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function contactPayload() { return S.qr.offline ? vcard(false) : contactLink(); }
   function qrPayload() {
     if (S.qr.mode === 'none' && !isDigital()) return '';
     if (S.qr.mode === 'link') return normUrl(S.qr.link || S.d.web || S.d.linkedin);
     var d = details();
     if (!d.name && !d.company && !d.email && !d.mobile) {
       // nothing typed yet: preview with the sample so the layout is visible
-      var keep = S.d; S.d = SAMPLE; var v = vcard(false); S.d = keep; return v;
+      var keep = S.d; S.d = SAMPLE; var v = contactPayload(); S.d = keep; return v;
     }
-    return vcard(false);
+    return contactPayload();
   }
   var qrCache = { key: '', q: null };
   function qrMatrix(ecl) {
@@ -271,6 +300,7 @@
     var b = e.target.closest('[data-qf]'); if (!b) return;
     var k = b.getAttribute('data-qf'); S.qr.f[k] = S.qr.f[k] ? 0 : 1; save(); renderQRControls(); scheduleLive();
   });
+  $('qr-offline').addEventListener('change', function () { S.qr.offline = this.checked; save(); renderQRControls(); scheduleLive(); if (isDigital()) renderDQ(); });
   $('qr-link').addEventListener('input', function (e) { S.qr.link = e.target.value; save(); renderQRControls(); scheduleLive(); });
   function renderQRControls() {
     if (isDigital() && S.qr.mode === 'none') S.qr.mode = 'vcard';
@@ -282,6 +312,8 @@
       return '<button type="button" role="checkbox" data-qf="' + f.k + '" aria-checked="' + on + '"><span class="bx" aria-hidden="true">' + (on ? '&#10003;' : '') + '</span>' + f.label + '</button>';
     }).join('');
     $('qr-link-wrap').hidden = S.qr.mode !== 'link';
+    $('qr-how').hidden = !vc;
+    $('qr-offline').checked = !!S.qr.offline;
     if (S.qr.mode === 'link' && !S.qr.link && document.activeElement !== $('qr-link')) $('qr-link').value = '';
     else if (document.activeElement !== $('qr-link')) $('qr-link').value = S.qr.link || '';
     $('qr-link').placeholder = S.d.web ? normUrl(S.d.web) : 'https://your-site.com or a LinkedIn profile';
@@ -594,7 +626,7 @@
   $('dl-qr-svg').addEventListener('click', function () { dlQrSvg(true); });
   $('dq-png').addEventListener('click', function () { if (needDetails()) return; dlQrPng(false, this); });
   $('dq-svg').addEventListener('click', function () { if (needDetails()) return; dlQrSvg(false); });
-  $('dq-vcf').addEventListener('click', function () { if (needDetails()) return; download(fileBase() + '.vcf', new Blob([vcard(true)], { type: 'text/vcard' })); });
+  $('dq-vcf').addEventListener('click', function () { if (needDetails()) return; saveContact(fileBase() + '.vcf', vcard(true)); });
 
   // ---------- digital step ----------
   function renderDQ() {

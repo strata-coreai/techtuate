@@ -34,7 +34,7 @@
     "browserRequirements": "Requires JavaScript. Requires modern browser.",
     "description": "Design a business card from curated templates, add a QR code that saves your contact, and download a print-ready PDF with bleed and crop marks, a home-print sheet or a QR on its own. Free, no sign-up.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": ["8 curated templates", "Front and back or one-sided", "vCard QR code", "Print-ready PDF with bleed and crop marks", "A4 and Letter home-print sheets", "300 DPI PNG", "Digital-only QR with logo", "No sign-up, no watermark"]
+    "featureList": ["8 curated templates", "Front and back or one-sided", "Contact QR that saves to any phone", "Print-ready PDF with bleed and crop marks", "A4 and Letter home-print sheets", "300 DPI PNG", "Digital-only QR with logo", "No sign-up, no watermark"]
   }
   </script>
   <script type="application/ld+json">
@@ -51,7 +51,7 @@
       {
         "@type": "Question",
         "name": "What does the QR code on the card do?",
-        "acceptedAnswer": { "@type": "Answer", "text": "You choose. It can hold your contact details as a vCard, so a phone camera offers to save you as a contact in one tap, or it can open a link such as your website or LinkedIn. You pick exactly which details go into it." }
+        "acceptedAnswer": { "@type": "Answer", "text": "You choose. By default it opens a small contact page with a Save to contacts button, which works with any scanner app. Your details are packed inside the QR itself and nothing is stored on a server. It can also hold a plain vCard for offline use, or open a link such as your website or LinkedIn. You pick exactly which details go into it." }
       },
       {
         "@type": "Question",
@@ -167,6 +167,10 @@
                   <button type="button" data-qr="none" role="radio" class="print-only">No QR</button>
                 </div>
                 <div class="bcm-checks" id="qr-fields"></div>
+                <div class="bcm-how" id="qr-how">
+                  <p class="bcm-hint">Scanning opens a small techtuate page showing these details with a big <strong>Save to contacts</strong> button. It works with every scanner app. Your details travel inside the QR itself; nothing is stored on a server.</p>
+                  <label class="bcm-tick"><input type="checkbox" id="qr-offline" /> Put the contact card inside the QR instead (works without internet, but some scanner apps show it as plain text)</label>
+                </div>
                 <label class="bcm-linkin" id="qr-link-wrap" hidden><span class="panel-label">link</span><input type="url" id="qr-link" placeholder="https://your-site.com or a LinkedIn profile" spellcheck="false" /></label>
                 <div class="bcm-meter" id="qr-meter"><span class="bcm-bar"><i></i></span><span class="bcm-meter-t"></span></div>
               </div>
@@ -240,7 +244,8 @@
                 <div class="bcm-seg" id="dq-caption" role="radiogroup" aria-label="Caption"><button type="button" data-v="1">Name + "scan to save"</button><button type="button" data-v="0">None</button></div>
               </div>
               <div class="bcm-sect"><span class="panel-label">download</span>
-                <div class="bcm-row"><button type="button" class="btn btn-primary" id="dq-png">PNG (2048 px)</button><button type="button" class="btn btn-ghost" id="dq-svg">SVG</button><button type="button" class="btn btn-text" id="dq-vcf">.vcf contact file</button></div>
+                <div class="bcm-row"><button type="button" class="btn btn-primary" id="dq-png">PNG (2048 px)</button><button type="button" class="btn btn-ghost" id="dq-svg">SVG</button><button type="button" class="btn btn-text" id="dq-vcf">Save to contacts (.vcf)</button></div>
+                <p class="bcm-hint">On a phone this opens your contacts app. On a computer it downloads a .vcf you can open in Outlook or Apple Contacts, or import at contacts.google.com.</p>
               </div>
               <div class="bcm-foot"><button type="button" class="btn btn-text" data-go="prev">&larr; Details</button><button type="button" class="bcm-linkbtn" data-reset>start over</button></div>
             </div>
@@ -255,7 +260,7 @@
       <section class="tt-section" aria-labelledby="about-h">
         <p class="eyebrow">about this tool</p>
         <h2 id="about-h" class="sr-only">About the business card maker</h2>
-        <p>Free, no sign-up and no watermark. Pick a format, choose one of eight hand-tuned templates and fill in your details. The QR code can save your contact straight to a phone (a vCard with only the fields you tick) or open a link. Downloads are a print-ready PDF with vector text, 3 mm bleed and crop marks, a home-print sheet for A4 or Letter card stock, 300 DPI PNGs, or the QR on its own. Everything is made in your browser and your design is remembered in this browser only. The one exception is the optional "digitize your card" scan, which sends the photo once to Cloudflare Workers AI (Google Gemini as backup) to read it and is labeled where you use it. Part of <a href="/">techtuate</a>, a growing collection of little tools that just work. Got a pile of cards from other people? The <a href="/card-reader/">business card reader</a> turns them into contacts.</p>
+        <p>Free, no sign-up and no watermark. Pick a format, choose one of eight hand-tuned templates and fill in your details. The QR code can save your contact straight to a phone (with only the fields you tick) or open a link. Downloads are a print-ready PDF with vector text, 3 mm bleed and crop marks, a home-print sheet for A4 or Letter card stock, 300 DPI PNGs, or the QR on its own. Everything is made in your browser and your design is remembered in this browser only. The one exception is the optional "digitize your card" scan, which sends the photo once to Cloudflare Workers AI (Google Gemini as backup) to read it and is labeled where you use it. Part of <a href="/">techtuate</a>, a growing collection of little tools that just work. Got a pile of cards from other people? The <a href="/card-reader/">business card reader</a> turns them into contacts.</p>
       </section>
 
       <section class="tt-section faq-section" aria-labelledby="faq-h">
@@ -268,7 +273,7 @@
           </details>
           <details class="faq-item">
             <summary><h3>What does the QR code on the card do?</h3></summary>
-            <p>You choose. It can hold your contact details as a vCard, so a phone camera offers to save you as a contact in one tap, or it can open a link such as your website or LinkedIn. You pick exactly which details go into it.</p>
+            <p>You choose. By default it opens a small contact page with a Save to contacts button, which works with any scanner app. Your details are packed inside the QR itself and nothing is stored on a server. It can also hold a plain vCard for offline use, or open a link such as your website or LinkedIn. You pick exactly which details go into it.</p>
           </details>
           <details class="faq-item">
             <summary><h3>Can I print the cards at home?</h3></summary>

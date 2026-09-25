@@ -49,6 +49,7 @@ const STATIC_DIRS = [
   'pdf-password-remover',
   'photo-to-scan',
   'business-card-maker',
+  'c',
 ];
 
 // NOTE: the /card-reader/ tool also relies on a Cloudflare Pages Function at

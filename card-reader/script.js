@@ -639,6 +639,23 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
+  // Save a vCard so it lands in the phone's contacts, not a text viewer.
+  // iPhone/iPad: open the card in Safari, which shows the native "Create New Contact" sheet.
+  // Android: download as text/x-vcard, the type the Contacts app opens.
+  // Computers: plain download (Outlook, Apple Contacts or a Google Contacts import).
+  function saveContact(filename, text) {
+    var ua = navigator.userAgent || '';
+    var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var android = /Android/i.test(ua);
+    var blob = new Blob([text], { type: android ? 'text/x-vcard' : 'text/vcard' });
+    var url = URL.createObjectURL(blob);
+    if (ios) { window.location.href = url; setTimeout(function () { URL.revokeObjectURL(url); }, 60000); return; }
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
   // ---------- CSV ----------
   function cEsc(s) { s = String(s == null ? '' : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
   function contactsToCsv(list) {
@@ -687,7 +704,7 @@
   $('btn-download-one').addEventListener('click', function () {
     var c = collectContact();
     if (needsSomething(c)) { toast('Add a name, company or email first'); return; }
-    download(safeName(c) + '.vcf', toVCard(c), 'text/vcard');
+    saveContact(safeName(c) + '.vcf', toVCard(c));
   });
   $('btn-copy-one').addEventListener('click', function () { copyText(contactToText(collectContact()), 'Contact copied'); });
   $('btn-save').addEventListener('click', function () {
@@ -829,7 +846,7 @@
 
     var menu = document.createElement('div');
     menu.className = 'cr-menu'; menu.hidden = true; menu.setAttribute('role', 'menu');
-    menu.appendChild(menuBtn('Download .vcf', function () { download(safeName(c) + '.vcf', toVCard(c), 'text/vcard'); }));
+    menu.appendChild(menuBtn('Save to contacts', function () { saveContact(safeName(c) + '.vcf', toVCard(c)); }));
     menu.appendChild(menuBtn('Copy details', function () { copyText(contactToText(c), 'Contact copied'); }));
     menu.appendChild(menuBtn('Delete', function () { dbDel(c.id).then(loadPhonebook); }, 'danger'));
 
@@ -860,7 +877,7 @@
 
   $('btn-export-vcf').addEventListener('click', function () {
     if (!current.length) return;
-    download('techtuate-contacts.vcf', current.map(toVCard).join('\r\n'), 'text/vcard');
+    saveContact('techtuate-contacts.vcf', current.map(toVCard).join('\r\n'));
   });
   $('btn-export-csv').addEventListener('click', function () {
     if (!current.length) return;
