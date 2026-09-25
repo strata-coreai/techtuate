@@ -1,7 +1,7 @@
 # Name card / business card generator
 feature-of: standalone tool at /business-card-maker/ (planned as /name-card/)
 scaffold: _template/ (vanilla single-HTML) initially; reconsider Vite if template editor gets complex
-status: shipped 2026-09-25 (8 templates, wizard, print PDF/sheet/PNG, digital QR, optional AI scan)
+status: shipped 2026-09-25 (10 templates incl. 2 portrait, wizard, print PDF/sheet/PNG, digital QR, optional AI scan)
 
 ## What it does
 Generate a printable business card (or digital share card) with templates, custom QR code, and editable text fields. Download as PDF (print-ready) or PNG (for sharing online). Runs entirely in the browser.

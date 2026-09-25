@@ -177,3 +177,31 @@ body:not(.is-digital) .digital-only { display: none !important; }
 .bcm-how[hidden] { display: none; }
 .bcm-how .bcm-tick { align-items: flex-start; margin-top: 10px; line-height: 1.45; }
 .bcm-how .bcm-tick input { margin-top: 2px; flex: 0 0 auto; }
+
+/* logo preview on a checkerboard so a removed background (or a white logo) is visible */
+.bcm-logo-box.has-logo { background: #fff repeating-conic-gradient(#e6e6ea 0% 25%, #fff 0% 50%) 50% / 12px 12px; }
+.bcm-logo-bg { margin-top: 12px; }
+.bcm-logo-bg[hidden] { display: none; }
+
+/* describe your business -> suggested templates */
+.bcm-suggest { margin: 4px 0 18px; }
+.bcm-suggest-row { position: relative; margin-top: 8px; }
+.bcm-suggest-ic { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--accent); pointer-events: none; }
+.bcm-suggest input { width: 100%; min-height: 50px; padding: 0 18px 0 44px; border-radius: 999px; border: 1px solid var(--line-2, rgba(255,255,255,.14)); background: rgba(255,255,255,.04); color: var(--text); font: 400 15px var(--f-body, inherit); }
+.bcm-suggest input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,214,10,.18); }
+.bcm-suggest input::placeholder { color: var(--faint); }
+#biz-out button { background: none; border: 0; padding: 0; color: var(--text); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.bcm-tpl .bcm-fit { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 4px 9px; border-radius: 999px; background: var(--accent); color: #111; font: 600 10.5px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+.bcm-tpl .bcm-fit.good { background: rgba(255,255,255,.9); }
+.bcm-tpl.dim { opacity: .55; }
+.bcm-tpl.dim:hover, .bcm-tpl.dim[aria-checked="true"] { opacity: 1; }
+.bcm-tpl { position: relative; }
+
+/* portrait templates: front and back side by side in the gallery, previews and final step */
+.bcm-tpl.portrait .bcm-tpl-pair { display: flex; justify-content: center; gap: 10px; aspect-ratio: 88.9 / 50.8; }
+.bcm-tpl.portrait .bcm-tpl-pair .face { position: static; opacity: 1; height: 100%; aspect-ratio: 50.8 / 88.9; width: auto; }
+.bcm-tpl.portrait .bcm-tpl-pair .face svg { height: 100%; width: 100%; }
+.bcm-stack.portrait { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 220px)); justify-content: center; gap: 16px; }
+.bcm-stack.portrait > div:only-child { grid-column: 1 / -1; max-width: 240px; justify-self: center; }
+.bcm-final.portrait { grid-template-columns: repeat(auto-fit, minmax(0, 260px)); justify-content: center; }
+@media (max-width: 760px) { .bcm-final.portrait { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

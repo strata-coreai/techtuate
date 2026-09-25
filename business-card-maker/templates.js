@@ -17,14 +17,54 @@
   function T(s, x, y, f, size, fill, extra) { return Object.assign({ t: 'text', s: s, x: x, y: y, f: f, size: size, fill: fill }, extra || {}); }
   function initial(d) { var s = (d.company || d.name || 'M').trim(); return (s.replace(/^(the|a|an)\s+/i, '')[0] || 'M').toUpperCase(); }
   // logo (uploaded image) or a monogram disc
-  function mark(o, d, x, y, size, disc, letter, fontKey) {
-    if (o.logo) return [{ t: 'image', src: o.logo, x: x, y: y, w: size, h: size }];
+  // Fit the uploaded logo into a box by its real aspect ratio. Wide wordmarks get up to
+  // maxW, square marks get the full height. If the logo's ink is too close to the background
+  // (a dark logo on a dark card), it sits on a small light or dark chip so it stays visible.
+  // Returns elements; .w/.h on the array give the space actually used.
+  function logoFit(o, x, y, maxW, maxH, align, bgc) {
+    var ar = o.logoAR > 0 ? o.logoAR : 1, w = Math.min(maxW, maxH * ar), h = w / ar;
+    if (h > maxH) { h = maxH; w = h * ar; }
+    var chip = null;
+    if (bgc && o.logoInk && root.BCM.contrast(o.logoInk, bgc) < 2) {
+      var pad = Math.max(0.8, Math.min(w, h) * 0.16);
+      var k = Math.min(1, (maxW - 2 * pad) / w, (maxH - 2 * pad) / h); w *= k; h *= k;
+      chip = { pad: pad, fill: root.BCM.lum(o.logoInk) < 0.4 ? '#ffffff' : '#161616' };
+    }
+    var fw = w + (chip ? 2 * chip.pad : 0), fh = h + (chip ? 2 * chip.pad : 0);
+    var fx = align === 'center' ? x - fw / 2 : align === 'right' ? x - fw : x, fy = y + (maxH - fh) / 2;
+    var out = [];
+    if (chip) out.push({ t: 'rect', x: fx, y: fy, w: fw, h: fh, r: Math.min(1.4, fh * 0.2), fill: chip.fill });
+    out.push({ t: 'image', src: o.logo, x: fx + (chip ? chip.pad : 0), y: fy + (chip ? chip.pad : 0), w: w, h: h });
+    out.w = fw; out.h = fh;
+    return out;
+  }
+  // true when the logo is a wide wordmark that already spells out the company name
+  function wordmark(o) { return !!(o.logo && o.logoAR >= 2.2); }
+  // Logo if there is one, otherwise a monogram disc. opt.align 'center' centres on x + size/2.
+  function mark(o, d, x, y, size, disc, letter, fontKey, opt) {
+    opt = opt || {};
+    if (o.logo) {
+      var mw = size * (opt.wide || 3.2);
+      return logoFit(o, opt.align === 'center' ? x + size / 2 : x, y, mw, size, opt.align || 'left', opt.bg);
+    }
     var r = size / 2, s = size * 1.25;
-    return [{ t: 'circle', cx: x + r, cy: y + r, r: r, fill: disc },
+    var out = [{ t: 'circle', cx: x + r, cy: y + r, r: r, fill: disc },
       T(initial(d), x + r, y + r + s * 0.352778 * 0.36, fontKey || o.fonts.b, s, letter, { align: 'center' })];
+    out.w = size; out.h = size;
+    return out;
   }
   function qr(o, x, y, size, fg, bgc) { return o.qr ? [{ t: 'qr', q: o.qr, x: x, y: y, size: size, fg: fg || '#111111', bg: bgc || '#ffffff', pad: size * 0.07, r: size * 0.04 }] : []; }
   function contacts(d, keys) { return keys.map(function (k) { return d[k]; }).filter(Boolean); }
+  // Name on one line if it fits at a decent size, otherwise first word(s) / last word on two lines.
+  var PT = 0.352778;
+  function nameLines(name, f, maxSize, maxW, split) {
+    name = String(name || '').trim();
+    var M = root.BCM.measure, one = M(name, f, maxSize, -0.02);
+    if ((!split && one <= maxW) || name.indexOf(' ') < 0) return { lines: [name], size: Math.max(8, Math.min(maxSize, maxSize * maxW / Math.max(one, 1))) };
+    var parts = name.split(/\s+/), last = parts.pop(), first = parts.join(' ');
+    var wide = Math.max(M(first, f, maxSize, -0.02), M(last, f, maxSize, -0.02));
+    return { lines: [first, last], size: Math.max(8, Math.min(maxSize, maxSize * maxW / Math.max(wide, 1))) };
+  }
   function stack(lines, x, yBottom, gap, f, size, fill, align, maxW) {
     var out = [], y = yBottom;
     for (var i = lines.length - 1; i >= 0; i--) { out.push(T(lines[i].s || lines[i], x, y, lines[i].f || f, lines[i].size || size, lines[i].fill || fill, { align: align, maxW: maxW })); y -= gap; }
@@ -46,8 +86,9 @@
     front: function (W, H, d, o) {
       var m = 5.5, a = o.accent, oneQR = o.oneSided && o.qr;
       var els = [bg(W, H, o.B, '#fbfaf7')];
-      els = els.concat(mark(o, d, m, m, 5.6, a, '#ffffff'));
-      els.push(T((d.company || '').toUpperCase(), m + 7.4, m + 3.9, 'sans700', 5.6, a, { ls: 0.2, maxW: W - m * 2 - 8 - (oneQR ? 17 : 0) }));
+      var mk = mark(o, d, m, m, 5.6, a, '#ffffff', null, { bg: '#fbfaf7', wide: 4.2 });
+      els = els.concat(mk);
+      if (!wordmark(o)) els.push(T((d.company || '').toUpperCase(), m + mk.w + 1.8, m + 3.9, 'sans700', 5.6, a, { ls: 0.2, maxW: W - m * 2 - mk.w - 2.4 - (oneQR ? 17 : 0) }));
       var ny = H - m - 11.5;
       els.push(T(d.name, m, ny, o.fonts.b, 15, a, { maxW: W * 0.52 }));
       els.push(T(d.title, m, ny + 4.4, 'sans400', 6.8, '#5b6275', { maxW: W * 0.5 }));
@@ -62,13 +103,13 @@
       var a = o.accent, fg = onColor(a), els = [bg(W, H, o.B, a)], m = 8;
       if (o.qr) {
         var qs = Math.min(23, H - 16);
-        els = els.concat(mark(o, d, m, H / 2 - 13, 10, fg, a));
-        els.push(T((d.company || '').toUpperCase(), m, H / 2 + 4, 'sans700', 6.2, fg, { ls: 0.2, maxW: W - qs - m * 2 - 5 }));
+        els = els.concat(mark(o, d, m, H / 2 - 13, 10, fg, a, null, { bg: a, wide: 3.4 }));
+        if (!wordmark(o)) els.push(T((d.company || '').toUpperCase(), m, H / 2 + 4, 'sans700', 6.2, fg, { ls: 0.2, maxW: W - qs - m * 2 - 5 }));
         if (d.tagline) els.push(T(d.tagline, m, H / 2 + 9, o.fonts.i, 7, mix(fg, a, 0.25), { maxW: W - qs - m * 2 - 5 }));
         els = els.concat(qr(o, W - m - qs, (H - qs) / 2, qs, a));
       } else {
-        els = els.concat(mark(o, d, W / 2 - 6, H / 2 - 12, 12, fg, a));
-        els.push(T((d.company || '').toUpperCase(), W / 2, H / 2 + 7, 'sans700', 6.6, fg, { ls: 0.22, align: 'center', maxW: W - 16 }));
+        els = els.concat(mark(o, d, W / 2 - 6, H / 2 - 12, 12, fg, a, null, { bg: a, align: 'center', wide: 4.5 }));
+        if (!wordmark(o)) els.push(T((d.company || '').toUpperCase(), W / 2, H / 2 + 7, 'sans700', 6.6, fg, { ls: 0.22, align: 'center', maxW: W - 16 }));
         if (d.tagline) els.push(T(d.tagline, W / 2, H / 2 + 12.5, o.fonts.i, 7.2, mix(fg, a, 0.25), { align: 'center', maxW: W - 16 }));
       }
       return els;
@@ -82,6 +123,7 @@
       var m = 5.5, a = o.accent, ink = '#1f2a26', oneQR = o.oneSided && o.qr;
       var els = [bg(W, H, o.B, '#f4f3ee')];
       var tw = W - 2 * m - (oneQR ? 17 : 0);
+      if (o.logo && !oneQR) { var lg = logoFit(o, W - m, m - 0.5, 22, 7, 'right', '#f4f3ee'); els = els.concat(lg); tw -= lg.w + 3; }
       els.push(T(d.name, m, m + 6.5, o.fonts.b, 14, ink, { maxW: tw }));
       els.push(T([d.title, d.company].filter(Boolean).join('  ·  '), m, m + 11, 'sans400', 6.8, a, { maxW: tw }));
       if (d.tagline && !oneQR) els.push(T(d.tagline, m, m + 15, o.fonts.i, 6.2, '#6b726e', { maxW: tw }));
@@ -103,6 +145,9 @@
         var qs = Math.min(24, H - 18);
         els = els.concat(qr(o, (W - qs) / 2, (H - qs) / 2 - 3, qs, mix(a, '#000000', 0.35)));
         els.push(T(caption(o), W / 2, (H + qs) / 2 + 3.5, 'mono500', 5.2, fg, { ls: 0.14, align: 'center' }));
+      } else if (o.logo) {
+        els = els.concat(logoFit(o, W / 2, H / 2 - 9, W * 0.55, 13, 'center', a));
+        if (d.tagline) els.push(T(d.tagline, W / 2, H / 2 + 10, 'sans400', 6.6, mix(fg, a, 0.3), { align: 'center', maxW: W - 16 }));
       } else {
         els.push(T(d.company, W / 2, H / 2 + 1, o.fonts.b, 12, fg, { align: 'center', maxW: W - 16 }));
         if (d.tagline) els.push(T(d.tagline, W / 2, H / 2 + 6.5, 'sans400', 6.6, mix(fg, a, 0.3), { align: 'center', maxW: W - 16 }));
@@ -135,8 +180,8 @@
     back: function (W, H, d, o) {
       var a = o.accent, light = mix(a, '#ffffff', 0.9);
       var els = [bg(W, H, o.B, a)].concat(this.grid(W, H, o));
-      els = els.concat(mark(o, d, W / 2 - 7, H / 2 - 10, 14, light, a));
-      els.push(T((d.company || '').toUpperCase(), W / 2, H / 2 + 11, 'mono500', 5.6, light, { ls: 0.16, align: 'center', maxW: W - 16 }));
+      els = els.concat(mark(o, d, W / 2 - 7, H / 2 - 10, 14, light, a, null, { bg: a, align: 'center', wide: 4 }));
+      if (!wordmark(o)) els.push(T((d.company || '').toUpperCase(), W / 2, H / 2 + 11, 'mono500', 5.6, light, { ls: 0.16, align: 'center', maxW: W - 16 }));
       return els;
     } },
 
@@ -149,6 +194,7 @@
       var els = [bg(W, H, o.B, '#ffffff')];
       var parts = String(d.name || '').trim().split(/\s+/), l1 = parts.shift() || '', l2 = parts.join(' ');
       var maxW = W - 2 * m - (oneQR ? 18 : 0), size = 19;
+      if (o.logo && !oneQR) { var lg = logoFit(o, W - m, m - 0.5, 20, 6.5, 'right', '#ffffff'); els = els.concat(lg); maxW -= lg.w + 3; }
       var widest = Math.max(root.BCM.measure(l1, o.fonts.b, size, -0.03), root.BCM.measure(l2 + '.', o.fonts.b, size, -0.03));
       if (widest > maxW) size = Math.max(8, size * maxW / widest);
       var y1 = m + size * 0.352778 * 0.95, y2 = y1 + size * 0.352778 * 1.02;
@@ -164,7 +210,11 @@
     back: function (W, H, d, o) {
       var a = o.accent, fg = onColor(a), m = 6.5, els = [bg(W, H, o.B, a)];
       var word = String(d.company || d.name || '').split(/\s+/)[0].toLowerCase();
-      if (o.qr) {
+      if (o.logo) {
+        var qs2 = o.qr ? Math.min(20, H - 14) : 0;
+        els = els.concat(logoFit(o, m, H - m - 11, W - qs2 - 2 * m - 6, 11, 'left', a));
+        if (o.qr) els = els.concat(qr(o, W - m - qs2, H - m - qs2, qs2, mix(a, '#000000', 0.45)));
+      } else if (o.qr) {
         var qs = Math.min(20, H - 14);
         els.push(T(word, m, H - m, 'geo700', 12, fg, { ls: -0.03, maxW: W - qs - 2 * m - 6 }));
         els.push(T('.', m + Math.min(root.BCM.measure(word, 'geo700', 12, -0.03), W - qs - 2 * m - 6) + 0.2, H - m, 'geo700', 12, mix(fg, a, 0.45)));
@@ -182,7 +232,7 @@
     front: function (W, H, d, o) {
       var a = o.accent, fg = onColor(a), pw = W * 0.38, m = 5, ink = '#1c1c1c', oneQR = o.oneSided && o.qr;
       var els = [bg(W, H, o.B, '#ffffff'), { t: 'rect', x: -o.B - 1, y: -o.B - 1, w: pw + o.B + 1, h: H + 2 * o.B + 2, fill: a }];
-      els = els.concat(mark(o, d, m, m, 8, fg, a));
+      els = els.concat(mark(o, d, m, m, 8, fg, a, null, { bg: a, wide: (pw - m - 3) / 8 }));
       var words = String(d.company || '').split(/\s+/), c1 = '', c2 = '';
       words.forEach(function (w) { if (!c2 && root.BCM.measure((c1 + ' ' + w).trim(), 'geo700', 7.4) < pw - m - 3) c1 = (c1 + ' ' + w).trim(); else c2 = (c2 + ' ' + w).trim(); });
       if (oneQR) {
@@ -207,7 +257,8 @@
         els.push(T('Let’s', x0 + qs + 5, H / 2 - 0.8, 'geo700', 11, fg));
         els.push(T('talk.', x0 + qs + 5, H / 2 + 4.6, 'geo700', 11, fg));
       } else {
-        els.push(T(d.company, W / 2, H / 2 + 2, 'geo700', 13, fg, { align: 'center', maxW: W - 16 }));
+        if (o.logo) els = els.concat(logoFit(o, W / 2, H / 2 - 8, W * 0.6, 16, 'center', a));
+        else els.push(T(d.company, W / 2, H / 2 + 2, 'geo700', 13, fg, { align: 'center', maxW: W - 16 }));
       }
       return els;
     } },
@@ -219,8 +270,9 @@
     front: function (W, H, d, o) {
       var m = 5.5, a = o.accent, ink = mix(a, '#000000', 0.55), oneQR = o.oneSided && o.qr;
       var els = [bg(W, H, o.B, mix(a, '#ffffff', 0.94)), { t: 'circle', cx: W + 2, cy: -7, r: 25, fill: a, opacity: 0.14 }];
-      els = els.concat(mark(o, d, m, m, 6, a, '#ffffff'));
-      els.push(T(d.company, m + 7.8, m + 4.1, 'sans700', 6.6, a, { maxW: W - 2 * m - 10 - (oneQR ? 16 : 0) }));
+      var mk = mark(o, d, m, m, 6, a, '#ffffff', null, { bg: mix(a, '#ffffff', 0.94), wide: 4.2 });
+      els = els.concat(mk);
+      if (!wordmark(o)) els.push(T(d.company, m + mk.w + 1.8, m + 4.1, 'sans700', 6.6, a, { maxW: W - 2 * m - mk.w - 2.4 - (oneQR ? 16 : 0) }));
       els.push(T(d.name, m, H * 0.54, o.fonts.b, 13.5, ink, { maxW: W - 2 * m }));
       els.push(T(d.title, m, H * 0.54 + 4.3, 'sans400', 6.8, mix(ink, '#ffffff', 0.25), { maxW: W - 2 * m }));
       var l1 = [d.mobile, d.email].filter(Boolean).join('    ');
@@ -236,21 +288,23 @@
         els = els.concat(qr(o, (W - qs) / 2, (H - qs) / 2 - 3, qs, mix(a, '#000000', 0.55)));
         els.push(T(o.qrKind === 'link' ? 'Scan to visit' : 'Scan to save my contact', W / 2, (H + qs) / 2 + 3.6, 'sans400', 6.4, fg, { align: 'center' }));
       } else {
-        els = els.concat(mark(o, d, W / 2 - 6, H / 2 - 10, 12, fg, a));
-        els.push(T(d.company, W / 2, H / 2 + 9, 'sans700', 7.4, fg, { align: 'center', maxW: W - 16 }));
+        els = els.concat(mark(o, d, W / 2 - 6, H / 2 - 10, 12, fg, a, null, { bg: a, align: 'center', wide: 4.5 }));
+        if (!wordmark(o)) els.push(T(d.company, W / 2, H / 2 + 9, 'sans700', 7.4, fg, { align: 'center', maxW: W - 16 }));
       }
       return els;
     } },
 
   // 7 ---------------------------------------------------------------
   { id: 'terminal', name: 'Terminal', accent: '#ffb000', font: 'mono',
-    for: 'Dark, monospaced, a prompt instead of a logo. Instantly says "builds software".',
+    for: 'Dark, monospaced, a command-line prompt. Instantly says "builds software".',
     inds: ['developers', 'SaaS', 'data', 'IT services'], cat: 'tech',
     front: function (W, H, d, o) {
       var m = 5.5, a = o.accent, base = '#0e0f13';
       var els = [bg(W, H, o.B, base)];
       var qs = o.qr ? 14 : 0;
-      els.push(T('~/' + slug(d.company) + ' $ whoami', m, m + 3.4, 'mono400', 5.6, a, { maxW: W - 2 * m }));
+      var pw = W - 2 * m;
+      if (o.logo) { var lg = logoFit(o, W - m, m - 0.5, 20, 6.5, 'right', base); els = els.concat(lg); pw -= lg.w + 3; }
+      els.push(T('~/' + slug(d.company) + ' $ whoami', m, m + 3.4, 'mono400', 5.6, a, { maxW: pw }));
       els.push(T(d.name, m, m + 11.5, o.fonts.b, 12.5, '#ffffff', { maxW: W - 2 * m }));
       els.push(T(d.title, m, m + 15.8, 'mono400', 6.1, '#9aa0aa', { maxW: W - 2 * m }));
       var rows = [['mail', d.email], ['tel ', d.mobile], ['web ', d.web]].filter(function (r) { return r[1]; });
@@ -266,6 +320,13 @@
     back: function (W, H, d, o) {
       var a = o.accent, base = '#0e0f13', els = [bg(W, H, o.B, base)];
       var s = '> ' + slug(d.company) + '_';
+      if (o.logo) {
+        els = els.concat(logoFit(o, W / 2, H / 2 - 13, W * 0.6, 15, 'center', base));
+        var w2 = Math.min(root.BCM.measure(s, 'mono500', 7), W - 16);
+        els.push(T(s, W / 2 - 1, H / 2 + 11, 'mono500', 7, a, { align: 'center', maxW: W - 16 }));
+        els.push({ t: 'rect', x: W / 2 - 1 + w2 / 2 + 0.4, y: H / 2 + 8.4, w: 1.3, h: 3, fill: a });
+        return els;
+      }
       var w = Math.min(root.BCM.measure(s, 'mono500', 10), W - 16);
       els.push(T(s, W / 2 - 1.5, H / 2 + 1.5, 'mono500', 10, a, { align: 'center', maxW: W - 16 }));
       els.push({ t: 'rect', x: W / 2 - 1.5 + w / 2 + 0.6, y: H / 2 - 2.2, w: 1.8, h: 4.3, fill: a });
@@ -295,10 +356,81 @@
       var a = o.accent, dark = mix(a, '#000000', 0.72), gold = mix(a, '#ffffff', 0.35), els = [bg(W, H, o.B, dark)];
       if (o.qr) {
         var qs = Math.min(21, H - 16);
-        els.push(T(initial(d), W / 2 - qs / 2 - 9, H / 2 + 7, 'disp400i', 40, gold, { align: 'center' }));
+        if (o.logo) els = els.concat(logoFit(o, W / 2 - qs / 2 - 9, (H - 20) / 2, W / 2 - qs / 2 - 4, 20, 'center', dark));
+        else els.push(T(initial(d), W / 2 - qs / 2 - 9, H / 2 + 7, 'disp400i', 40, gold, { align: 'center' }));
         els = els.concat(qr(o, W / 2 + 1, (H - qs) / 2, qs, dark, '#f5efe2'));
       } else {
-        els.push(T(initial(d), W / 2, H / 2 + 8, 'disp400i', 46, gold, { align: 'center' }));
+        if (o.logo) els = els.concat(logoFit(o, W / 2, H / 2 - 12, W * 0.6, 24, 'center', dark));
+        else els.push(T(initial(d), W / 2, H / 2 + 8, 'disp400i', 46, gold, { align: 'center' }));
+      }
+      return els;
+    } },
+
+  // ---- portrait templates: W < H (the app swaps the card size for these) ----
+  // 9 ---------------------------------------------------------------
+  { id: 'tower', name: 'Tower', portrait: true, accent: '#4b3fb5', font: 'geo',
+    for: 'Upright card, a bold color block up top, your name stacked large below. Stands out in a pile of landscape cards.',
+    inds: ['startups', 'media', 'events', 'product'], cat: 'sales',
+    front: function (W, H, d, o) {
+      var a = o.accent, fg = onColor(a), m = 5, ink = '#161616', ph = H * 0.4, oneQR = o.oneSided && o.qr;
+      var els = [bg(W, H, o.B, '#ffffff'), { t: 'rect', x: -o.B - 1, y: -o.B - 1, w: W + 2 * o.B + 2, h: ph + o.B + 1, fill: a }];
+      var qs = oneQR ? 14 : 0;
+      els = els.concat(mark(o, d, m, m, 8, fg, a, null, { bg: a, wide: (W - 2 * m - (qs ? qs + 3 : 0)) / 8 }));
+      if (oneQR) els = els.concat(qr(o, W - m - qs, m - 0.5, qs, ink));
+      if (!wordmark(o)) els.push(T(d.company, m, ph - m, 'geo700', 7, fg, { maxW: W - 2 * m }));
+      var nl = nameLines(d.name, o.fonts.b, 21, W - 2 * m, true);
+      var y = ph + 6 + nl.size * PT;
+      nl.lines.forEach(function (l, i) { els.push(T(l, m, y + i * nl.size * PT * 1.02, o.fonts.b, nl.size, ink, { ls: -0.02, maxW: W - 2 * m })); });
+      y += (nl.lines.length - 1) * nl.size * PT * 1.02 + 4.6;
+      els.push(T(d.title, m, y, 'geo700', 6.2, a, { maxW: W - 2 * m }));
+      els = els.concat(stack(contacts(d, ['mobile', 'email', 'web']), m, H - m, 3.2, 'sans400', 6, '#444444', 'left', W - 2 * m));
+      return els;
+    },
+    back: function (W, H, d, o) {
+      var a = o.accent, fg = onColor(a), m = 5, els = [bg(W, H, o.B, a)];
+      if (o.qr) {
+        var qs = Math.min(W - 16, 32), qy = H / 2 - qs / 2 + 2;
+        els = els.concat(mark(o, d, W / 2 - 4, m + 2, 8, fg, a, null, { bg: a, align: 'center', wide: (W - 2 * m) / 8 }));
+        els = els.concat(qr(o, (W - qs) / 2, qy, qs, mix(a, '#000000', 0.45)));
+        els.push(T(caption(o), W / 2, qy + qs + 6, 'geo700', 5.2, fg, { ls: 0.14, align: 'center', maxW: W - 2 * m }));
+      } else {
+        els = els.concat(mark(o, d, W / 2 - 8, H / 2 - 14, 16, fg, a, null, { bg: a, align: 'center', wide: (W - 2 * m) / 16 }));
+        if (!wordmark(o)) els.push(T(d.company, W / 2, H / 2 + 10, 'geo700', 8, fg, { align: 'center', maxW: W - 2 * m }));
+      }
+      return els;
+    } },
+
+  // 10 --------------------------------------------------------------
+  { id: 'atelier', name: 'Atelier', portrait: true, accent: '#8c4a3b', font: 'display',
+    for: 'Upright and airy: centred serif name, a fine rule, warm paper stock. Feels like a boutique label.',
+    inds: ['fashion', 'beauty', 'architecture', 'galleries'], cat: 'creative',
+    front: function (W, H, d, o) {
+      var a = o.accent, ink = '#2b2522', paper = '#faf6f0', m = 5, cx = W / 2, oneQR = o.oneSided && o.qr;
+      var els = [bg(W, H, o.B, paper)];
+      els = els.concat(mark(o, d, cx - 4.5, m + 3, 9, a, '#ffffff', null, { bg: paper, align: 'center', wide: (W - 2 * m) / 9 }));
+      if (!wordmark(o)) els.push(T((d.company || '').toUpperCase(), cx, m + 18, 'sans400', 5, a, { ls: 0.26, align: 'center', maxW: W - 2 * m }));
+      var nl = nameLines(d.name, o.fonts.b, 13.5, W - 2 * m);
+      var y = H * 0.43;
+      nl.lines.forEach(function (l, i) { els.push(T(l, cx, y + i * nl.size * PT * 1.08, o.fonts.b, nl.size, ink, { align: 'center', maxW: W - 2 * m })); });
+      y += (nl.lines.length - 1) * nl.size * PT * 1.08;
+      els.push(T(d.title, cx, y + 5, o.fonts.i, 7, mix(ink, paper, 0.35), { align: 'center', maxW: W - 2 * m }));
+      els.push({ t: 'rect', x: cx - 5, y: y + 9.5, w: 10, h: 0.3, fill: a });
+      var bottom = H - m - (oneQR ? 17 : 0);
+      els = els.concat(stack(contacts(d, ['mobile', 'email', 'web']), cx, bottom, 3.1, 'sans400', 5.6, '#4a403a', 'center', W - 2 * m));
+      if (oneQR) els = els.concat(qr(o, (W - 13) / 2, H - m - 13, 13, ink, paper));
+      return els;
+    },
+    back: function (W, H, d, o) {
+      var a = o.accent, fg = onColor(a), m = 5, els = [bg(W, H, o.B, a),
+        { t: 'rect', x: 3, y: 3, w: W - 6, h: H - 6, fill: 'none', stroke: mix(a, '#ffffff', 0.35), sw: 0.25 }];
+      if (o.qr) {
+        var qs = Math.min(W - 18, 28), qy = H / 2 - qs / 2 + 4;
+        els = els.concat(mark(o, d, W / 2 - 4.5, m + 5, 9, fg, a, 'disp400i', { bg: a, align: 'center', wide: (W - 2 * m - 4) / 9 }));
+        els = els.concat(qr(o, (W - qs) / 2, qy, qs, mix(a, '#000000', 0.5)));
+        els.push(T(o.qrKind === 'link' ? 'scan to visit' : 'scan to save my contact', W / 2, qy + qs + 6, 'disp400i', 7, fg, { align: 'center', maxW: W - 2 * m }));
+      } else {
+        els = els.concat(mark(o, d, W / 2 - 9, H / 2 - 12, 18, fg, a, 'disp400i', { bg: a, align: 'center', wide: (W - 2 * m - 4) / 18 }));
+        if (d.tagline) els.push(T(d.tagline, W / 2, H / 2 + 14, 'disp400i', 7, fg, { align: 'center', maxW: W - 2 * m - 4 }));
       }
       return els;
     } }
@@ -306,7 +438,7 @@
 
   root.BCM_TEMPLATES = TEMPLATES;
   root.BCM_CATS = [
-    { id: 'all', label: 'all' }, { id: 'corporate', label: 'corporate & finance' }, { id: 'industrial', label: 'industrial & engineering' },
+    { id: 'all', label: 'all' }, { id: 'portrait', label: 'portrait' }, { id: 'corporate', label: 'corporate & finance' }, { id: 'industrial', label: 'industrial & engineering' },
     { id: 'creative', label: 'creative' }, { id: 'sales', label: 'sales & startups' }, { id: 'health', label: 'health & education' },
     { id: 'tech', label: 'tech' }, { id: 'hospitality', label: 'hospitality & property' }
   ];

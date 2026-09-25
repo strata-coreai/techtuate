@@ -291,7 +291,8 @@
     return Promise.all(Object.keys(srcs).map(function (src) {
       return loadImg(src).then(function (im) {
         if (!im) return;
-        var max = 1200, s = Math.min(1, max / Math.max(im.naturalWidth || max, im.naturalHeight || max));
+        // SVG logos are rasterised at full size so print stays sharp; bitmaps are never upscaled
+        var max = 1200, big = Math.max(im.naturalWidth || max, im.naturalHeight || max), s = /^data:image\/svg/.test(src) ? max / big : Math.min(1, max / big);
         var cv = document.createElement('canvas');
         cv.width = Math.max(1, Math.round((im.naturalWidth || max) * s)); cv.height = Math.max(1, Math.round((im.naturalHeight || max) * s));
         cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);

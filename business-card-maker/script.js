@@ -58,7 +58,7 @@
   }
   function freshState() {
     return { v: 1, format: 'double', tpl: 'boardroom', size: defaultSize(), accent: null, font: null, step: 0,
-      d: {}, qr: { mode: 'vcard', f: Object.assign({}, QR_DEFAULT), link: '', offline: false }, logo: null,
+      d: {}, logoMeta: null, logoRaw: null, logoBg: 'auto', qr: { mode: 'vcard', f: Object.assign({}, QR_DEFAULT), link: '', offline: false }, logo: null,
       dq: { logo: 1, fg: '#111111', caption: 1 }, paper: /-US$|-CA$/i.test(navigator.language || '') ? 'letter' : 'a4', pngBleed: false };
   }
   var S = freshState();
@@ -70,8 +70,9 @@
   function save() {
     clearTimeout(saveT);
     saveT = setTimeout(function () {
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
-      catch (e) { try { var c = Object.assign({}, S, { logo: null }); localStorage.setItem(STORE_KEY, JSON.stringify(c)); } catch (e2) {} }
+      var keep = Object.assign({}, S, { logo: null }); // the cleaned logo is rebuilt from logoRaw on load
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(keep)); }
+      catch (e) { try { localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign(keep, { logoRaw: null, logoMeta: null }))); } catch (e2) {} }
     }, 250);
   }
 
@@ -82,7 +83,9 @@
     clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
   }
   function tpl() { return TEMPLATES.filter(function (t) { return t.id === S.tpl; })[0] || TEMPLATES[0]; }
-  function size() { return SIZES[S.size] || SIZES.us; }
+  // portrait templates use the same card size turned upright
+  function dims(t) { var z = SIZES[S.size] || SIZES.us; return t && t.portrait ? { w: z.h, h: z.w, b: z.b, label: z.label + ' upright' } : z; }
+  function size() { return dims(tpl()); }
   function fontChoice(t) { var id = S.font || t.font; return FONT_CHOICES.filter(function (f) { return f.id === id; })[0] || FONT_CHOICES[0]; }
   function accentOf(t) { return S.accent || t.accent; }
   function isDigital() { return S.format === 'digital'; }
@@ -175,11 +178,11 @@
   // ---------- card rendering ----------
   function opts(t, o) {
     var sz = size();
-    return Object.assign({ accent: accentOf(t), fonts: fontChoice(t).f, qr: qrMatrix('M'), logo: S.logo,
+    return Object.assign({ accent: accentOf(t), fonts: fontChoice(t).f, qr: qrMatrix('M'), logo: S.logo, logoAR: S.logoMeta && S.logoMeta.ar, logoInk: S.logoMeta && S.logoMeta.ink,
       oneSided: S.format === 'single', qrKind: S.qr.mode, B: sz.b }, o || {});
   }
   function faces(t, d, o) {
-    var sz = size(), W = sz.w, H = sz.h;
+    var sz = dims(t), W = sz.w, H = sz.h;
     var out = [{ side: 'front', els: t.front(W, H, d, o) }];
     if (S.format === 'double') out.push({ side: 'back', els: t.back(W, H, d, o) });
     return out;
@@ -240,23 +243,24 @@
 
   // ---------- step 2: template gallery ----------
   var filter = 'all';
+  function inFilter(t) { return filter === 'all' || (filter === 'portrait' ? !!t.portrait : t.cat === filter); }
   $('filters').innerHTML = CATS.map(function (c) { return '<button type="button" data-cat="' + c.id + '" aria-pressed="' + (c.id === 'all') + '">' + c.label.replace(/&/g, '&amp;') + '</button>'; }).join('');
   $('filters').addEventListener('click', function (e) {
     var b = e.target.closest('[data-cat]'); if (!b) return;
     filter = b.getAttribute('data-cat');
     $$('[data-cat]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
-    $$('.bcm-tpl').forEach(function (el) { var t = TEMPLATES[+el.getAttribute('data-i')]; el.hidden = !(filter === 'all' || t.cat === filter); });
+    $$('.bcm-tpl').forEach(function (el) { el.hidden = !inFilter(TEMPLATES[+el.getAttribute('data-i')]); });
   });
   var galleryKey = '';
   function renderGallery() {
-    var d = previewDetails(), key = JSON.stringify([d, S.size, S.logo ? S.logo.length : 0, S.qr, S.format]);
+    var d = previewDetails(), key = JSON.stringify([d, S.size, S.logo ? S.logo.length : 0, S.logoMeta, S.qr, S.format]);
     if (key !== galleryKey) {
       galleryKey = key;
       $('gallery').innerHTML = TEMPLATES.map(function (t, i) {
         var o = opts(t, { accent: t.accent, fonts: FONT_CHOICES.filter(function (f) { return f.id === t.font; })[0].f, oneSided: false });
-        var sz = size();
+        var sz = dims(t);
         var front = BCM.toSVG(t.front(sz.w, sz.h, d, o), sz.w, sz.h), back = BCM.toSVG(t.back(sz.w, sz.h, d, o), sz.w, sz.h);
-        return '<button type="button" class="bcm-tpl" role="radio" data-i="' + i + '"' + (filter !== 'all' && t.cat !== filter ? ' hidden' : '') + '>' +
+        return '<button type="button" class="bcm-tpl' + (t.portrait ? ' portrait' : '') + '" role="radio" data-i="' + i + '"' + (inFilter(t) ? '' : ' hidden') + '>' +
           '<span class="bcm-tpl-pair"><span class="face" style="display:block">' + front + '</span><span class="face back">' + back + '</span></span>' +
           '<span class="bcm-tpl-h">' + t.name + '<small>' + (i < 9 ? '0' : '') + (i + 1) + '</small></span>' +
           '<span class="bcm-tpl-for">' + t.for + '</span>' +
@@ -264,6 +268,7 @@
       }).join('');
     }
     $$('.bcm-tpl').forEach(function (el) { el.setAttribute('aria-checked', String(TEMPLATES[+el.getAttribute('data-i')].id === S.tpl)); });
+    if (typeof applySuggest === 'function') applySuggest(false);
   }
   $('gallery').addEventListener('click', function (e) {
     var b = e.target.closest('.bcm-tpl'); if (!b) return;
@@ -271,6 +276,79 @@
     if (S.tpl === t.id) { b.classList.toggle('flip'); return; } // second tap shows the back on touch screens
     S.tpl = t.id; S.accent = null; S.font = null; save(); renderGallery();
   });
+
+  // ---------- describe your business -> suggested templates ----------
+  // A plain keyword match, no AI: the choice is only eight templates, so a curated word list
+  // per template does the job instantly and nothing leaves the browser.
+  // Stems match the start of a word ("account" matches accountant, accounting); short ones
+  // (3 letters or fewer) must match exactly. Weight 3 = core fit, 1 = also fits.
+  var FIT = {
+    boardroom: [3, 'law lawyer legal attorney solicitor barrister advocate notary counsel consult advis strateg financ invest wealth capital private equity venture partner executive director ceo corporate management governance policy diplomat recruit headhunt', 1, 'real estate property board trust'],
+    ledger: [3, 'account cpa audit tax bank insur actuar bookkeep payroll fund pension credit loan mortgage treasur complian risk broker fintech valuat', 1, 'financ invest wealth consult advis'],
+    blueprint: [3, 'engineer construct builder contractor energy solar renewab wind oil gas petrol lubric power electric mechanic manufactur factory industr logistic shipping freight supply chain warehouse mining steel metal chemical automotive plumb weld hvac survey civil infrastructure utilit machin fabricat aerospace marine', 1, 'architect drone robot hardware'],
+    studio: [3, 'design creative architect interior photo film video studio agency art artist illustrat music producer writer author copywrit content media stylist tattoo animat ux ui brand portfolio freelanc', 1, 'fashion market advertis wedding boutique'],
+    colorblock: [3, 'sales market retail fmcg consumer ecommerce startup entrepreneur growth advertis event distribut franchise trade dealer beverage promo sport fitness gym trainer agent', 1, 'shop store food brand founder business'],
+    clinic: [3, 'health medic doctor dentist dental clinic hospital nurse therap physio pharma wellness yoga pilates psycholog nutrition dietit vet care school educat teach tutor coach university academ nonprofit ngo charit foundation volunteer church mosque temple counsell midwife optometr chiropract', 1, 'spa massage science research'],
+    terminal: [3, 'software code coder program saas tech data analytic cloud cyber security devops web app digital crypto blockchain hardware robot machine learning gaming game', 1, 'develop startup engineer founder automation'],
+    tower: [3, 'founder cofounder product media podcast influencer creator youtube event speaker startup', 1, 'marketing growth tech app agency author'],
+    atelier: [3, 'fashion couture bridal makeup cosmetic skincare perfume gallery curator model jewel stylist boutique beauty', 1, 'architect interior design art florist salon photo'],
+    heritage: [3, 'hotel hospitality restaurant cafe coffee bakery baker patisser food catering chef bar wine winery brew distill spa salon beauty real estate property realtor boutique jewel luxury wedding florist flower travel tour resort venue antique craft artisan tailor butcher tea', 1, 'interior fashion event']
+  };
+  var SHORT_FIT = { law: 'boardroom', cpa: 'ledger', tax: 'ledger', it: 'terminal', ai: 'terminal', ml: 'terminal', dev: 'terminal', ux: 'studio', ui: 'studio', gym: 'colorblock', spa: 'heritage', bar: 'heritage', pr: 'colorblock', hr: 'boardroom', ngo: 'clinic', vet: 'clinic', gp: 'clinic', fnb: 'heritage', oil: 'blueprint', gas: 'blueprint', tea: 'heritage', app: 'terminal', art: 'studio' };
+  function suggest(text) {
+    var t = ' ' + String(text || '').toLowerCase().replace(/f\s*&\s*b/g, 'fnb').replace(/non[\s-]+profit/g, 'nonprofit').replace(/[^a-z0-9]+/g, ' ') + ' ';
+    var words = t.trim().split(' ').filter(Boolean);
+    if (!words.length) return [];
+    var res = TEMPLATES.map(function (tp) {
+      var spec = FIT[tp.id] || [], score = 0, hits = [];
+      for (var k = 0; k < spec.length; k += 2) {
+        var w = spec[k];
+        spec[k + 1].split(' ').forEach(function (stem) {
+          var hit = null;
+          if (stem.indexOf(' ') < 0 && stem.length <= 3) { if (words.indexOf(stem) >= 0) hit = stem; }
+          else words.forEach(function (x) { if (!hit && x.length >= 3 && x.indexOf(stem) === 0) hit = x; });
+          if (!hit && / /.test(stem) && t.indexOf(' ' + stem) >= 0) hit = stem;
+          if (hit) { score += w; if (hits.indexOf(hit) < 0) hits.push(hit); }
+        });
+      }
+      words.forEach(function (x) { if (SHORT_FIT[x] === tp.id) { score += 3; if (hits.indexOf(x) < 0) hits.push(x); } });
+      return { id: tp.id, name: tp.name, score: score, hits: hits };
+    }).filter(function (r) { return r.score > 0; });
+    res.sort(function (a, b) { return b.score - a.score; });
+    return res.slice(0, 3);
+  }
+  var bizT = null, lastPick = '';
+  $('biz').value = S.biz || '';
+  $('biz').addEventListener('input', function () {
+    S.biz = this.value; save();
+    clearTimeout(bizT); bizT = setTimeout(function () { applySuggest(true); }, 180);
+  });
+  $('biz-out').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pick]'); if (!b) return;
+    S.tpl = b.getAttribute('data-pick'); S.accent = null; S.font = null; save(); renderGallery();
+  });
+  function applySuggest(autoPick) {
+    var out = $('biz-out'), r = suggest(S.biz), top = r[0] ? r[0].score : 0;
+    var good = r.filter(function (x) { return x.score >= Math.max(3, top / 2); });
+    $$('.bcm-tpl').forEach(function (el) {
+      var id = TEMPLATES[+el.getAttribute('data-i')].id, i = -1;
+      good.forEach(function (g, j) { if (g.id === id) i = j; });
+      var badge = el.querySelector('.bcm-fit'); if (badge) badge.remove();
+      el.style.order = i >= 0 ? i - 10 : '';
+      el.classList.toggle('dim', good.length > 0 && i < 0);
+      if (i >= 0) { var s = document.createElement('span'); s.className = 'bcm-fit' + (i ? ' good' : ''); s.textContent = i ? 'good fit' : 'best fit'; el.appendChild(s); }
+    });
+    if (!trimv(S.biz)) { out.textContent = 'We’ll suggest the templates that suit your line of work.'; return; }
+    if (!good.length) { out.textContent = 'No close match for that. Boardroom and Studio suit almost any business.'; return; }
+    out.innerHTML = 'Suggested: ' + good.map(function (g) { return '<button type="button" data-pick="' + g.id + '">' + g.name + '</button>'; }).join(', ') +
+      '. <span class="bcm-why">Matched ' + good[0].hits.slice(0, 3).map(function (h) { return '“' + h + '”'; }).join(', ') + '.</span>';
+    if (autoPick && good[0].id !== lastPick) {
+      lastPick = good[0].id;
+      if (filter !== 'all') $$('#filters [data-cat="all"]')[0].click();
+      S.tpl = good[0].id; S.accent = null; S.font = null; save();
+      $$('.bcm-tpl').forEach(function (el) { el.setAttribute('aria-checked', String(TEMPLATES[+el.getAttribute('data-i')].id === S.tpl)); });
+    }
+  }
 
   // ---------- step 3: details ----------
   var fieldsEl = $('fields');
@@ -358,33 +436,113 @@
   $('sizes').addEventListener('click', function (e) { var b = e.target.closest('[data-size]'); if (!b) return; S.size = b.getAttribute('data-size'); save(); scheduleLive(); });
 
   // logo
+  // S.logoRaw = the uploaded logo (rasterised, max 1200 px), S.logoBg = 'auto' | 'remove' | 'keep',
+  // S.logo = the cleaned version the cards use (rebuilt from logoRaw, not saved separately).
   $('btn-logo').addEventListener('click', function () { $('logo-file').click(); });
-  $('btn-logo-rm').addEventListener('click', function () { S.logo = null; save(); renderLogo(); scheduleLive(); });
+  $('btn-logo-rm').addEventListener('click', function () { S.logo = S.logoRaw = S.logoMeta = null; S.logoBg = 'auto'; save(); renderLogo(); galleryKey = ''; scheduleLive(); });
   $('logo-file').addEventListener('change', function () {
     var f = this.files && this.files[0]; this.value = '';
     if (!f) return;
     var rd = new FileReader();
     rd.onload = function () {
-      var src = rd.result;
-      if (/svg/.test(f.type)) { S.logo = src; save(); renderLogo(); scheduleLive(); return; }
-      var im = new Image();
-      im.onload = function () {
-        var max = 900, s = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
-        var cv = document.createElement('canvas'); cv.width = Math.round(im.naturalWidth * s); cv.height = Math.round(im.naturalHeight * s);
-        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
-        S.logo = cv.toDataURL('image/png'); save(); renderLogo(); scheduleLive();
-      };
-      im.onerror = function () { toast('That image could not be read'); };
-      im.src = src;
+      rasterLogo(rd.result).then(function (raw) {
+        S.logoRaw = raw; S.logoBg = 'auto';
+        return applyLogo().then(function () {
+          if (S.logoMeta.removed) toast('Removed the logo’s background. You can keep it instead.');
+        });
+      }).catch(function () { toast('That image could not be read. Try a PNG, JPG or SVG.'); });
     };
     rd.readAsDataURL(f);
   });
+  $('logo-bg').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-bg]'); if (!b || !S.logoRaw) return;
+    S.logoBg = b.getAttribute('data-bg'); applyLogo();
+  });
+  function loadImage(src) {
+    return new Promise(function (res, rej) { var im = new Image(); im.onload = function () { res(im); }; im.onerror = rej; im.src = src; });
+  }
+  // Any upload -> PNG, max 1200 px on the long side. SVGs are rasterised at 1200 px (sharp for print).
+  function rasterLogo(src) {
+    return loadImage(src).then(function (im) {
+      var nw = im.naturalWidth || 1200, nh = im.naturalHeight || 1200, isSvg = /^data:image\/svg/.test(src);
+      var s = isSvg ? 1200 / Math.max(nw, nh) : Math.min(1, 1200 / Math.max(nw, nh));
+      var cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(nw * s)); cv.height = Math.max(1, Math.round(nh * s));
+      cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+      return cv.toDataURL('image/png');
+    });
+  }
+  function applyLogo() {
+    return prepLogo(S.logoRaw, S.logoBg).then(function (r) {
+      S.logo = r.src; S.logoMeta = r.meta; save(); renderLogo(); galleryKey = ''; scheduleLive();
+      if (isDigital() && stepName() === 'qr') renderDQ();
+    });
+  }
+  // Clean up a logo so it sits well on any card:
+  // - detects a solid background (the border of the image is one opaque color)
+  // - removes it when asked ('auto' removes white only; 'remove' removes any color)
+  // - trims empty margins, then measures aspect ratio and ink color
+  //   (used to fit the logo and to add a contrast chip on dark cards)
+  function prepLogo(src, mode) {
+    return loadImage(src).then(function (im) {
+      var cw = im.naturalWidth, ch = im.naturalHeight;
+      var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+      var g = cv.getContext('2d', { willReadFrequently: true }); g.drawImage(im, 0, 0);
+      var px = g.getImageData(0, 0, cw, ch), d = px.data, i, x, y;
+      // sample the border: is it one solid, opaque color?
+      var sr = 0, sg = 0, sb = 0, sn = 0, opaque = 0, samples = [];
+      var step = Math.max(1, Math.floor((cw + ch) / 200));
+      for (x = 0; x < cw; x += step) { samples.push((0 * cw + x) * 4, ((ch - 1) * cw + x) * 4); }
+      for (y = 0; y < ch; y += step) { samples.push((y * cw) * 4, (y * cw + cw - 1) * 4); }
+      samples.forEach(function (k) { if (d[k + 3] > 240) { opaque++; sr += d[k]; sg += d[k + 1]; sb += d[k + 2]; sn++; } });
+      var bg = sn ? [sr / sn, sg / sn, sb / sn] : null, near = 0;
+      if (bg) samples.forEach(function (k) { if (d[k + 3] > 240 && Math.abs(d[k] - bg[0]) + Math.abs(d[k + 1] - bg[1]) + Math.abs(d[k + 2] - bg[2]) < 60) near++; });
+      var hasBg = !!bg && opaque / samples.length > 0.9 && near / samples.length > 0.85;
+      var bgWhite = hasBg && Math.min(bg[0], bg[1], bg[2]) > 225;
+      var remove = hasBg && (mode === 'remove' || (mode !== 'keep' && bgWhite));
+      if (remove) {
+        // knock out every pixel close to the background color, with a soft edge
+        var T0 = 38, T1 = 110;
+        for (i = 0; i < d.length; i += 4) {
+          var dist = Math.sqrt((d[i] - bg[0]) * (d[i] - bg[0]) + (d[i + 1] - bg[1]) * (d[i + 1] - bg[1]) + (d[i + 2] - bg[2]) * (d[i + 2] - bg[2]));
+          if (dist < T0) d[i + 3] = 0;
+          else if (dist < T1) {
+            var a = (dist - T0) / (T1 - T0);
+            // un-mix the background from the edge pixel so no halo is left behind
+            for (var c = 0; c < 3; c++) d[i + c] = Math.max(0, Math.min(255, Math.round(bg[c] + (d[i + c] - bg[c]) / a)));
+            d[i + 3] = Math.round(d[i + 3] * a);
+          }
+        }
+      }
+      var x0 = cw, y0 = ch, x1 = -1, y1 = -1, r = 0, gg = 0, b = 0, n = 0;
+      for (y = 0; y < ch; y++) for (x = 0; x < cw; x++) {
+        i = (y * cw + x) * 4;
+        if (d[i + 3] > 24) {
+          if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+          if (d[i + 3] > 128) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; }
+        }
+      }
+      if (x1 < 0) throw new Error('empty');
+      var pad = Math.round(Math.max(x1 - x0, y1 - y0) * 0.02);
+      x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(cw - 1, x1 + pad); y1 = Math.min(ch - 1, y1 + pad);
+      g.putImageData(px, 0, 0);
+      var tw = x1 - x0 + 1, th = y1 - y0 + 1, out = document.createElement('canvas');
+      out.width = tw; out.height = th; out.getContext('2d').drawImage(cv, x0, y0, tw, th, 0, 0, tw, th);
+      var hex = function (v) { v = Math.round(v / Math.max(1, n)); return (v < 16 ? '0' : '') + v.toString(16); };
+      // a logo kept on its own solid background is "inked" in that background color
+      var ink = hasBg && !remove ? '#' + bg.map(function (v) { v = Math.round(v); return (v < 16 ? '0' : '') + v.toString(16); }).join('') : (n ? '#' + hex(r) + hex(gg) + hex(b) : null);
+      return { src: out.toDataURL('image/png'), meta: { ar: tw / th, ink: ink, hasBg: hasBg, removed: remove } };
+    });
+  }
   function renderLogo() {
     var t = tpl(), box = $('logo-box');
     if (S.logo) box.innerHTML = '<img alt="" src="' + S.logo + '">';
     else box.innerHTML = '<span class="mono" style="background:' + accentOf(t) + '">' + ((trimv(S.d.company) || trimv(S.d.name) || 'M')[0] || 'M').toUpperCase() + '</span>';
+    box.classList.toggle('has-logo', !!S.logo);
     $('btn-logo').textContent = S.logo ? 'Replace logo' : 'Add logo';
     $('btn-logo-rm').hidden = !S.logo;
+    var hasBg = !!(S.logo && S.logoMeta && S.logoMeta.hasBg);
+    $('logo-bg').hidden = !hasBg;
+    $$('#logo-bg [data-bg]').forEach(function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-bg') === 'remove') === !!(S.logoMeta && S.logoMeta.removed))); });
   }
 
   // live preview
@@ -395,6 +553,7 @@
     $$('#sizes [data-size]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-size') === S.size)); });
     if (isDigital()) return;
     var t = tpl(), d = previewDetails(), o = opts(t), fs = faces(t, d, o), cut = [];
+    $('live').classList.toggle('portrait', !!t.portrait);
     $('live').innerHTML = fs.map(function (f) {
       BCM.resolve(f.els).forEach(function (e) { if (e.t === 'text' && e.cut) cut.push(e.s); });
       return '<div><p class="bcm-face-l">' + f.side + '</p><div class="bcm-face">' + svgFace(f.els, { bleed: 0, guides: true, safe: 3.5 }) + '</div></div>';
@@ -454,7 +613,7 @@
   // ---------- step 4: download (print) ----------
   function renderFinal() {
     var t = tpl(), d = previewDetails(), fs = faces(t, d, opts(t));
-    $('final').className = 'bcm-final' + (fs.length === 1 ? ' one' : '');
+    $('final').className = 'bcm-final' + (fs.length === 1 ? ' one' : '') + (t.portrait ? ' portrait' : '');
     $('final').innerHTML = fs.map(function (f) { return '<div><p class="bcm-face-l">' + f.side + '</p><div class="bcm-face">' + svgFace(f.els, { bleed: 0 }) + '</div></div>'; }).join('');
     $$('[data-sides]').forEach(function (e) { e.textContent = fs.length > 1 ? 'front and back pages' : 'one page'; });
     $$('[data-backs-note]').forEach(function (e) { e.hidden = fs.length === 1; });
@@ -660,5 +819,8 @@
   renderFormat();
   document.body.classList.toggle('is-digital', isDigital());
   BCM.loadAllFonts().then(function () { galleryKey = ''; renderSteps(); });
+  // designs saved before logoRaw existed kept the logo in S.logo
+  if (!S.logoRaw && S.logo) S.logoRaw = S.logo;
+  if (S.logoRaw) applyLogo().then(function () { renderSteps(); }, function () { S.logo = S.logoRaw = S.logoMeta = null; save(); });
   renderSteps();
 })();

@@ -34,7 +34,7 @@
     "browserRequirements": "Requires JavaScript. Requires modern browser.",
     "description": "Design a business card from curated templates, add a QR code that saves your contact, and download a print-ready PDF with bleed and crop marks, a home-print sheet or a QR on its own. Free, no sign-up.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": ["8 curated templates", "Front and back or one-sided", "Contact QR that saves to any phone", "Print-ready PDF with bleed and crop marks", "A4 and Letter home-print sheets", "300 DPI PNG", "Digital-only QR with logo", "No sign-up, no watermark"]
+    "featureList": ["10 curated templates, landscape and portrait", "Front and back or one-sided", "Contact QR that saves to any phone", "Print-ready PDF with bleed and crop marks", "A4 and Letter home-print sheets", "300 DPI PNG", "Digital-only QR with logo", "No sign-up, no watermark"]
   }
   </script>
   <script type="application/ld+json">
@@ -129,7 +129,15 @@
         <section class="bcm-pane glass" data-step="template" aria-labelledby="h-template">
           <p class="panel-label">step 2</p>
           <h2 class="bcm-h2" id="h-template">Pick a template</h2>
-          <p class="bcm-sub">Eight hand-tuned designs. Hover or tap to see the back. Colors and font are yours to change next.</p>
+          <p class="bcm-sub">Ten hand-tuned designs, two of them upright. Hover or tap to see the back. Colors and font are yours to change next.</p>
+          <div class="bcm-suggest">
+            <label class="panel-label" for="biz">describe what you do</label>
+            <div class="bcm-suggest-row">
+              <svg class="bcm-suggest-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18.5 15.5l.8 2 2 .7-2 .8-.8 2-.7-2-2-.8 2-.7z"/></svg>
+              <input type="text" id="biz" placeholder="e.g. family law firm, bakery, solar installer, SaaS startup" autocomplete="off" spellcheck="false" />
+            </div>
+            <p class="bcm-hint" id="biz-out" aria-live="polite">We'll suggest the templates that suit your line of work.</p>
+          </div>
           <div class="bcm-filters" id="filters"></div>
           <div class="bcm-gallery" id="gallery"></div>
           <div class="bcm-foot"><button type="button" class="btn btn-text" data-go="prev">&larr; Back</button><button type="button" class="btn btn-primary" data-go="next">Add your details &rarr;</button></div>
@@ -189,6 +197,7 @@
                   <button type="button" class="btn btn-text" id="btn-logo-rm" hidden>Remove</button>
                   <input type="file" id="logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden />
                 </div>
+                <div class="bcm-seg bcm-seg-sm bcm-logo-bg" id="logo-bg" role="radiogroup" aria-label="Logo background" hidden><button type="button" data-bg="remove">Remove background</button><button type="button" data-bg="keep">Keep background</button></div>
                 <p class="bcm-hint print-only">No logo? The templates use your company's first letter as a monogram.</p>
                 <p class="bcm-hint digital-only">Your logo sits in the middle of the QR. We switch to the strongest error correction so it still scans.</p>
               </div>
@@ -260,7 +269,7 @@
       <section class="tt-section" aria-labelledby="about-h">
         <p class="eyebrow">about this tool</p>
         <h2 id="about-h" class="sr-only">About the business card maker</h2>
-        <p>Free, no sign-up and no watermark. Pick a format, choose one of eight hand-tuned templates and fill in your details. The QR code can save your contact straight to a phone (with only the fields you tick) or open a link. Downloads are a print-ready PDF with vector text, 3 mm bleed and crop marks, a home-print sheet for A4 or Letter card stock, 300 DPI PNGs, or the QR on its own. Everything is made in your browser and your design is remembered in this browser only. The one exception is the optional "digitize your card" scan, which sends the photo once to Cloudflare Workers AI (Google Gemini as backup) to read it and is labeled where you use it. Part of <a href="/">techtuate</a>, a growing collection of little tools that just work. Got a pile of cards from other people? The <a href="/card-reader/">business card reader</a> turns them into contacts.</p>
+        <p>Free, no sign-up and no watermark. Pick a format, choose one of ten hand-tuned templates (two of them portrait) and fill in your details. The QR code can save your contact straight to a phone (with only the fields you tick) or open a link. Downloads are a print-ready PDF with vector text, 3 mm bleed and crop marks, a home-print sheet for A4 or Letter card stock, 300 DPI PNGs, or the QR on its own. Everything is made in your browser and your design is remembered in this browser only. The one exception is the optional "digitize your card" scan, which sends the photo once to Cloudflare Workers AI (Google Gemini as backup) to read it and is labeled where you use it. Part of <a href="/">techtuate</a>, a growing collection of little tools that just work. Got a pile of cards from other people? The <a href="/card-reader/">business card reader</a> turns them into contacts.</p>
       </section>
 
       <section class="tt-section faq-section" aria-labelledby="faq-h">
